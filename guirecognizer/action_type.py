@@ -1,0 +1,232 @@
+from enum import Enum, Flag, unique, auto
+
+from .types import Coord, Ratios
+
+@unique
+class SelectionType(Flag):
+  """
+  Available selection types.
+  """
+
+  POINT = auto()
+  """
+  Point selection to select a pixel.
+  """
+  AREA = auto()
+  """
+  Area selection to select a rectangle of pixels on the image.
+  """
+  POINT_OR_AREA = POINT | AREA
+  """
+  Point or area selection.
+  """
+
+  @classmethod
+  def fromSelection(cls, selection: Coord | Ratios) -> 'SelectionType':
+    """
+    Return a SelectionType from a selection.
+
+    param selection: either borders or ratios
+    """
+    if len(selection) == 2:
+      return cls.POINT
+    elif len(selection) == 4:
+      return cls.AREA
+    raise ValueError('Selection must be of length 2 or 4.')
+
+  def isCompatibleWithSelectionType(self, selectionType: 'SelectionType') -> bool:
+    """
+    Return whether the selection type is compatible with this selection type.
+
+    param selectionType:
+    """
+    return self == SelectionType.POINT or self.isRightSelectionType(selectionType)
+
+  def isCompatibleWithSelection(self, selection: Coord | Ratios) -> bool:
+    """
+    Return whether the selection is compatible with this selection.
+
+    param selection: either coordinates or ratios
+    """
+    return self.isCompatibleWithSelectionType(self.fromSelection(selection))
+
+  def isRightSelectionType(self, selectionType: 'SelectionType') -> bool:
+    """
+    Return whether the selection type is a right one with this selection.
+
+    param selectionType:
+    """
+    return bool(self & selectionType)
+
+  def isRightSelection(self, selection: Coord | Ratios) -> bool:
+    """
+    Return whether the selection is has a right form with this selection.
+
+    param selection: either coordinates or ratios
+    """
+    return self.isRightSelectionType(self.fromSelection(selection))
+
+@unique
+class ActionType(Enum):
+  """
+  Available action types.
+  """
+
+  COORDINATES = (auto(), SelectionType.POINT_OR_AREA)
+  """
+  Return the coordinates of a point or an area. It is designed to be used in a pipeline of actions.
+
+  Expects **a point or an area selection**.
+
+  **Return type:** :obj:`tuple`\ [:obj:`int`] | :obj:`list`\ [:obj:`int`]
+
+  **Returns:** point or area coordinates
+  """
+  SELECTION = (auto(), SelectionType.POINT_OR_AREA)
+  """
+  Return point as a pixel or an area as an image. It is designed to be used in a pipeline of actions.
+
+  Expects **a point or an area selection**.
+
+  **Return type:** :obj:`tuple`\ [:obj:`int`] | :obj:`list`\ [:obj:`int`] | :obj:`int` | :obj:`PIL.Image.Image`
+
+  **Returns:** point or area
+  """
+  FIND_IMAGE = (auto(), SelectionType.AREA)
+  """
+  Find the locations of an image inside the selected area.
+  Specify a detection threshold, the maximum number of locations and a resize interval to find the same image
+  but a bit smaller or bigger.
+
+  Expects **an area selection**.
+
+  **Return type:** :obj:`list`\ [:obj:`tuple`\ [:obj:`int`]]
+
+  **Returns:** tuple containing the coordinates of each location
+  """
+  CLICK = (auto(), SelectionType.POINT)
+  """
+  Click on the selected point.
+
+  Expects **a point selection**.
+
+  **Return type:** :obj:`None`
+  """
+  PIXEL_COLOR = (auto(), SelectionType.POINT_OR_AREA)
+  """
+  Compute the pixel color of the point selection or the average pixel color of the area selection.
+
+  Expects **a point or an area selection**.
+
+  **Return type:** :obj:`tuple`\ [:obj:`int`]
+
+  **Returns:** rgb values between 0 and 255
+  """
+  COMPARE_PIXEL_COLOR = (auto(), SelectionType.POINT_OR_AREA)
+  """
+  Compute the pixel color of the point selection or the average pixel color of the area selection
+  then compute the difference with the pixel color in reference.
+
+  The difference is the average difference of the rgb colors and between 0 and 1.
+
+  Expects **a point or an area selection**.
+
+  **Return type:** :obj:`float`
+  """
+  IS_SAME_PIXEL_COLOR = (auto(), SelectionType.POINT_OR_AREA)
+  """
+  Compute the pixel color of the point selection or the average pixel color of the area selection
+  and compare it to the pixel color in reference.
+
+  Expects **a point or an area selection**.
+
+  **Return type:** :obj:`bool`
+  """
+  IMAGE_HASH = (auto(), SelectionType.AREA)
+  """
+  Compute the image hash of the area selection. The color is taken into account. Similar images generate close hashes.
+
+  More about image hashes: https://pypi.org/project/ImageHash .
+
+  Expects **an area selection**.
+
+  **Return type:** :obj:`str`
+
+  **Returns:** image hash
+  """
+  COMPARE_IMAGE_HASH = (auto(), SelectionType.AREA)
+  """
+  Compute the image hash of the area selection then compute the difference with the hash in reference.
+
+  Expects **an area selection**.
+
+  **Return type:** :obj:`int`
+  """
+  IS_SAME_IMAGE_HASH = (auto(), SelectionType.AREA)
+  """
+  Compute the image hash of the area selection and compare it to the hash in reference.
+
+  Expects **an area selection**.
+
+  **Return type:** :obj:`bool`
+  """
+  TEXT = (auto(), SelectionType.AREA)
+  """
+  Try to recognize text. Return the empty string if no text has been recognized.
+
+  Expects **an area selection**.
+
+  **Return type:** :obj:`str`
+  """
+  NUMBER = (auto(), SelectionType.AREA)
+  """
+  Try to recognize a number. Return None if no number has been recognized.
+
+  Expects **an area selection**.
+
+  **Return type:** :obj:`float` | :obj:`None`
+  """
+
+  def __new__(cls, value, selectionType: SelectionType) -> 'ActionType':
+    """
+    Custom Enum to manage action types.
+
+    param value: automatically filled
+    param selectionType: right selection type for this action
+    """
+    obj = object.__new__(cls)
+    obj._value_ = value
+    obj.selectionType = selectionType
+    return obj
+
+  def isCompatibleWithSelectionType(self, selectionType: SelectionType) -> bool:
+    """
+    Return whether this action can be used with the selection type.
+
+    param selectionType:
+    """
+    return self.selectionType.isCompatibleWithSelectionType(selectionType)
+
+  def isCompatibleWithSelection(self, selection: Coord | Ratios) -> bool:
+    """
+    Return whether this action can be used with the selection.
+
+    param selection: either coordinates or ratios
+    """
+    return self.isCompatibleWithSelectionType(SelectionType.fromSelection(selection))
+
+  def isRightSelectionType(self, selectionType: SelectionType) -> bool:
+    """
+    Return whether the selection type is a right one for this action.
+
+    param selectionType:
+    """
+    return self.selectionType.isRightSelectionType(selectionType)
+
+  def isRightSelection(self, selection: Coord | Ratios) -> bool:
+    """
+    Return whether the selection has a right form for this action.
+
+    param selection: either coordinates or ratios
+    """
+    return self.isRightSelectionType(SelectionType.fromSelection(selection))
