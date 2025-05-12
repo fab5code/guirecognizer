@@ -78,3 +78,5 @@ cover/
 
 # Visual Studio code
 .vscode
+
+guirecognizer.egg-info

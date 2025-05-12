@@ -5,3 +5,7 @@ from .preprocessing import Preprocessing, GrayscalePreprocessor, ColorMapMethod,
     ThresholdType, ThresholdPreprocessor, ResizeMethod, ResizePreprocessor
 from .preprocessing_type import PreprocessingType
 from .recognizer import Recognizer, OcrType
+
+"""A library to help recognize some patterns on screen and make GUI actions."""
+
+__version__ = "0.1.0"
