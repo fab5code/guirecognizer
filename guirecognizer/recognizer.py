@@ -6,10 +6,10 @@ from math import ceil
 import os
 from statistics import mean
 from typing import Any
-
 from PIL import Image, ImageOps, ImageGrab, ImageStat
 from imagehash import phash, colorhash, ImageHash, hex_to_hash, hex_to_flathash
-
+import base64
+from io import BytesIO
 import numpy as np
 
 from .action_type import ActionType, SelectionType
@@ -20,8 +20,7 @@ from .types import Coord, Ratios, PixelColor
 
 logger = logging.getLogger(__name__)
 
-ImageRawData = tuple[tuple | list] | list[tuple | list]
-AnyActionReturnType = Image.Image | list[Coord] | tuple[int] | list[int] | str | int | float | bool | None
+AnyActionReturnType = Image.Image | list[Coord] | tuple[int, ...] | list[int] | str | int | float | bool | None
 
 @unique
 class OcrType(Enum):
@@ -140,11 +139,10 @@ class Recognizer():
     """
     :param imageToFindData:
     """
-    if not isinstance(imageToFindData, (tuple, list)) or len(imageToFindData) == 0 \
-        or not isinstance(imageToFindData[0], (tuple, list)):
+    if not isinstance(imageToFindData, str):
       return False
     try:
-      cls.getImageToFindFromList(imageToFindData)
+      cls.getImageToFindFromData(imageToFindData)
     except:
       return False
     return True
@@ -172,8 +170,8 @@ class Recognizer():
         and all(isinstance(i, (int, float)) and i > 0 for i in resizeIntervalData) and resizeIntervalData[0] <= resizeIntervalData[1]
 
   @classmethod
-  def isImageToFindCompatibleWithSelection(cls, imageToFind: ImageRawData, borders: Coord, ratios: Ratios,
-        resizeInterval: tuple[int] | None=None) -> bool:
+  def isImageToFindCompatibleWithSelection(cls, imageToFind: str, borders: Coord, ratios: Ratios,
+        resizeInterval: tuple[int, int] | None=None) -> bool:
     """
     :param imageToFind:
     :param borders:
@@ -184,16 +182,15 @@ class Recognizer():
     return cls.isImageToFindCompatibleWithAreaSize(imageToFind, (coord[2] - coord[0], coord[3] - coord[1]), resizeInterval)
 
   @classmethod
-  def isImageToFindCompatibleWithAreaSize(cls, imageToFind: ImageRawData, areaSize: tuple[int],
-      resizeInterval: tuple[int] | None=None) -> bool:
+  def isImageToFindCompatibleWithAreaSize(cls, imageToFindValue: str, areaSize: tuple[int, int],
+      resizeInterval: tuple[int, int] | None=None) -> bool:
     """
-    :param imageToFind:
+    :param imageToFindValue:
     :param areaSize:
     :param resizeInterval: (optional)
     """
-    if len(imageToFind) == 0 or len(imageToFind[0]) == 0:
-      return False
-    imageSize = (len(imageToFind[0]), len(imageToFind))
+    image = cls.getImageToFindFromData(imageToFindValue)
+    imageSize = (image.width, image.height)
     if resizeInterval is not None:
       imageSize = (int(imageSize[0] * resizeInterval[1]), int(imageSize[1] * resizeInterval[1]))
     return  imageSize[0] < areaSize[0] and imageSize[1] < areaSize[1]
@@ -206,10 +203,10 @@ class Recognizer():
     if not isinstance(imageHashData, str):
       return False
     try:
-      cls._getRawImageHashFromStr(imageHashData)
+      hash = cls._getRawImageHashFromStr(imageHashData)
     except:
       return False
-    return True
+    return hash[0].hash.size == 64 and hash[1].hash.size == 42
 
   @classmethod
   def isImageHashDifferenceDataValid(cls, differenceData: Any) -> bool:
@@ -229,7 +226,7 @@ class Recognizer():
         and len(ocrOrderData) == len(set(ocrOrderData))
 
   @classmethod
-  def getCoord(cls, borders: Coord, ratios: Ratios) -> tuple[int]:
+  def getCoord(cls, borders: Coord, ratios: Ratios) -> tuple[int, int, int, int]:
     """
     :param borders:
     :param ratios:
@@ -253,7 +250,7 @@ class Recognizer():
     raise RecognizerValueError('Parameters borders or ratios are invalid.')
 
   @classmethod
-  def getPoint(cls, coord: Coord) -> tuple[int] | int:
+  def getPoint(cls, coord: Coord) -> tuple[int, int, int] | int:
     """
     :param coord:
     :return: rgb colors - If outside screen (0, 0, 0).
@@ -266,7 +263,7 @@ class Recognizer():
       return (0, 0, 0)
 
   @classmethod
-  def getPointFromScreenshot(cls, screenshot: Image.Image, coord: Coord) -> tuple[int] | int:
+  def getPointFromScreenshot(cls, screenshot: Image.Image, coord: Coord) -> tuple[int, int, int] | tuple[int, int, int, int] | int:
     """
     :param screenshot:
     :param coord:
@@ -278,7 +275,7 @@ class Recognizer():
       return screenshot.getpixel((coord[0], coord[1]))
 
   @classmethod
-  def getPointFromBordersImage(cls, bordersImage: Image.Image, coord: Coord, borders: Coord) -> tuple[int] | int:
+  def getPointFromBordersImage(cls, bordersImage: Image.Image, coord: Coord, borders: Coord) -> tuple[int, int, int] | tuple[int, int, int, int] | int:
     """
     :param bordersImage:
     :param coord:
@@ -289,7 +286,7 @@ class Recognizer():
     return cls.getPointFromScreenshot(bordersImage, relativeCoord)
 
   @classmethod
-  def getPixelColor(cls, point: tuple[int] | int) -> tuple[int]:
+  def getPixelColor(cls, point: tuple[int, int, int] | tuple[int, int, int, int] | int) -> tuple[int, int, int]:
     """
     :param point:
     :return: rgb colors without alpha
@@ -299,7 +296,7 @@ class Recognizer():
     return point[0:3]
 
   @classmethod
-  def getAveragePixelColor(cls, area: Image.Image) -> tuple[int] | int:
+  def getAveragePixelColor(cls, area: Image.Image) -> tuple[int, int, int]:
     """
     :param area:
     :return: rgb colors without alpha
@@ -344,8 +341,8 @@ class Recognizer():
     return cls.getAreaFromScreenshot(bordersImage, relativeCoord)
 
   @classmethod
-  def findImageCoordinates(cls, areaCoord: Coord, area: Image.Image, imageToFindValue: ImageRawData,
-      threshold: int, maxResults: int, resizeInterval: tuple[int] | None=None) -> tuple[Coord]:
+  def findImageCoordinates(cls, areaCoord: Coord, area: Image.Image, imageToFindValue: str,
+      threshold: int, maxResults: int, resizeInterval: tuple[int, int] | None=None) -> list[Coord]:
     """
     :param areaCoord:
     :param area:
@@ -354,12 +351,12 @@ class Recognizer():
     :param maxResults:
     :param resizeInterval: (optional)
     """
-    imageToFind = cls.getImageToFindFromList(imageToFindValue)
+    imageToFind = cls.getImageToFindFromData(imageToFindValue)
     return cls.findImageCoordinatesWithImageToFindAsImage(areaCoord, area, imageToFind, threshold, maxResults, resizeInterval)
 
   @classmethod
   def findImageCoordinatesWithImageToFindAsImage(cls, areaCoord: Coord, area: Image.Image, imageToFind: Image.Image,
-      threshold: int, maxResults: int, resizeInterval: tuple[int] | None=None) -> tuple[Coord]:
+      threshold: int, maxResults: int, resizeInterval: tuple[int, int] | None=None) -> list[Coord]:
     """
     :param areaCoord:
     :param area:
@@ -422,7 +419,7 @@ class Recognizer():
     return [(indice[1], indice[0], matches[indice], imageToFind.size) for indice in zip(*indices)]
 
   @classmethod
-  def _doesOverlay(cls, coord: Coord, coords: tuple[Coord]) -> bool:
+  def _doesOverlay(cls, coord: Coord, coords: list[Coord]) -> bool:
     """
     Return whether `coord` overlays one of `coords` more than 70% for each axe.
 
@@ -438,11 +435,11 @@ class Recognizer():
     return False
 
   @classmethod
-  def getImageToFindFromList(cls, imageToFindValue: ImageRawData) -> Image.Image:
+  def getImageToFindFromData(cls, imageToFindValue: str) -> Image.Image:
     """
     :param imageToFindValue:
     """
-    return Image.fromarray(np.array(imageToFindValue, dtype='uint8'))
+    return Image.open(BytesIO(base64.b64decode(imageToFindValue)))
 
   @classmethod
   def getImageHash(cls, area: Image.Image) -> str:
@@ -453,14 +450,14 @@ class Recognizer():
     return str(imageHash[0]) + ',' + str(imageHash[1])
 
   @classmethod
-  def _getRawImageHash(cls, area: Image.Image) -> tuple[ImageHash]:
+  def _getRawImageHash(cls, area: Image.Image) -> tuple[ImageHash, ImageHash]:
     """
     :param area:
     """
     return (phash(area), colorhash(area))
 
   @classmethod
-  def _getRawImageHashFromStr(cls, hashValue: str) -> tuple[ImageHash]:
+  def _getRawImageHashFromStr(cls, hashValue: str) -> tuple[ImageHash, ImageHash]:
     """
     :param hashValue:
     """
@@ -476,12 +473,12 @@ class Recognizer():
     return cls._getRawImageHashDifference(cls._getRawImageHashFromStr(hashA), cls._getRawImageHashFromStr(hashB))
 
   @classmethod
-  def _getRawImageHashDifference(cls, hashA: tuple[ImageHash], hashB: tuple[ImageHash]) -> int:
+  def _getRawImageHashDifference(cls, hashA: tuple[ImageHash, ImageHash], hashB: tuple[ImageHash, ImageHash]) -> int:
     """
     :param hashA:
     :param hashB:
     """
-    return (hashA[0] - hashB[0]) + (hashA[1] - hashB[1])
+    return int((hashA[0] - hashB[0]) + (hashA[1] - hashB[1]))
 
   @classmethod
   def getTextTesseractOcr(cls, area: Image.Image, lang: str, config: str) -> str | None:
@@ -498,7 +495,7 @@ class Recognizer():
     return result
 
   @classmethod
-  def _getEasyOcrPredictions(cls, image: Image.Image, reader) -> str | None:
+  def _getEasyOcrPredictions(cls, image: Image.Image, reader) -> list[str]:
     """
     :param image:
     :param reader:
@@ -556,7 +553,7 @@ class Recognizer():
     self.actionById.clear()
     self.preprocessing.clearAllData()
 
-  def setOcrOrder(self, ocrOrder: tuple[OcrType] | list[OcrType]) -> None:
+  def setOcrOrder(self, ocrOrder: tuple[OcrType, ...] | list[OcrType]) -> None:
     """
     :param ocrOrder:
     :raise RecognizerValueError: invalid `ocrOrder`
@@ -627,7 +624,7 @@ class Recognizer():
         return result
     return ''
 
-  def _getTextFromOcr(self, area: Image.Image, ocrType: OcrType) -> str:
+  def _getTextFromOcr(self, area: Image.Image, ocrType: OcrType) -> str | None:
     """
     :param area:
     :param ocrType:
@@ -768,7 +765,7 @@ class Recognizer():
       raise RecognizerValueError('No borders data.')
     return self.getArea(self.borders)
 
-  def execute(self, *args: str | ActionType, **kwargs: Image.Image | tuple[int] | list[int] | str | int | float) -> AnyActionReturnType:
+  def execute(self, *args: str | ActionType, **kwargs: Image.Image | tuple[int, ...] | list[int] | str | int | float | ActionType) -> AnyActionReturnType:
     r"""
     Return the result of the given action(s).
 
@@ -783,7 +780,7 @@ class Recognizer():
 
     With option **reinterpret**, the last action, if given by an id, is executed as if it was from the given type.
     An exception is raised if some parameters are missing.
-    
+
     The selected area can be preprocessed using the id of a defined preprocessing operation with option **preprocessing**.
 
     :Keyword Arguments:

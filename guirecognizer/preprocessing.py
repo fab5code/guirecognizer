@@ -115,7 +115,7 @@ class ColorMapPreprocessor(Preprocessor):
     newImage = Image.fromarray(np.uint8(npimage))
     return newImage
 
-  def _computeClosestColor(self, image: np.ndarray, input1: np.ndarray, input2: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+  def _computeClosestColor(self, image: np.ndarray, input1: np.ndarray, input2: np.ndarray) -> tuple[np.ndarray, np.ndarray | None]:
     """
     :param image:
     :param input1:

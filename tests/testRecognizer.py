@@ -569,6 +569,10 @@ class TestExecuteAction(LoggedTestCase):
       self.recognizer.execute('compareImageHash1', imageHashReference='invalid')
     with self.assertRaises(RecognizerValueError):
       self.recognizer.execute('compareImageHash1', imageHashReference=42)
+    with self.assertRaises(RecognizerValueError):
+      self.recognizer.execute('compareImageHash1', imageHashReference='a1e24e1f1372761e,1b00b0')
+    with self.assertRaises(RecognizerValueError):
+      self.recognizer.execute('compareImageHash1', imageHashReference='a1e24e1f13727,1b00b000040')
 
   def test_error_optionImageHashDifference(self):
     with self.assertRaises(RecognizerValueError):
