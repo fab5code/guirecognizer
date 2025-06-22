@@ -27,8 +27,8 @@ class OcrType(Enum):
   """
   OCR types.
   """
-  TESSERACT = auto()
-  EASY_OCR = auto()
+  TESSERACT = 'tesseract'
+  EASY_OCR = 'easyOcr'
 
 class Recognizer():
   """
