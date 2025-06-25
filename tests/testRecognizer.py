@@ -381,9 +381,9 @@ class TestRecognizer(LoggedTestCase):
     self.assertFalse(Recognizer.isOcrOrderDataValid('invalid'))
     self.assertFalse(Recognizer.isOcrOrderDataValid([None]))
     self.assertFalse(Recognizer.isOcrOrderDataValid(['invalid']))
-    self.assertFalse(Recognizer.isOcrOrderDataValid([OcrType.EASY_OCR.name, OcrType.EASY_OCR.name]))
+    self.assertFalse(Recognizer.isOcrOrderDataValid([OcrType.EASY_OCR.value, OcrType.EASY_OCR.value]))
     self.assertTrue(Recognizer.isOcrOrderDataValid([]))
-    self.assertTrue(Recognizer.isOcrOrderDataValid([OcrType.EASY_OCR.name]))
+    self.assertTrue(Recognizer.isOcrOrderDataValid([OcrType.EASY_OCR.value]))
 
 class TestSelectionType(LoggedTestCase):
   def test_error_selectionType(self):
