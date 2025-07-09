@@ -193,7 +193,8 @@ class Recognizer():
     imageSize = (image.width, image.height)
     if resizeInterval is not None:
       imageSize = (int(imageSize[0] * resizeInterval[1]), int(imageSize[1] * resizeInterval[1]))
-    return  imageSize[0] < areaSize[0] and imageSize[1] < areaSize[1]
+    # TODO: should it be "<="" instead of "<"? The actual computation does floor the value with int. Also change the app checking image to find.
+    return imageSize[0] < areaSize[0] and imageSize[1] < areaSize[1]
 
   @classmethod
   def isImageHashDataValid(cls, imageHashData: Any) -> bool:
@@ -220,9 +221,9 @@ class Recognizer():
     """
     :param ocrOrderData: In string form.
     """
-    ocrTypeNames = [ocrType.name for ocrType in OcrType]
+    ocrTypes = set(ocrType.value for ocrType in OcrType)
     return isinstance(ocrOrderData, (tuple, list)) \
-        and all(isinstance(ocrType, str) and ocrType in ocrTypeNames for ocrType in ocrOrderData) \
+        and all(isinstance(ocrType, str) and ocrType in ocrTypes for ocrType in ocrOrderData) \
         and len(ocrOrderData) == len(set(ocrOrderData))
 
   @classmethod
@@ -736,6 +737,7 @@ class Recognizer():
           action['resizeInterval'] = None
         if not self.isImageToFindCompatibleWithSelection(action['imageToFind'], self.borders, action['ratios'],
               action['resizeInterval']):
+          # TODO: Is this relevant? Only the version with max size ration is going to be used (and max size ratio could be < 1)
           if self.isImageToFindCompatibleWithSelection(action['imageToFind'], self.borders, action['ratios']):
             logger.warning('The size of the image to find is too big for the selected area considering the max size ratio.'
                 f' This action \'{actionId}\' is ignored.')
