@@ -283,15 +283,15 @@ class TestThreshold(LoggedTestCase):
     with self.assertRaises(RecognizerValueError):
       ThresholdPreprocessor(method=ThresholdMethod.ADAPTIVE_GAUSSIAN, thresholdType=ThresholdType.TRUNCATE)
     with self.assertRaises(RecognizerValueError):
-      ThresholdPreprocessor(method=ThresholdMethod.ADAPTIVE_GAUSSIAN, thresholdType=ThresholdType.To_ZERO)
+      ThresholdPreprocessor(method=ThresholdMethod.ADAPTIVE_GAUSSIAN, thresholdType=ThresholdType.TO_ZERO)
     with self.assertRaises(RecognizerValueError):
-      ThresholdPreprocessor(method=ThresholdMethod.ADAPTIVE_GAUSSIAN, thresholdType=ThresholdType.To_ZERO_INVERSE)
+      ThresholdPreprocessor(method=ThresholdMethod.ADAPTIVE_GAUSSIAN, thresholdType=ThresholdType.TO_ZERO_INVERSE)
     with self.assertRaises(RecognizerValueError):
       ThresholdPreprocessor(method=ThresholdMethod.ADAPTIVE_MEAN, thresholdType=ThresholdType.TRUNCATE)
     with self.assertRaises(RecognizerValueError):
-      ThresholdPreprocessor(method=ThresholdMethod.ADAPTIVE_MEAN, thresholdType=ThresholdType.To_ZERO)
+      ThresholdPreprocessor(method=ThresholdMethod.ADAPTIVE_MEAN, thresholdType=ThresholdType.TO_ZERO)
     with self.assertRaises(RecognizerValueError):
-      ThresholdPreprocessor(method=ThresholdMethod.ADAPTIVE_MEAN, thresholdType=ThresholdType.To_ZERO_INVERSE)
+      ThresholdPreprocessor(method=ThresholdMethod.ADAPTIVE_MEAN, thresholdType=ThresholdType.TO_ZERO_INVERSE)
 
   def test_error_invalidMaxValue(self):
     with self.assertRaises(RecognizerValueError):

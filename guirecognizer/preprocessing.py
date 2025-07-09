@@ -185,8 +185,8 @@ class ThresholdType(Enum):
   BINARY = auto()
   BINARY_INVERSE = auto()
   TRUNCATE = auto()
-  To_ZERO = auto()
-  To_ZERO_INVERSE = auto()
+  TO_ZERO = auto()
+  TO_ZERO_INVERSE = auto()
 
 class ThresholdPreprocessor(Preprocessor):
   """
@@ -303,9 +303,9 @@ class ThresholdPreprocessor(Preprocessor):
         thresholdType = cv.THRESH_BINARY_INV
       case ThresholdType.TRUNCATE:
         thresholdType = cv.THRESH_TRUNC
-      case ThresholdType.To_ZERO:
+      case ThresholdType.TO_ZERO:
         thresholdType = cv.THRESH_TOZERO
-      case ThresholdType.To_ZERO_INVERSE:
+      case ThresholdType.TO_ZERO_INVERSE:
         thresholdType = cv.THRESH_TOZERO_INV
     match self.method:
       case ThresholdMethod.SIMPLE | ThresholdMethod.OTSU:
@@ -529,6 +529,8 @@ class Preprocessing:
     if 'preprocessing' not in data or not isinstance(data['preprocessing'], dict):
       raise RecognizerValueError('Invalid suboperation data.')
 
+    # TODO: don't use a common preprocessing value
+    # TODO: check value in a kind of factory and keep type hinting on the constructors of the preprocessors
     match preprocessingType:
       case PreprocessingType.GRAYSCALE:
         return GrayscalePreprocessor()
