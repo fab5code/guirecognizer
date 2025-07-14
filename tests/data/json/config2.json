@@ -1,1 +1,36 @@
-{"actions": [{"id": "otherSelection1", "ratios": [0.23076923076923078, 0.1794871794871795], "type": "SELECTION"}, {"id": "otherSelection2", "ratios": [0.1794871794871795, 0.28205128205128205, 0.3076923076923077, 0.46153846153846156], "type": "SELECTION"}, {"id": "otherPixelColor1", "ratios": [0.20512820512820512, 0.46153846153846156], "type": "PIXEL_COLOR"}], "borders": [0, 0, 39, 39]}
+{
+  "actions": [
+    {
+      "id": "otherSelection1",
+      "ratios": [
+        0.23076923076923078,
+        0.1794871794871795
+      ],
+      "type": "selection"
+    },
+    {
+      "id": "otherSelection2",
+      "ratios": [
+        0.1794871794871795,
+        0.28205128205128205,
+        0.3076923076923077,
+        0.46153846153846156
+      ],
+      "type": "selection"
+    },
+    {
+      "id": "otherPixelColor1",
+      "ratios": [
+        0.20512820512820512,
+        0.46153846153846156
+      ],
+      "type": "pixelColor"
+    }
+  ],
+  "borders": [
+    0,
+    0,
+    39,
+    39
+  ]
+}

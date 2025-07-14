@@ -526,20 +526,23 @@ class Preprocessing:
       preprocessingType = PreprocessingType(data['type'])
     else:
       raise RecognizerValueError('Invalid preprocessing type.')
-    if 'preprocessing' not in data or not isinstance(data['preprocessing'], dict):
-      raise RecognizerValueError('Invalid suboperation data.')
 
-    # TODO: don't use a common preprocessing value
     # TODO: check value in a kind of factory and keep type hinting on the constructors of the preprocessors
     match preprocessingType:
       case PreprocessingType.GRAYSCALE:
         return GrayscalePreprocessor()
       case PreprocessingType.COLOR_MAP:
-        return ColorMapPreprocessor(**data['preprocessing'])
+        if 'colorMap' not in data or not isinstance(data['colorMap'], dict):
+          raise RecognizerValueError('Invalid suboperation data.')
+        return ColorMapPreprocessor(**data['colorMap'])
       case PreprocessingType.THRESHOLD:
-        return ThresholdPreprocessor(**data['preprocessing'])
+        if 'threshold' not in data or not isinstance(data['threshold'], dict):
+          raise RecognizerValueError('Invalid suboperation data.')
+        return ThresholdPreprocessor(**data['threshold'])
       case PreprocessingType.RESIZE:
-        return ResizePreprocessor(**data['preprocessing'])
+        if 'resize' not in data or not isinstance(data['resize'], dict):
+          raise RecognizerValueError('Invalid suboperation data.')
+        return ResizePreprocessor(**data['resize'])
 
   def checkProcessInput(self, operationId: str):
     """

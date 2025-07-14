@@ -702,11 +702,11 @@ class Recognizer():
 
     if not action['type'].isCompatibleWithSelection(action['ratios']):
       logger.warning('Size of action ratios (2) is too small for action type \'{actionType}\'. This action \'{actionId}\' is ignored.'
-          .format(actionType=action['type'].name, actionId=actionId))
+          .format(actionType=action['type'].value, actionId=actionId))
       return
     elif not action['type'].isRightSelection(action['ratios']):
       logger.warning('Size of action ratios (4) is bigger than necessary for action type \'{actionType}\'.'
-          ' This action \'{actionId}\' is still processed.'.format(actionType=action['type'].name, actionId=actionId))
+          ' This action \'{actionId}\' is still processed.'.format(actionType=action['type'].value, actionId=actionId))
       action['ratios'] = action['ratios'][0:2]
 
     match action['type']:

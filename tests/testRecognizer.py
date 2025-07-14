@@ -35,11 +35,11 @@ class TestLoad(LoggedTestCase):
 
   def test_error_invalidBorder(self):
     with self.assertRaises(RecognizerValueError):
-      Recognizer({'borders': (1, 20, 39, 10), 'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.CLICK.name}]})
+      Recognizer({'borders': (1, 20, 39, 10), 'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.CLICK.value}]})
 
   def test_error_noBorder(self):
     with self.assertRaises(RecognizerValueError):
-      Recognizer({'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.CLICK.name}]})
+      Recognizer({'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.CLICK.value}]})
 
   def test_error_noAction(self):
     with self.assertRaises(RecognizerValueError):
@@ -50,32 +50,32 @@ class TestLoad(LoggedTestCase):
       Recognizer({'borders': (1, 1, 39, 39), 'actions': [42]})
 
   def test_error_invalidId(self):
-    recognizer = Recognizer({'borders': (1, 1, 39, 39), 'actions': [{'id': 42, 'ratios': (0, 0), 'type': ActionType.CLICK.name}]})
+    recognizer = Recognizer({'borders': (1, 1, 39, 39), 'actions': [{'id': 42, 'ratios': (0, 0), 'type': ActionType.CLICK.value}]})
     self.assertEqual(len(recognizer.actionById), 0)
-    recognizer = Recognizer({'borders': (1, 1, 39, 39), 'actions': [{'id': '', 'ratios': (0, 0), 'type': ActionType.CLICK.name}]})
+    recognizer = Recognizer({'borders': (1, 1, 39, 39), 'actions': [{'id': '', 'ratios': (0, 0), 'type': ActionType.CLICK.value}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.CLICK.name},
-                    {'id': 'action1', 'ratios': (0, 0), 'type': ActionType.CLICK.name}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.CLICK.value},
+                    {'id': 'action1', 'ratios': (0, 0), 'type': ActionType.CLICK.value}]})
     self.assertEqual(len(recognizer.actionById), 1)
 
   def test_error_invalidRatios(self):
-    recognizer = Recognizer({'borders': (1, 1, 39, 39), 'actions': [{'id': 'action1', 'ratios': 42, 'type': ActionType.CLICK.name}]})
+    recognizer = Recognizer({'borders': (1, 1, 39, 39), 'actions': [{'id': 'action1', 'ratios': 42, 'type': ActionType.CLICK.value}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, '0'), 'type': ActionType.CLICK.name}]})
+        'actions': [{'id': 'action1', 'ratios': (0, '0'), 'type': ActionType.CLICK.value}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.1), 'type': ActionType.CLICK.name}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.1), 'type': ActionType.CLICK.value}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.1, 0.1), 'type': ActionType.CLICK.name}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.1, 0.1), 'type': ActionType.CLICK.value}]})
     self.assertEqual(len(recognizer.actionById), 1)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0.1, 0.3, 0.5, 0.2), 'type': ActionType.IMAGE_HASH.name}]})
+        'actions': [{'id': 'action1', 'ratios': (0.1, 0.3, 0.5, 0.2), 'type': ActionType.IMAGE_HASH.value}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0.1, 0.3), 'type': ActionType.IMAGE_HASH.name}]})
+        'actions': [{'id': 'action1', 'ratios': (0.1, 0.3), 'type': ActionType.IMAGE_HASH.value}]})
     self.assertEqual(len(recognizer.actionById), 0)
 
   def test_error_invalidActionType(self):
@@ -85,130 +85,130 @@ class TestLoad(LoggedTestCase):
   def test_error_actionFindImage(self):
     # Missing parameter.
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.name,
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value,
         'threshold': 10, 'maxResults': 5}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.name,
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value,
         'maxResults': 5, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]]}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.name, 'threshold': 10,
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
         'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]]}]})
     self.assertEqual(len(recognizer.actionById), 0)
 
     # Wrong parameter imageToFind.
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.name, 'threshold': 10,
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
         'maxResults': 5, 'imageToFind': 'invalid'}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.name, 'threshold': 10,
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
         'maxResults': 5, 'imageToFind': [[]]}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.name, 'threshold': 10,
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
         'maxResults': 5, 'imageToFind': [94, 94, 94, 255]}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.name, 'threshold': 10,
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
         'maxResults': 5, 'imageToFind': [[94, 94, 94, 255], [243, 243, 243]]}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.name, 'threshold': 10,
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
         'maxResults': 5, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]]}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.01, 0.01), 'type': ActionType.FIND_IMAGE.name, 'threshold': 10,
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.01, 0.01), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
         'maxResults': 5, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]]}]})
     self.assertEqual(len(recognizer.actionById), 0)
 
     # Wrong parameter threshold.
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.name, 'threshold': 'invalid',
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 'invalid',
         'maxResults': 5, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]]}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.name, 'threshold':-1,
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold':-1,
         'maxResults': 5, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]]}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.name, 'threshold': 10.0,
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10.0,
         'maxResults': 5, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]]}]})
     self.assertEqual(len(recognizer.actionById), 0)
 
     # Wrong parameter maxResults.
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.name, 'threshold': 10,
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
         'maxResults': 'invalid', 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]]}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.name, 'threshold': 10,
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
         'maxResults': 0, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]]}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.name, 'threshold': 10,
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
         'maxResults':-1, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]]}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.name, 'threshold': 10,
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
         'maxResults': 5.0, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]]}]})
     self.assertEqual(len(recognizer.actionById), 0)
 
     # Wrong parameter resizeInterval.
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.name, 'threshold': 10,
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
         'maxResults': 5, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]],
         'resizeInterval': None}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.name, 'threshold': 10,
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
         'maxResults': 5, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]],
         'resizeInterval': 'invalid'}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.name, 'threshold': 10,
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
         'maxResults': 5, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]],
         'resizeInterval': 1.1}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.name, 'threshold': 10,
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
         'maxResults': 5, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]],
         'resizeInterval': (1.1,)}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.name, 'threshold': 10,
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
         'maxResults': 5, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]],
         'resizeInterval': (1.1, 0.9)}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.name, 'threshold': 10,
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
         'maxResults': 5, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]],
         'resizeInterval': (0.9, 1.1, 1.3)}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.2, 0.2), 'type': ActionType.FIND_IMAGE.name, 'threshold': 10,
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.2, 0.2), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
         'maxResults': 5, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]],
         'resizeInterval': (1, 5)}]})
     self.assertEqual(len(recognizer.actionById), 0)
 
   def test_error_actionComparePixelColor(self):
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.COMPARE_PIXEL_COLOR.name}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.COMPARE_PIXEL_COLOR.value}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.COMPARE_PIXEL_COLOR.name, 'pixelColor': (1, 2)}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.COMPARE_PIXEL_COLOR.value, 'pixelColor': (1, 2)}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.COMPARE_PIXEL_COLOR.name, 'pixelColor': (1, 2, 256)}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.COMPARE_PIXEL_COLOR.value, 'pixelColor': (1, 2, 256)}]})
     self.assertEqual(len(recognizer.actionById), 0)
 
   def test_error_actionCompareImageHash(self):
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.COMPARE_IMAGE_HASH.name, 'imageHash': 42}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.COMPARE_IMAGE_HASH.value, 'imageHash': 42}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.1, 0.1), 'type': ActionType.COMPARE_IMAGE_HASH.name, 'imageHash': (0, 0)}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.1, 0.1), 'type': ActionType.COMPARE_IMAGE_HASH.value, 'imageHash': (0, 0)}]})
     self.assertEqual(len(recognizer.actionById), 0)
 
   def test_noData(self):
@@ -227,11 +227,11 @@ class TestLoad(LoggedTestCase):
     self.assertEqual(len(recognizer.actionById), 16)
 
   def test_loadData(self):
-    data1 = {'borders': (1, 1, 39, 39), 'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.SELECTION.name},
-        {'id': 'action2', 'ratios': (0, 0), 'type': ActionType.SELECTION.name}]}
-    data2 = {'borders': (1, 1, 39, 39), 'actions': [{'id': 'action3', 'ratios': (0, 0), 'type': ActionType.SELECTION.name},
-        {'id': 'action4', 'ratios': (0, 0), 'type': ActionType.SELECTION.name},
-        {'id': 'action5', 'ratios': (0, 0), 'type': ActionType.SELECTION.name}]}
+    data1 = {'borders': (1, 1, 39, 39), 'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.SELECTION.value},
+        {'id': 'action2', 'ratios': (0, 0), 'type': ActionType.SELECTION.value}]}
+    data2 = {'borders': (1, 1, 39, 39), 'actions': [{'id': 'action3', 'ratios': (0, 0), 'type': ActionType.SELECTION.value},
+        {'id': 'action4', 'ratios': (0, 0), 'type': ActionType.SELECTION.value},
+        {'id': 'action5', 'ratios': (0, 0), 'type': ActionType.SELECTION.value}]}
     recognizer = Recognizer(data1)
     self.assertEqual(len(recognizer.actionById), 2)
     recognizer = Recognizer()
@@ -255,102 +255,102 @@ class TestLoad(LoggedTestCase):
 
   def test_actionCoordinates(self):
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.COORDINATES.name}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.COORDINATES.value}]})
     self.assertEqual(len(recognizer.actionById), 1)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.1, 0.1), 'type': ActionType.COORDINATES.name}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.1, 0.1), 'type': ActionType.COORDINATES.value}]})
     self.assertEqual(len(recognizer.actionById), 1)
 
   def test_actionSelection(self):
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.SELECTION.name}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.SELECTION.value}]})
     self.assertEqual(len(recognizer.actionById), 1)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.1, 0.1), 'type': ActionType.SELECTION.name}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.1, 0.1), 'type': ActionType.SELECTION.value}]})
     self.assertEqual(len(recognizer.actionById), 1)
 
   def test_actionFindImage(self):
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.name, 'threshold': 10,
-        'maxResults': 5, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]]}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
+        'maxResults': 5, 'imageToFind': "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC"}]})
     self.assertEqual(len(recognizer.actionById), 1)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.name, 'threshold': 10,
-        'maxResults': 5, 'imageToFind': [[[94, 94, 94], [243, 243, 243]], [[69, 69, 69], [185, 185, 185]]]}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
+        'maxResults': 5, 'imageToFind': "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAF0lEQVR4nGOIi4v7/Pkz0/Pnz48dOwYAOSII/cUTqBEAAAAASUVORK5CYII="}]})
     self.assertEqual(len(recognizer.actionById), 1)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.name, 'threshold': 10,
-        'maxResults': 5, 'imageToFind': [[94, 243], [69, 185]]}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
+        'maxResults': 5, 'imageToFind': "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAAAAABX3VL4AAAADklEQVR4nGOI+8z0/BgACEIDASGCoWsAAAAASUVORK5CYII="}]})
     self.assertEqual(len(recognizer.actionById), 1)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.name, 'threshold': 10,
-        'maxResults': 5, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]],
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
+        'maxResults': 5, 'imageToFind': "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC",
         'resizeInterval': (0.9, 1.1)}]})
     self.assertEqual(len(recognizer.actionById), 1)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.name, 'threshold': 10,
-        'maxResults': 5, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]],
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
+        'maxResults': 5, 'imageToFind': "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC",
         'resizeInterval': (1, 3)}]})
     self.assertEqual(len(recognizer.actionById), 1)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.name, 'threshold': 10,
-        'maxResults': 5, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]],
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
+        'maxResults': 5, 'imageToFind': "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC",
         'resizeInterval': (2, 2)}]})
     self.assertEqual(len(recognizer.actionById), 1)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.06, 0.06), 'type': ActionType.FIND_IMAGE.name, 'threshold': 10,
-        'maxResults': 5, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]],
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.06, 0.06), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
+        'maxResults': 5, 'imageToFind': "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC",
         'resizeInterval': (0.5, 0.5)}]})
     self.assertEqual(len(recognizer.actionById), 1)
 
   def test_actionClick(self):
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.CLICK.name}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.CLICK.value}]})
     self.assertEqual(len(recognizer.actionById), 1)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.1, 0.1), 'type': ActionType.CLICK.name}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.1, 0.1), 'type': ActionType.CLICK.value}]})
     self.assertEqual(len(recognizer.actionById), 1)
 
   def test_actionPixelColor(self):
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.PIXEL_COLOR.name}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.PIXEL_COLOR.value}]})
     self.assertEqual(len(recognizer.actionById), 1)
 
   def test_actionComparePixelColor(self):
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.COMPARE_PIXEL_COLOR.name, 'pixelColor': (0, 255, 255)}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.COMPARE_PIXEL_COLOR.value, 'pixelColor': (0, 255, 255)}]})
     self.assertEqual(len(recognizer.actionById), 1)
 
   def test_actionIsSamePixelColor(self):
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.IS_SAME_PIXEL_COLOR.name, 'pixelColor': (0, 255, 255)}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.IS_SAME_PIXEL_COLOR.value, 'pixelColor': (0, 255, 255)}]})
     self.assertEqual(len(recognizer.actionById), 1)
 
   def test_actionImageHash(self):
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.1, 0.1), 'type': ActionType.IMAGE_HASH.name}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.1, 0.1), 'type': ActionType.IMAGE_HASH.value}]})
     self.assertEqual(len(recognizer.actionById), 1)
 
   def test_actionCompareImageHash(self):
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.1, 0.1), 'type': ActionType.COMPARE_IMAGE_HASH.name,
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.1, 0.1), 'type': ActionType.COMPARE_IMAGE_HASH.value,
                      'imageHash': 'b88cf69dd66c8960,07000000000'}]})
     self.assertEqual(len(recognizer.actionById), 1)
 
   def test_actionIsSameImageHash(self):
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.1, 0.1), 'type': ActionType.IS_SAME_IMAGE_HASH.name,
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.1, 0.1), 'type': ActionType.IS_SAME_IMAGE_HASH.value,
                      'imageHash': 'b88cf69dd66c8960,07000000000'}]})
     self.assertEqual(len(recognizer.actionById), 1)
 
   def test_actionText(self):
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.1, 0.1), 'type': ActionType.TEXT.name}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.1, 0.1), 'type': ActionType.TEXT.value}]})
     self.assertEqual(len(recognizer.actionById), 1)
 
   def test_actionNumber(self):
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.1, 0.1), 'type': ActionType.NUMBER.name}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.1, 0.1), 'type': ActionType.NUMBER.value}]})
     self.assertEqual(len(recognizer.actionById), 1)
 
 class TestRecognizer(LoggedTestCase):

@@ -1,1 +1,22 @@
-{"actions": [{"id": "pixelColor1" "ratios": [0.20512820512820512, 0.3888888888888889], "type": "PIXEL_COLOR", "pixelColor": [253, 113, 85]}], "borders": [0, 3, 39, 39]}
+{
+  "actions": [
+    {
+      "id": "pixelColor1""ratios": [
+        0.20512820512820512,
+        0.3888888888888889
+      ],
+      "type": "pixelColor",
+      "pixelColor": [
+        253,
+        113,
+        85
+      ]
+    }
+  ],
+  "borders": [
+    0,
+    3,
+    39,
+    39
+  ]
+}
