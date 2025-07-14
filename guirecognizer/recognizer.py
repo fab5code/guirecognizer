@@ -93,7 +93,7 @@ class Recognizer():
     """
     :param typeData:
     """
-    return type(typeData) == str and typeData in [actionType.name for actionType in ActionType]
+    return type(typeData) == str and typeData in [actionType.value for actionType in ActionType]
 
   @classmethod
   def isCoordDataValid(cls, coordData: Any) -> bool:
@@ -695,7 +695,7 @@ class Recognizer():
       return
 
     if 'type' in data and self.isTypeDataValid(data['type']):
-      action['type'] = ActionType[data['type']]
+      action['type'] = ActionType(data['type'])
     else:
       logger.warning(f'Invalid action type. This action \'{actionId}\' is ignored.')
       return

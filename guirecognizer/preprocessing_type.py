@@ -1,11 +1,11 @@
-from enum import Enum, unique, auto
+from enum import Enum, unique
 
 @unique
 class PreprocessingType(Enum):
   """
   Available preprocessing types.
   """
-  GRAYSCALE = auto()
-  COLOR_MAP = auto()
-  THRESHOLD = auto()
-  RESIZE = auto()
+  GRAYSCALE = 'grayscale'
+  COLOR_MAP = 'colorMap'
+  THRESHOLD = 'threshold'
+  RESIZE = 'resize'

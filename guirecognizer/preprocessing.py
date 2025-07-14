@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from enum import Enum, unique, auto
+from enum import Enum, unique
 import logging
 from typing import Any
 
@@ -39,9 +39,9 @@ class ColorMapMethod(Enum):
   """
   Color mapping methods.
   """
-  ONE_TO_ONE = auto()
-  RANGE_TO_ONE = auto()
-  RANGE_TO_RANGE = auto()
+  ONE_TO_ONE = 'oneToOne'
+  RANGE_TO_ONE = 'rangeToOne'
+  RANGE_TO_RANGE = 'rangeToRange'
 
 class ColorMapPreprocessor(Preprocessor):
   """
@@ -61,7 +61,7 @@ class ColorMapPreprocessor(Preprocessor):
     :raise RecognizerValueError: invalid input
     """
     if self.isColorMapMethodDataValid(method):
-      self.method = ColorMapMethod[method]
+      self.method = ColorMapMethod(method)
     elif isinstance(method, ColorMapMethod):
       self.method = method
     else:
@@ -89,7 +89,7 @@ class ColorMapPreprocessor(Preprocessor):
     """
     :param colorMapMethodData: In string form.
     """
-    return type(colorMapMethodData) == str and colorMapMethodData in [colorMapMethod.name for colorMapMethod in ColorMapMethod]
+    return type(colorMapMethodData) == str and colorMapMethodData in [colorMapMethod.value for colorMapMethod in ColorMapMethod]
 
   def process(self, image: Image.Image) -> Image.Image:
     self.checkImage(image)
@@ -172,21 +172,21 @@ class ThresholdMethod(Enum):
   """
   Threshold methods.
   """
-  SIMPLE = auto()
-  ADAPTIVE_MEAN = auto()
-  ADAPTIVE_GAUSSIAN = auto()
-  OTSU = auto()
+  SIMPLE = 'simple'
+  ADAPTIVE_MEAN = 'adaptiveMean'
+  ADAPTIVE_GAUSSIAN = 'adaptiveGaussian'
+  OTSU = 'otsu'
 
 @unique
 class ThresholdType(Enum):
   """
   Threshold types.
   """
-  BINARY = auto()
-  BINARY_INVERSE = auto()
-  TRUNCATE = auto()
-  TO_ZERO = auto()
-  TO_ZERO_INVERSE = auto()
+  BINARY = 'binary'
+  BINARY_INVERSE = 'binaryInverse'
+  TRUNCATE = 'truncate'
+  TO_ZERO = 'toZero'
+  TO_ZERO_INVERSE = 'toZeroInverse'
 
 class ThresholdPreprocessor(Preprocessor):
   """
@@ -206,13 +206,13 @@ class ThresholdPreprocessor(Preprocessor):
     :raise RecognizerValueError: invalid input
     """
     if self.isThresholdMethodDataValid(method):
-      self.method = ThresholdMethod[method]
+      self.method = ThresholdMethod(method)
     elif isinstance(method, ThresholdMethod):
       self.method = method
     else:
       raise RecognizerValueError('Invalid method value.')
     if self.isThresholdTypeDataValid(thresholdType):
-      self.thresholdType = ThresholdType[thresholdType]
+      self.thresholdType = ThresholdType(thresholdType)
     elif isinstance(thresholdType, ThresholdType):
       self.thresholdType = thresholdType
     else:
@@ -242,14 +242,14 @@ class ThresholdPreprocessor(Preprocessor):
     """
     :param methodData: In string form.
     """
-    return type(methodData) == str and methodData in [method.name for method in ThresholdMethod]
+    return type(methodData) == str and methodData in [method.value for method in ThresholdMethod]
 
   @classmethod
   def isThresholdTypeDataValid(cls, thresholdTypeData: Any) -> bool:
     """
     :param thresholdTypeData: In string form.
     """
-    return type(thresholdTypeData) == str and thresholdTypeData in [thresholdType.name for thresholdType in ThresholdType]
+    return type(thresholdTypeData) == str and thresholdTypeData in [thresholdType.value for thresholdType in ThresholdType]
 
   @classmethod
   def isThresholdTypeCompatibleWithThresholdMethod(cls, thresholdType: ThresholdType, method: ThresholdMethod) -> bool:
@@ -333,12 +333,12 @@ class ResizeMethod(Enum):
   """
   Resize methods.
   """
-  UNFIXED_RATIO = auto()
-  FIXED_RATIO_WIDTH = auto()
+  UNFIXED_RATIO = 'unfixedRatio'
+  FIXED_RATIO_WIDTH = 'fixedRatioWidth'
   """
   The height is computed from the width and the ratio width/height of the image to process.
   """
-  FIXED_RATIO_HEIGHT = auto()
+  FIXED_RATIO_HEIGHT = 'fixedRatioHeight'
   """
   The width is computed from the height and the ratio width/height of the image to process.
   """
@@ -356,7 +356,7 @@ class ResizePreprocessor(Preprocessor):
     :raise RecognizerValueError: invalid input
     """
     if self.isResizeMethodDataValid(method):
-      self.method = ResizeMethod[method]
+      self.method = ResizeMethod(method)
     elif isinstance(method, ResizeMethod):
       self.method = method
     else:
@@ -382,7 +382,7 @@ class ResizePreprocessor(Preprocessor):
     """
     :param methodData: In string form.
     """
-    return type(methodData) == str and methodData in [method.name for method in ResizeMethod]
+    return type(methodData) == str and methodData in [method.value for method in ResizeMethod]
 
   def process(self, image: Image.Image) -> Image.Image:
     self.checkImage(image)
@@ -438,7 +438,7 @@ class Preprocessing:
     """
     :param typeData:
     """
-    return type(typeData) == str and typeData in [preprocessingType.name for preprocessingType in PreprocessingType]
+    return type(typeData) == str and typeData in [preprocessingType.value for preprocessingType in PreprocessingType]
 
   @classmethod
   def isPixelColorDataValid(cls, pixelColorData: Any) -> bool:
@@ -523,7 +523,7 @@ class Preprocessing:
     :raise RecognizerValueError: invalid `data`
     """
     if 'type' in data and self.isTypeDataValid(data['type']):
-      preprocessingType = PreprocessingType[data['type']]
+      preprocessingType = PreprocessingType(data['type'])
     else:
       raise RecognizerValueError('Invalid preprocessing type.')
     if 'preprocessing' not in data or not isinstance(data['preprocessing'], dict):

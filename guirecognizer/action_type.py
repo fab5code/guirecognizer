@@ -72,7 +72,7 @@ class ActionType(Enum):
   Available action types.
   """
 
-  COORDINATES = (auto(), SelectionType.POINT_OR_AREA)
+  COORDINATES = ('coordinates', SelectionType.POINT_OR_AREA)
   """
   Return the coordinates of a point or an area. It is designed to be used in a pipeline of actions.
 
@@ -82,7 +82,7 @@ class ActionType(Enum):
 
   **Returns:** point or area coordinates
   """
-  SELECTION = (auto(), SelectionType.POINT_OR_AREA)
+  SELECTION = ('selection', SelectionType.POINT_OR_AREA)
   """
   Return point as a pixel or an area as an image. It is designed to be used in a pipeline of actions.
 
@@ -92,7 +92,7 @@ class ActionType(Enum):
 
   **Returns:** point or area
   """
-  FIND_IMAGE = (auto(), SelectionType.AREA)
+  FIND_IMAGE = ('findImage', SelectionType.AREA)
   """
   Find the locations of an image inside the selected area.
   Specify a detection threshold, the maximum number of locations and a resize interval to find the same image
@@ -104,7 +104,7 @@ class ActionType(Enum):
 
   **Returns:** tuple containing the coordinates of each location
   """
-  CLICK = (auto(), SelectionType.POINT)
+  CLICK = ('click', SelectionType.POINT)
   """
   Click on the selected point.
 
@@ -112,7 +112,7 @@ class ActionType(Enum):
 
   **Return type:** :obj:`None`
   """
-  PIXEL_COLOR = (auto(), SelectionType.POINT_OR_AREA)
+  PIXEL_COLOR = ('pixelColor', SelectionType.POINT_OR_AREA)
   """
   Compute the pixel color of the point selection or the average pixel color of the area selection.
 
@@ -122,7 +122,7 @@ class ActionType(Enum):
 
   **Returns:** rgb values between 0 and 255
   """
-  COMPARE_PIXEL_COLOR = (auto(), SelectionType.POINT_OR_AREA)
+  COMPARE_PIXEL_COLOR = ('comparePixelColor', SelectionType.POINT_OR_AREA)
   """
   Compute the pixel color of the point selection or the average pixel color of the area selection
   then compute the difference with the pixel color in reference.
@@ -133,7 +133,7 @@ class ActionType(Enum):
 
   **Return type:** :obj:`float`
   """
-  IS_SAME_PIXEL_COLOR = (auto(), SelectionType.POINT_OR_AREA)
+  IS_SAME_PIXEL_COLOR = ('isSamePixelColor', SelectionType.POINT_OR_AREA)
   """
   Compute the pixel color of the point selection or the average pixel color of the area selection
   and compare it to the pixel color in reference.
@@ -142,7 +142,7 @@ class ActionType(Enum):
 
   **Return type:** :obj:`bool`
   """
-  IMAGE_HASH = (auto(), SelectionType.AREA)
+  IMAGE_HASH = ('imageHash', SelectionType.AREA)
   """
   Compute the image hash of the area selection. The color is taken into account. Similar images generate close hashes.
 
@@ -154,7 +154,7 @@ class ActionType(Enum):
 
   **Returns:** image hash
   """
-  COMPARE_IMAGE_HASH = (auto(), SelectionType.AREA)
+  COMPARE_IMAGE_HASH = ('compareImageHash', SelectionType.AREA)
   """
   Compute the image hash of the area selection then compute the difference with the hash in reference.
 
@@ -162,7 +162,7 @@ class ActionType(Enum):
 
   **Return type:** :obj:`int`
   """
-  IS_SAME_IMAGE_HASH = (auto(), SelectionType.AREA)
+  IS_SAME_IMAGE_HASH = ('isSameImageHash', SelectionType.AREA)
   """
   Compute the image hash of the area selection and compare it to the hash in reference.
 
@@ -170,7 +170,7 @@ class ActionType(Enum):
 
   **Return type:** :obj:`bool`
   """
-  TEXT = (auto(), SelectionType.AREA)
+  TEXT = ('text', SelectionType.AREA)
   """
   Try to recognize text. Return the empty string if no text has been recognized.
 
@@ -178,7 +178,7 @@ class ActionType(Enum):
 
   **Return type:** :obj:`str`
   """
-  NUMBER = (auto(), SelectionType.AREA)
+  NUMBER = ('number', SelectionType.AREA)
   """
   Try to recognize a number. Return None if no number has been recognized.
 
