@@ -1,13 +1,13 @@
+import logging
 from abc import ABC, abstractmethod
 from enum import Enum, unique
-import logging
-from typing import Any
-
-from PIL import Image, ImageOps
+from typing import Any, TypeGuard, TypeIs
 
 import numpy as np
+from PIL import Image, ImageOps
 
-from .common import RecognizerValueError, isIdDataValid, isImageDataValid, isPixelColorDataValid, isPixelColorDifferenceDataValid
+from .common import (RecognizerValueError, isIdDataValid, isImageDataValid,
+                     isPixelColorDataValid, isPixelColorDifferenceDataValid)
 from .preprocessing_type import PreprocessingType
 from .types import PixelColor
 
@@ -85,11 +85,11 @@ class ColorMapPreprocessor(Preprocessor):
       self.outputColor2 = outputColor2
 
   @classmethod
-  def isColorMapMethodDataValid(cls, colorMapMethodData: Any) -> bool:
+  def isColorMapMethodDataValid(cls, colorMapMethodData: Any) -> TypeGuard[str]:
     """
     :param colorMapMethodData: In string form.
     """
-    return type(colorMapMethodData) == str and colorMapMethodData in [colorMapMethod.value for colorMapMethod in ColorMapMethod]
+    return isinstance(colorMapMethodData, str) and colorMapMethodData in [colorMapMethod.value for colorMapMethod in ColorMapMethod]
 
   def process(self, image: Image.Image) -> Image.Image:
     self.checkImage(image)
@@ -238,18 +238,18 @@ class ThresholdPreprocessor(Preprocessor):
       self.maxValue = maxValue
 
   @classmethod
-  def isThresholdMethodDataValid(cls, methodData: Any) -> bool:
+  def isThresholdMethodDataValid(cls, methodData: Any) -> TypeGuard[str]:
     """
     :param methodData: In string form.
     """
-    return type(methodData) == str and methodData in [method.value for method in ThresholdMethod]
+    return isinstance(methodData, str) and methodData in [method.value for method in ThresholdMethod]
 
   @classmethod
-  def isThresholdTypeDataValid(cls, thresholdTypeData: Any) -> bool:
+  def isThresholdTypeDataValid(cls, thresholdTypeData: Any) -> TypeGuard[str]:
     """
     :param thresholdTypeData: In string form.
     """
-    return type(thresholdTypeData) == str and thresholdTypeData in [thresholdType.value for thresholdType in ThresholdType]
+    return isinstance(thresholdTypeData, str) and thresholdTypeData in [thresholdType.value for thresholdType in ThresholdType]
 
   @classmethod
   def isThresholdTypeCompatibleWithThresholdMethod(cls, thresholdType: ThresholdType, method: ThresholdMethod) -> bool:
@@ -261,28 +261,28 @@ class ThresholdPreprocessor(Preprocessor):
         or thresholdType in [ThresholdType.BINARY, ThresholdType.BINARY_INVERSE]
 
   @classmethod
-  def isMaxValueDataValid(cls, maxValueData: Any) -> bool:
+  def isMaxValueDataValid(cls, maxValueData: Any) -> TypeGuard[int]:
     """
     :param maxValueData:
     """
     return isinstance(maxValueData, int) and 0 <= maxValueData and maxValueData <= 255
 
   @classmethod
-  def isThresholdDataValid(cls, thresholdData: Any) -> bool:
+  def isThresholdDataValid(cls, thresholdData: Any) -> TypeGuard[int]:
     """
     :param thresholdData:
     """
     return isinstance(thresholdData, int) and 0 <= thresholdData and thresholdData <= 255
 
   @classmethod
-  def isBlockSizeDataValid(cls, blockSizeData: Any) -> bool:
+  def isBlockSizeDataValid(cls, blockSizeData: Any) -> TypeGuard[int]:
     """
     :param blockSizeData:
     """
     return isinstance(blockSizeData, int) and blockSizeData > 1 and blockSizeData % 2 == 1
 
   @classmethod
-  def isCConstantDataValid(cls, cConstantData: Any) -> bool:
+  def isCConstantDataValid(cls, cConstantData: Any) -> TypeGuard[int | float]:
     """
     :param cConstantData:
     """
@@ -371,18 +371,18 @@ class ResizePreprocessor(Preprocessor):
       self.height = height
 
   @classmethod
-  def isWidthOrHeightDataValid(cls, widthOrHeightData: Any) -> bool:
+  def isWidthOrHeightDataValid(cls, widthOrHeightData: Any) -> TypeGuard[int]:
     """
     :param widthOrHeightData:
     """
     return isinstance(widthOrHeightData, int) and 0 < widthOrHeightData
 
   @classmethod
-  def isResizeMethodDataValid(cls, methodData: Any) -> bool:
+  def isResizeMethodDataValid(cls, methodData: Any) -> TypeGuard[str]:
     """
     :param methodData: In string form.
     """
-    return type(methodData) == str and methodData in [method.value for method in ResizeMethod]
+    return isinstance(methodData, str) and methodData in [method.value for method in ResizeMethod]
 
   def process(self, image: Image.Image) -> Image.Image:
     self.checkImage(image)
@@ -399,8 +399,6 @@ class ResizePreprocessor(Preprocessor):
           self.width = max(round(image.size[0] / image.size[1] * self.height), 1)
     return image.resize((self.width, self.height))
 
-# TODO: now
-# - add and test last action in Recognizer
 class Preprocessing:
   """
   Preprocess images.
@@ -414,41 +412,41 @@ class Preprocessing:
     :raise RecognizerValueError: invalid `data`
     """
     self.operationById = {}
-    if type(data) == dict:
+    if isinstance(data, dict):
       self.loadData(data)
     elif data is not None:
       raise RecognizerValueError('Expect a dict as config data.')
 
   @classmethod
-  def isIdDataValid(cls, idData: Any) -> bool:
+  def isIdDataValid(cls, idData: Any) -> TypeGuard[str]:
     """
     :param idData:
     """
     return isIdDataValid(idData)
 
   @classmethod
-  def isImageDataValid(cls, imageData: Any) -> bool:
+  def isImageDataValid(cls, imageData: Any) -> TypeIs[Image.Image]:
     """
     :param imageData:
     """
     return isImageDataValid(imageData)
 
   @classmethod
-  def isTypeDataValid(cls, typeData: Any) -> bool:
+  def isTypeDataValid(cls, typeData: Any) -> TypeGuard[str]:
     """
     :param typeData:
     """
-    return type(typeData) == str and typeData in [preprocessingType.value for preprocessingType in PreprocessingType]
+    return isinstance(typeData, str) and typeData in [preprocessingType.value for preprocessingType in PreprocessingType]
 
   @classmethod
-  def isPixelColorDataValid(cls, pixelColorData: Any) -> bool:
+  def isPixelColorDataValid(cls, pixelColorData: Any) -> TypeGuard[PixelColor]:
     """
     :param pixelColorData:
     """
     return isPixelColorDataValid(pixelColorData)
 
   @classmethod
-  def isPixelColorDifferenceDataValid(cls, differenceData: Any) -> bool:
+  def isPixelColorDifferenceDataValid(cls, differenceData: Any) -> TypeGuard[int | float]:
     """
     :param differenceData:
     """
@@ -467,7 +465,7 @@ class Preprocessing:
       if not isinstance(data['operations'], (list, tuple)):
         raise RecognizerValueError('Invalid preprocessing operations data: expects a list of preprocessing operations.')
       for operationData in data['operations']:
-        if type(operationData) != dict:
+        if not isinstance(operationData, dict):
           raise RecognizerValueError('Invalid preprocessing operation data: every preprocessing operation data should be a dict.')
         self._addOperation(operationData)
 
@@ -527,7 +525,6 @@ class Preprocessing:
     else:
       raise RecognizerValueError('Invalid preprocessing type.')
 
-    # TODO: check value in a kind of factory and keep type hinting on the constructors of the preprocessors
     match preprocessingType:
       case PreprocessingType.GRAYSCALE:
         return GrayscalePreprocessor()
@@ -544,7 +541,7 @@ class Preprocessing:
           raise RecognizerValueError('Invalid suboperation data.')
         return ResizePreprocessor(**data['resize'])
 
-  def checkProcessInput(self, operationId: str):
+  def checkProcessInput(self, operationId: str) -> None:
     """
     :param operationId:
     :raise RecognizerValueError: invalid `operationId`

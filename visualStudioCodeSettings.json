@@ -1,0 +1,27 @@
+{
+  "editor.tabSize": 2,
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  },
+  "editor.wordWrapColumn": 150,
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "typescript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
+  "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
+  "svelte.enable-ts-plugin": true,
+  "python.analysis.typeCheckingMode": "basic",
+  "[python]": {
+    "editor.wordWrapColumn": 150,
+    "editor.formatOnType": true,
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    },
+    "diffEditor.ignoreTrimWhitespace": false,
+    "editor.defaultColorDecorators": "never",
+    "editor.wordBasedSuggestions": "off"
+  },
+  "svelte.plugin.svelte.format.config.printWidth": 150
+}

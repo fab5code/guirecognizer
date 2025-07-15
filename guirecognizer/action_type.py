@@ -1,6 +1,7 @@
-from enum import Enum, Flag, unique, auto
+from enum import Enum, Flag, auto, unique
 
 from .types import Coord, Ratios
+
 
 @unique
 class SelectionType(Flag):
@@ -186,6 +187,8 @@ class ActionType(Enum):
 
   **Return type:** :obj:`float` | :obj:`None`
   """
+
+  selectionType: SelectionType
 
   def __new__(cls, value, selectionType: SelectionType) -> 'ActionType':
     """

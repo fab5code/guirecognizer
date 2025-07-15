@@ -2,16 +2,16 @@ import time
 
 import pyautogui
 
-from .types import Coord
+from .types import PointCoord
 
-# TODO: Rename it MouseHelper, in doc too
-class MouseManager:
+
+class MouseHelper:
   """
   Helper for mouse actions.
   """
 
   @classmethod
-  def clickOnPosition(cls, xy: tuple[int, int], pauseDuration: float=0.02, nbClicks=1) -> None:
+  def clickOnPosition(cls, xy: tuple[int, int], pauseDuration: float=0.02, nbClicks: int=1) -> None:
     """
     :param xy:
     :param pauseDuration: (optional) pause duration of the click in second - default: 0.02
@@ -25,7 +25,7 @@ class MouseManager:
     pyautogui.PAUSE = previousPause
 
   @classmethod
-  def dragCoords(cls, coords: tuple[Coord, ...] | list[Coord], pauseDuration: float=0.1, moveDuration: float=0.25) -> None:
+  def dragCoords(cls, coords: tuple[PointCoord, ...] | list[PointCoord], pauseDuration: float=0.1, moveDuration: float=0.25) -> None:
     """
     :param xy:
     :param pauseDuration: (optional) pause duration at the beginning and end of the drag - default: 0.01

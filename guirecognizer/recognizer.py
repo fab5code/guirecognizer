@@ -1,26 +1,64 @@
-from enum import Enum, unique, auto
-from io import BytesIO
+import base64
 import json
 import logging
-from math import ceil
 import os
-from statistics import mean
-from typing import Any
-from PIL import Image, ImageOps, ImageGrab, ImageStat
-from imagehash import phash, colorhash, ImageHash, hex_to_hash, hex_to_flathash
-import base64
+from enum import Enum, unique
 from io import BytesIO
+from math import ceil
+from statistics import mean
+from typing import (Annotated, Any, Required, TypedDict, TypeGuard, TypeIs,
+                    Unpack, cast, overload)
+
 import numpy as np
+from imagehash import ImageHash, colorhash, hex_to_flathash, hex_to_hash, phash
+from PIL import Image, ImageGrab, ImageOps, ImageStat
 
 from .action_type import ActionType, SelectionType
-from .common import RecognizerValueError, isIdDataValid, isImageDataValid, isPixelColorDataValid, isPixelColorDifferenceDataValid
-from .mouse_manager import MouseManager
+from .common import (RecognizerValueError, isIdDataValid, isImageDataValid,
+                     isPixelColorDataValid, isPixelColorDifferenceDataValid)
+from .mouse_helper import MouseHelper
 from .preprocessing import Preprocessing
-from .types import Coord, Ratios, PixelColor
+from .types import (AreaCoord, AreaRatios, Coord, PixelColor, PointRatios,
+                    Ratios)
 
 logger = logging.getLogger(__name__)
 
-AnyActionReturnType = Image.Image | list[Coord] | tuple[int, ...] | list[int] | str | int | float | bool | None
+Point = PixelColor | int | tuple[int, int, int, int]
+ResizeInterval = tuple[int | float, int | float] | Annotated[list[int | float], 2]
+AnyActionReturnType = Coord | Point | Image.Image | list[AreaCoord] | str | int | float | bool | None
+
+class ActionDict(TypedDict, total=False):
+  id: Required[str]
+  type: Required[ActionType]
+  ratios: Required[Ratios]
+  pixelColor: PixelColor
+  imageHash: str
+  imageToFind: str
+  threshold: int
+  maxResults: int
+  resizeInterval: ResizeInterval | None
+
+class PipeInfoDict(TypedDict, total=False):
+  screenshot: Image.Image
+  bordersImage: Image.Image
+  coord: Coord
+  selectedPoint: Point
+  selectedArea: Image.Image
+  clickPauseDuration: float
+  nbClicks: int
+  pixelColor: PixelColor
+  pixelColorReference: PixelColor
+  pixelColorDifference: int | float
+  imageHash: str
+  imageHashReference: str
+  imageHashDifference: int
+  reinterpret: ActionType
+  preprocessing: str
+
+class ExecuteParams(PipeInfoDict, total=False):
+  screenshotFilepath: str
+  bordersImageFilepath: str
+  selectedAreaFilepath: str
 
 @unique
 class OcrType(Enum):
@@ -31,6 +69,9 @@ class OcrType(Enum):
   EASY_OCR = 'easyOcr'
 
 class Recognizer():
+  borders: AreaCoord | None
+  actionById: dict[str, ActionDict]
+
   """
   Recognize given patterns and make GUI actions.
 
@@ -50,15 +91,15 @@ class Recognizer():
     self.easyOcrReader = None
     self.tesseractOptions = None
     self.preprocessing = Preprocessing()
-    if type(data) == str:
+    if isinstance(data, str):
       self.loadFilepath(data)
-    elif type(data) == dict:
+    elif isinstance(data, dict):
       self.loadData(data)
     elif data is not None:
       raise RecognizerValueError('Expect a filepath or a dict as config data.')
 
   @classmethod
-  def isBordersDataValid(cls, bordersData: Any) -> bool:
+  def isBordersDataValid(cls, bordersData: Any) -> TypeIs[AreaCoord]:
     """
     :param bordersData:
     """
@@ -67,21 +108,21 @@ class Recognizer():
         and bordersData[0] <= bordersData[2] and bordersData[1] <= bordersData[3]
 
   @classmethod
-  def isImageDataValid(cls, imageData: Any) -> bool:
+  def isImageDataValid(cls, imageData: Any) -> TypeIs[Image.Image]:
     """
     :param imageData:
     """
     return isImageDataValid(imageData)
 
   @classmethod
-  def isIdDataValid(cls, idData: Any) -> bool:
+  def isIdDataValid(cls, idData: Any) -> TypeGuard[str]:
     """
     :param idData:
     """
     return isIdDataValid(idData)
 
   @classmethod
-  def isRatiosDataValid(cls, ratiosData: Any) -> bool:
+  def isRatiosDataValid(cls, ratiosData: Any) -> TypeGuard[Ratios]:
     """
     :param ratiosData:
     """
@@ -89,14 +130,14 @@ class Recognizer():
         and (len(ratiosData) == 2 or (len(ratiosData) == 4 and ratiosData[0] <= ratiosData[2] and ratiosData[1] <= ratiosData[3]))
 
   @classmethod
-  def isTypeDataValid(cls, typeData: Any) -> bool:
+  def isTypeDataValid(cls, typeData: Any) -> TypeGuard[str]:
     """
     :param typeData:
     """
-    return type(typeData) == str and typeData in [actionType.value for actionType in ActionType]
+    return isinstance(typeData, str) and typeData in [actionType.value for actionType in ActionType]
 
   @classmethod
-  def isCoordDataValid(cls, coordData: Any) -> bool:
+  def isCoordDataValid(cls, coordData: Any) -> TypeGuard[Coord]:
     """
     :param coordData:
     """
@@ -104,7 +145,7 @@ class Recognizer():
         and (len(coordData) == 2 or (len(coordData) == 4 and coordData[0] <= coordData[2] and coordData[1] <= coordData[3]))
 
   @classmethod
-  def isPointDataValid(cls, pointData: Any) -> bool:
+  def isPointDataValid(cls, pointData: Any) -> TypeGuard[int | PixelColor | tuple[int, int, int, int] | Annotated[list[int], 4]]:
     """
     :param pointData:
     """
@@ -114,28 +155,28 @@ class Recognizer():
         and all(isinstance(i, int) and 0 <= i and i <= 255 for i in pointData)
 
   @classmethod
-  def isPixelColorDataValid(cls, pixelColorData: Any) -> bool:
+  def isPixelColorDataValid(cls, pixelColorData: Any) -> TypeGuard[PixelColor]:
     """
     :param pixelColorData:
     """
     return isPixelColorDataValid(pixelColorData)
 
   @classmethod
-  def isPixelColorDifferenceDataValid(cls, differenceData: Any) -> bool:
+  def isPixelColorDifferenceDataValid(cls, differenceData: Any) -> TypeGuard[int | float]:
     """
     :param differenceData:
     """
     return isPixelColorDifferenceDataValid(differenceData)
 
   @classmethod
-  def isAreaDataValid(cls, areaData: Any) -> bool:
+  def isAreaDataValid(cls, areaData: Any) -> TypeIs[Image.Image]:
     """
     :param areaData:
     """
     return isinstance(areaData, Image.Image)
 
   @classmethod
-  def isImageToFindDataValid(cls, imageToFindData: Any) -> bool:
+  def isImageToFindDataValid(cls, imageToFindData: Any) -> TypeGuard[str]:
     """
     :param imageToFindData:
     """
@@ -148,21 +189,21 @@ class Recognizer():
     return True
 
   @classmethod
-  def isThresholdDataValid(cls, thresholdData: Any) -> bool:
+  def isThresholdDataValid(cls, thresholdData: Any) -> TypeGuard[int]:
     """
     :param thresholdData:
     """
     return isinstance(thresholdData, int) and thresholdData >= 0
 
   @classmethod
-  def isMaxResultsDataValid(cls, maxResultsData: Any) -> bool:
+  def isMaxResultsDataValid(cls, maxResultsData: Any) -> TypeGuard[int]:
     """
     :param maxResultsData:
     """
     return isinstance(maxResultsData, int) and maxResultsData > 0
 
   @classmethod
-  def isResizeIntervalDataValid(cls, resizeIntervalData: Any) -> bool:
+  def isResizeIntervalDataValid(cls, resizeIntervalData: Any) -> TypeGuard[ResizeInterval]:
     """
     :param resizeIntervalData:
     """
@@ -170,8 +211,8 @@ class Recognizer():
         and all(isinstance(i, (int, float)) and i > 0 for i in resizeIntervalData) and resizeIntervalData[0] <= resizeIntervalData[1]
 
   @classmethod
-  def isImageToFindCompatibleWithSelection(cls, imageToFind: str, borders: Coord, ratios: Ratios,
-        resizeInterval: tuple[int, int] | None=None) -> bool:
+  def isImageToFindCompatibleWithSelection(cls, imageToFind: str, borders: AreaCoord, ratios: AreaRatios,
+      resizeInterval: ResizeInterval | None=None) -> bool:
     """
     :param imageToFind:
     :param borders:
@@ -183,7 +224,7 @@ class Recognizer():
 
   @classmethod
   def isImageToFindCompatibleWithAreaSize(cls, imageToFindValue: str, areaSize: tuple[int, int],
-      resizeInterval: tuple[int, int] | None=None) -> bool:
+      resizeInterval: ResizeInterval | None=None) -> bool:
     """
     :param imageToFindValue:
     :param areaSize:
@@ -197,7 +238,7 @@ class Recognizer():
     return imageSize[0] < areaSize[0] and imageSize[1] < areaSize[1]
 
   @classmethod
-  def isImageHashDataValid(cls, imageHashData: Any) -> bool:
+  def isImageHashDataValid(cls, imageHashData: Any) -> TypeGuard[str]:
     """
     :param imageHashData:
     """
@@ -210,14 +251,14 @@ class Recognizer():
     return hash[0].hash.size == 64 and hash[1].hash.size == 42
 
   @classmethod
-  def isImageHashDifferenceDataValid(cls, differenceData: Any) -> bool:
+  def isImageHashDifferenceDataValid(cls, differenceData: Any) -> TypeGuard[int]:
     """
     :param differenceData:
     """
     return isinstance(differenceData, int) and 0 <= differenceData
 
   @classmethod
-  def isOcrOrderDataValid(cls, ocrOrderData: Any) -> bool:
+  def isOcrOrderDataValid(cls, ocrOrderData: Any) -> TypeGuard[tuple[str, ...] | list[str]]:
     """
     :param ocrOrderData: In string form.
     """
@@ -226,8 +267,16 @@ class Recognizer():
         and all(isinstance(ocrType, str) and ocrType in ocrTypes for ocrType in ocrOrderData) \
         and len(ocrOrderData) == len(set(ocrOrderData))
 
+  @overload
   @classmethod
-  def getCoord(cls, borders: Coord, ratios: Ratios) -> tuple[int, int, int, int]:
+  def getCoord(cls, borders: AreaCoord, ratios: AreaRatios) -> tuple[int, int, int, int]: ...
+
+  @overload
+  @classmethod
+  def getCoord(cls, borders: AreaCoord, ratios: PointRatios) -> tuple[int, int]: ...
+
+  @classmethod
+  def getCoord(cls, borders: AreaCoord, ratios: Ratios) -> tuple[int, int] | tuple[int, int, int, int]:
     """
     :param borders:
     :param ratios:
@@ -251,7 +300,7 @@ class Recognizer():
     raise RecognizerValueError('Parameters borders or ratios are invalid.')
 
   @classmethod
-  def getPoint(cls, coord: Coord) -> tuple[int, int, int] | int:
+  def getPoint(cls, coord: Coord) -> Point:
     """
     :param coord:
     :return: rgb colors - If outside screen (0, 0, 0).
@@ -259,12 +308,12 @@ class Recognizer():
     imageCoord = (coord[0], coord[1], coord[0] + 1, coord[1] + 1)
     try:
       image = ImageGrab.grab(imageCoord)
-      return image.getpixel((0, 0))
+      return image.getpixel((0, 0)) # type: ignore
     except:
       return (0, 0, 0)
 
   @classmethod
-  def getPointFromScreenshot(cls, screenshot: Image.Image, coord: Coord) -> tuple[int, int, int] | tuple[int, int, int, int] | int:
+  def getPointFromScreenshot(cls, screenshot: Image.Image, coord: Coord) -> Point:
     """
     :param screenshot:
     :param coord:
@@ -273,10 +322,10 @@ class Recognizer():
     if coord[0] < 0 or coord[0] >= screenshot.size[0] or coord[1] < 0 or coord[1] >= screenshot.size[1]:
       return (0, 0, 0)
     else:
-      return screenshot.getpixel((coord[0], coord[1]))
+      return screenshot.getpixel((coord[0], coord[1])) # type: ignore
 
   @classmethod
-  def getPointFromBordersImage(cls, bordersImage: Image.Image, coord: Coord, borders: Coord) -> tuple[int, int, int] | tuple[int, int, int, int] | int:
+  def getPointFromBordersImage(cls, bordersImage: Image.Image, coord: Coord, borders: Coord) -> Point:
     """
     :param bordersImage:
     :param coord:
@@ -287,7 +336,7 @@ class Recognizer():
     return cls.getPointFromScreenshot(bordersImage, relativeCoord)
 
   @classmethod
-  def getPixelColor(cls, point: tuple[int, int, int] | tuple[int, int, int, int] | int) -> tuple[int, int, int]:
+  def getPixelColor(cls, point: Point) -> PixelColor:
     """
     :param point:
     :return: rgb colors without alpha
@@ -297,15 +346,16 @@ class Recognizer():
     return point[0:3]
 
   @classmethod
-  def getAveragePixelColor(cls, area: Image.Image) -> tuple[int, int, int]:
+  def getAveragePixelColor(cls, area: Image.Image) -> PixelColor:
     """
     :param area:
     :return: rgb colors without alpha
     """
     stat = ImageStat.Stat(area)
     pixelColor = tuple([round(i) for i in stat.mean])
-    if len(pixelColor) < 3:
+    if len(pixelColor) == 1:
       pixelColor = (pixelColor[0], pixelColor[0], pixelColor[0])
+    pixelColor = cast(tuple[int, int, int], pixelColor)
     return cls.getPixelColor(pixelColor)
 
   @classmethod
@@ -317,22 +367,22 @@ class Recognizer():
     return mean(tuple(map(lambda x, y: abs(x - y) / 255, pixelColorA, pixelColorB)))
 
   @classmethod
-  def getArea(cls, coord: Coord) -> Image.Image:
+  def getArea(cls, coord: AreaCoord) -> Image.Image:
     """
     :param coord:
     """
-    return ImageGrab.grab(coord)
+    return ImageGrab.grab(coord) # type: ignore
 
   @classmethod
-  def getAreaFromScreenshot(cls, screenshot: Image.Image, coord: Coord) -> Image.Image:
+  def getAreaFromScreenshot(cls, screenshot: Image.Image, coord: AreaCoord) -> Image.Image:
     """
     :param screenshot:
     :param coord:
     """
-    return screenshot.crop(coord)
+    return screenshot.crop(coord) # type: ignore
 
   @classmethod
-  def getAreaFromBordersImage(cls, bordersImage: Image.Image, coord: Coord, borders: Coord) -> Image.Image:
+  def getAreaFromBordersImage(cls, bordersImage: Image.Image, coord: AreaCoord, borders: AreaCoord) -> Image.Image:
     """
     :param bordersImage:
     :param coord:
@@ -342,8 +392,8 @@ class Recognizer():
     return cls.getAreaFromScreenshot(bordersImage, relativeCoord)
 
   @classmethod
-  def findImageCoordinates(cls, areaCoord: Coord, area: Image.Image, imageToFindValue: str,
-      threshold: int, maxResults: int, resizeInterval: tuple[int, int] | None=None) -> list[Coord]:
+  def findImageCoordinates(cls, areaCoord: AreaCoord, area: Image.Image, imageToFindValue: str,
+      threshold: int, maxResults: int, resizeInterval: ResizeInterval | None=None) -> list[AreaCoord]:
     """
     :param areaCoord:
     :param area:
@@ -356,8 +406,8 @@ class Recognizer():
     return cls.findImageCoordinatesWithImageToFindAsImage(areaCoord, area, imageToFind, threshold, maxResults, resizeInterval)
 
   @classmethod
-  def findImageCoordinatesWithImageToFindAsImage(cls, areaCoord: Coord, area: Image.Image, imageToFind: Image.Image,
-      threshold: int, maxResults: int, resizeInterval: tuple[int, int] | None=None) -> list[Coord]:
+  def findImageCoordinatesWithImageToFindAsImage(cls, areaCoord: AreaCoord, area: Image.Image, imageToFind: Image.Image,
+      threshold: int, maxResults: int, resizeInterval: ResizeInterval | None=None) -> list[AreaCoord]:
     """
     :param areaCoord:
     :param area:
@@ -381,7 +431,7 @@ class Recognizer():
         if newSize == precedentSize:
           continue
         precedentSize = newSize
-        localImageToFind = imageToFind.resize(newSize, Image.LANCZOS)
+        localImageToFind = imageToFind.resize(newSize, Image.LANCZOS) # type: ignore
         localResults = cls._computeFindImageMatchResults(localImageToFind, areaCv)
         results += localResults
 
@@ -420,7 +470,7 @@ class Recognizer():
     return [(indice[1], indice[0], matches[indice], imageToFind.size) for indice in zip(*indices)]
 
   @classmethod
-  def _doesOverlay(cls, coord: Coord, coords: list[Coord]) -> bool:
+  def _doesOverlay(cls, coord: AreaCoord, coords: list[AreaCoord]) -> bool:
     """
     Return whether `coord` overlays one of `coords` more than 70% for each axe.
 
@@ -530,17 +580,17 @@ class Recognizer():
     :param data: config data
     :raise RecognizerValueError: invalid or incomplete `data`
     """
-    if type(data) != dict:
+    if not isinstance(data, dict):
       raise RecognizerValueError('Invalid data: data to be loaded should be a dict.')
 
     if 'borders' in data and self.isBordersDataValid(data['borders']):
-      self.borders = data['borders']
+      self.borders = cast(AreaCoord, data['borders'])
     else:
       raise RecognizerValueError('Incomplete data: the borders are missing which are necessary for any use.')
 
     if 'actions' in data and isinstance(data['actions'], (list, tuple)):
       for actionData in data['actions']:
-        if type(actionData) != dict:
+        if not isinstance(actionData, dict):
           raise RecognizerValueError('Invalid action data: every action data should be a dict.')
         self._createAction(actionData)
     else:
@@ -634,6 +684,7 @@ class Recognizer():
       case OcrType.TESSERACT:
         if self.tesseractOptions is None:
           self.setTesseractOcr()
+        assert self.tesseractOptions is not None
         return self.getTextTesseractOcr(area, self.tesseractOptions['lang'], self.tesseractOptions['textConfig'])
       case OcrType.EASY_OCR:
         return self.getTextEasyOcr(area)
@@ -657,6 +708,7 @@ class Recognizer():
       case OcrType.TESSERACT:
         if self.tesseractOptions is None:
           self.setTesseractOcr()
+        assert self.tesseractOptions is not None
         result = self.getTextTesseractOcr(area, self.tesseractOptions['lang'], self.tesseractOptions['numberConfig'])
       case OcrType.EASY_OCR:
         result = self.getTextEasyOcr(area)
@@ -683,7 +735,7 @@ class Recognizer():
       if actionId in self.actionById:
         logger.warning(f'Action id \'{actionId}\' is already used. This action is ignored.')
         return
-      action = {'id': actionId}
+      action = cast(ActionDict, {'id': actionId})
     else:
       logger.warning('Invalid action id. This action is ignored.')
       return
@@ -729,16 +781,17 @@ class Recognizer():
         action['resizeInterval'] = None
         if 'resizeInterval' in data:
           if self.isResizeIntervalDataValid(data['resizeInterval']):
-            action['resizeInterval'] = tuple(data['resizeInterval'])
+            action['resizeInterval'] = data['resizeInterval']
           else:
             logger.warning(f'Invalid min and max size ratios. This action \'{actionId}\' is ignored.')
             return
         else:
           action['resizeInterval'] = None
-        if not self.isImageToFindCompatibleWithSelection(action['imageToFind'], self.borders, action['ratios'],
-              action['resizeInterval']):
+        assert self.borders is not None
+        if not self.isImageToFindCompatibleWithSelection(action['imageToFind'], self.borders, cast(AreaRatios, action['ratios']),
+            cast(ResizeInterval, action['resizeInterval'])):
           # TODO: Is this relevant? Only the version with max size ration is going to be used (and max size ratio could be < 1)
-          if self.isImageToFindCompatibleWithSelection(action['imageToFind'], self.borders, action['ratios']):
+          if self.isImageToFindCompatibleWithSelection(action['imageToFind'], self.borders, cast(AreaRatios, action['ratios'])):
             logger.warning('The size of the image to find is too big for the selected area considering the max size ratio.'
                 f' This action \'{actionId}\' is ignored.')
           else:
@@ -746,7 +799,7 @@ class Recognizer():
           return
       case ActionType.COMPARE_PIXEL_COLOR | ActionType.IS_SAME_PIXEL_COLOR:
         if 'pixelColor' in data and self.isPixelColorDataValid(data['pixelColor']):
-          action['pixelColor'] = tuple(data['pixelColor'])
+          action['pixelColor'] = data['pixelColor']
         else:
           logger.warning(f'Invalid pixel color value. This action \'{actionId}\' is ignored.')
           return
@@ -767,7 +820,7 @@ class Recognizer():
       raise RecognizerValueError('No borders data.')
     return self.getArea(self.borders)
 
-  def execute(self, *args: str | ActionType, **kwargs: Image.Image | tuple[int, ...] | list[int] | str | int | float | ActionType) -> AnyActionReturnType:
+  def execute(self, *args: str | ActionType, **kwargs: Unpack[ExecuteParams]) -> AnyActionReturnType:
     r"""
     Return the result of the given action(s).
 
@@ -838,7 +891,7 @@ class Recognizer():
       if 'screenshot' in kwargs:
         raise RecognizerValueError('Cannot specify both parameters screenshot and screenshotFilepath.')
       try:
-        kwargs['screenshot'] = Image.open(kwargs['screenshotFilepath'])
+        kwargs['screenshot'] = Image.open(kwargs['screenshotFilepath']) # type: ignore
         kwargs.pop('screenshotFilepath')
       except:
         raise RecognizerValueError('Could not open screenshot filepath \'{filepath}\''
@@ -847,7 +900,7 @@ class Recognizer():
       if 'bordersImage' in kwargs:
         raise RecognizerValueError('Cannot specify both parameters bordersImage and bordersImageFilepath.')
       try:
-        kwargs['bordersImage'] = Image.open(kwargs['bordersImageFilepath'])
+        kwargs['bordersImage'] = Image.open(kwargs['bordersImageFilepath']) # type: ignore
         kwargs.pop('bordersImageFilepath')
       except:
         raise RecognizerValueError('Could not open borders image filepath \'{filepath}\''
@@ -858,14 +911,14 @@ class Recognizer():
       if 'selectedArea' in kwargs:
         raise RecognizerValueError('Cannot specify both parameters selectedArea and selectedAreaFilepath.')
       try:
-        kwargs['selectedArea'] = Image.open(kwargs['selectedAreaFilepath'])
+        kwargs['selectedArea'] = Image.open(kwargs['selectedAreaFilepath']) # type: ignore
         kwargs.pop('selectedAreaFilepath')
       except:
         raise RecognizerValueError('Could not open selected area filepath \'{filepath}\''
             .format(filepath=kwargs['selectedAreaFilepath']))
     return self._pipeExecute(actionIdOrTypes, kwargs)
 
-  def _pipeExecute(self, actionIdOrTypes: list[str | ActionType], pipeInfo: dict) -> Any:
+  def _pipeExecute(self, actionIdOrTypes: list[str | ActionType], pipeInfo: PipeInfoDict) -> AnyActionReturnType:
     """
     :param actionIdOrTypes: assume len(actionIdOrTypes) > 0
     :param pipeInfo:
@@ -905,8 +958,8 @@ class Recognizer():
       case ActionType.NUMBER:
         return self._pipeExecuteActionNumber(action, actionIdOrTypes, pipeInfo)
 
-  def _pipeExecuteActionCoordinates(self, action: dict | None,
-      actionIdOrTypes: list[str | ActionType], pipeInfo: dict) -> AnyActionReturnType:
+  def _pipeExecuteActionCoordinates(self, action: ActionDict | None,
+      actionIdOrTypes: list[str | ActionType], pipeInfo: PipeInfoDict) -> AnyActionReturnType:
     """
     :param action:
     :param actionIdOrTypes:
@@ -922,11 +975,12 @@ class Recognizer():
           return self._pipeExecute(actionIdOrTypes, pipeInfo)
     if action is None:
       raise RecognizerValueError('With given action types, option coord is required.')
+    assert self.borders is not None
     pipeInfo['coord'] = self.getCoord(self.borders, action['ratios'])
     return self._pipeExecuteActionCoordinates(action, actionIdOrTypes, pipeInfo)
 
-  def _pipeExecuteActionSelection(self, action: dict | None,
-      actionIdOrTypes: list[str | ActionType], pipeInfo: dict) -> AnyActionReturnType:
+  def _pipeExecuteActionSelection(self, action: ActionDict | None,
+      actionIdOrTypes: list[str | ActionType], pipeInfo: PipeInfoDict) -> AnyActionReturnType:
     """
     :param action:
     :param actionIdOrTypes:
@@ -939,6 +993,7 @@ class Recognizer():
         selectionType = SelectionType.AREA
     else:
       self._pipeExecuteActionCoordinates(action, [], pipeInfo)
+      assert 'coord' in pipeInfo
       selectionType = SelectionType.fromSelection(pipeInfo['coord'])
     if selectionType == SelectionType.POINT:
       if 'selectedPoint' in pipeInfo:
@@ -953,14 +1008,18 @@ class Recognizer():
         if not self.isImageDataValid(pipeInfo['screenshot']):
           raise RecognizerValueError('Invalid screenshot value.')
         else:
+          assert 'coord' in pipeInfo
           pipeInfo['selectedPoint'] = self.getPointFromScreenshot(pipeInfo['screenshot'], pipeInfo['coord'])
           return self._pipeExecuteActionSelection(action, actionIdOrTypes, pipeInfo)
       if 'bordersImage' in pipeInfo:
         if not self.isImageDataValid(pipeInfo['bordersImage']):
           raise RecognizerValueError('Invalid bordersImage value.')
         else:
+          assert self.borders is not None
+          assert 'coord' in pipeInfo
           pipeInfo['selectedPoint'] = self.getPointFromBordersImage(pipeInfo['bordersImage'], pipeInfo['coord'], self.borders)
           return self._pipeExecuteActionSelection(action, actionIdOrTypes, pipeInfo)
+      assert 'coord' in pipeInfo
       pipeInfo['selectedPoint'] = self.getPoint(pipeInfo['coord'])
       return self._pipeExecuteActionSelection(action, actionIdOrTypes, pipeInfo)
     else:
@@ -978,19 +1037,23 @@ class Recognizer():
         if not self.isImageDataValid(pipeInfo['screenshot']):
           raise RecognizerValueError('Invalid screenshot value.')
         else:
-          pipeInfo['selectedArea'] = self.getAreaFromScreenshot(pipeInfo['screenshot'], pipeInfo['coord'])
+          assert 'coord' in pipeInfo
+          pipeInfo['selectedArea'] = self.getAreaFromScreenshot(pipeInfo['screenshot'], cast(AreaCoord, pipeInfo['coord']))
           return self._pipeExecuteActionSelection(action, actionIdOrTypes, pipeInfo)
       if 'bordersImage' in pipeInfo:
         if not self.isImageDataValid(pipeInfo['bordersImage']):
           raise RecognizerValueError('Invalid bordersImage value.')
         else:
-          pipeInfo['selectedArea'] = self.getAreaFromBordersImage(pipeInfo['bordersImage'], pipeInfo['coord'], self.borders)
+          assert self.borders is not None
+          assert 'coord' in pipeInfo
+          pipeInfo['selectedArea'] = self.getAreaFromBordersImage(pipeInfo['bordersImage'], cast(AreaCoord, pipeInfo['coord']), self.borders)
           return self._pipeExecuteActionSelection(action, actionIdOrTypes, pipeInfo)
-      pipeInfo['selectedArea'] = self.getArea(pipeInfo['coord'])
+      assert 'coord' in pipeInfo
+      pipeInfo['selectedArea'] = self.getArea(cast(AreaCoord, pipeInfo['coord']))
       return self._pipeExecuteActionSelection(action, actionIdOrTypes, pipeInfo)
 
-  def _pipeExecuteActionFindImage(self, action: dict | None,
-      actionIdOrTypes: list[str | ActionType], pipeInfo: dict) -> AnyActionReturnType:
+  def _pipeExecuteActionFindImage(self, action: ActionDict | None,
+      actionIdOrTypes: list[str | ActionType], pipeInfo: PipeInfoDict) -> AnyActionReturnType:
     """
     :param action:
     :param actionIdOrTypes:
@@ -1005,26 +1068,32 @@ class Recognizer():
         raise RecognizerValueError('Cannot reinterpret as ActionType.FIND_IMAGE.'
             ' To load an action of this type, add it with its parameters in a config file or load it directly with loadData.')
       self._checkSelectedAreaAndNotJustSelectedPoint(pipeInfo)
+      assert 'imageToFind' in action
+      assert 'resizeInterval' in action
+      assert 'selectedArea' in pipeInfo
       if not self.isImageToFindCompatibleWithAreaSize(action['imageToFind'], pipeInfo['selectedArea'].size, action['resizeInterval']):
         if self.isImageToFindCompatibleWithAreaSize(action['imageToFind'], pipeInfo['selectedArea'].size):
           raise RecognizerValueError('Incompatible area value with image to find.'
               ' The image to find must be smaller than the area also considering the max size ratio.')
         else:
           raise RecognizerValueError('Incompatible area value with image to find. The image to find must be smaller than the area.')
-      return self.findImageCoordinates(pipeInfo['coord'], pipeInfo['selectedArea'], action['imageToFind'], action['threshold'],
+      assert 'threshold' in action
+      assert 'maxResults' in action
+      assert 'coord' in pipeInfo
+      return self.findImageCoordinates(cast(AreaCoord, pipeInfo['coord']), pipeInfo['selectedArea'], action['imageToFind'], action['threshold'],
           action['maxResults'], action['resizeInterval'])
     else:
       return self._pipeExecute(actionIdOrTypes, pipeInfo)
 
-  def _checkSelectedAreaAndNotJustSelectedPoint(self, pipeInfo):
+  def _checkSelectedAreaAndNotJustSelectedPoint(self, pipeInfo: PipeInfoDict) -> None:
     """
     :param pipeInfo:
     """
     if 'selectedArea' not in pipeInfo:
       raise RecognizerValueError('Expected an area selection instead of a point.')
 
-  def _pipeExecuteActionClick(self, action: dict | None,
-      actionIdOrTypes: list[str | ActionType], pipeInfo: dict) -> AnyActionReturnType:
+  def _pipeExecuteActionClick(self, action: ActionDict | None,
+      actionIdOrTypes: list[str | ActionType], pipeInfo: PipeInfoDict) -> AnyActionReturnType:
     """
     :param action:
     :param actionIdOrTypes:
@@ -1043,13 +1112,15 @@ class Recognizer():
             .format(nbClicks=pipeInfo['nbClicks']))
       options['nbClicks'] = pipeInfo['nbClicks']
     if len(actionIdOrTypes) == 0:
-      MouseManager.clickOnPosition(pipeInfo['coord'], **options)
+      assert 'coord' in pipeInfo
+      # TODO: test manually if can click by giving coord with 4 values or has issue and should fix
+      MouseHelper.clickOnPosition(pipeInfo['coord'], **options)
       return None
     else:
       return self._pipeExecute(actionIdOrTypes, pipeInfo)
 
-  def _pipeExecuteActionPixelColor(self, action: dict | None,
-      actionIdOrTypes: list[str | ActionType], pipeInfo: dict) -> AnyActionReturnType:
+  def _pipeExecuteActionPixelColor(self, action: ActionDict | None,
+      actionIdOrTypes: list[str | ActionType], pipeInfo: PipeInfoDict) -> AnyActionReturnType:
     """
     :param action:
     :param actionIdOrTypes:
@@ -1071,13 +1142,15 @@ class Recognizer():
     else:
       selectionType = SelectionType.AREA
     if selectionType == SelectionType.POINT:
+      assert 'selectedPoint' in pipeInfo
       pipeInfo['pixelColor'] = self.getPixelColor(pipeInfo['selectedPoint'])
     else:
+      assert 'selectedArea' in pipeInfo
       pipeInfo['pixelColor'] = self.getAveragePixelColor(pipeInfo['selectedArea'])
     return self._pipeExecuteActionPixelColor(action, actionIdOrTypes, pipeInfo)
 
-  def _pipeExecuteActionComparePixelColor(self, action: dict | None,
-      actionIdOrTypes: list[str | ActionType], pipeInfo: dict) -> AnyActionReturnType:
+  def _pipeExecuteActionComparePixelColor(self, action: ActionDict | None,
+      actionIdOrTypes: list[str | ActionType], pipeInfo: PipeInfoDict) -> AnyActionReturnType:
     """
     :param action:
     :param actionIdOrTypes:
@@ -1100,11 +1173,12 @@ class Recognizer():
       raise RecognizerValueError('With given action types, option pixelColorReference is required.')
     if not self.isPixelColorDataValid(pipeInfo['pixelColorReference']):
       raise RecognizerValueError('Invalid pixel color reference value: \'{pixelColor}\'.'.format(pixelColor=pipeInfo['pixelColorReference']))
+    assert 'pixelColor' in pipeInfo
     pipeInfo['pixelColorDifference'] = self.getPixelColorDifference(pipeInfo['pixelColor'], pipeInfo['pixelColorReference'])
     return self._pipeExecuteActionComparePixelColor(action, actionIdOrTypes, pipeInfo)
 
-  def _pipeExecuteActionIsSamePixelColor(self, action: dict | None,
-      actionIdOrTypes: list[str | ActionType], pipeInfo: dict) -> AnyActionReturnType:
+  def _pipeExecuteActionIsSamePixelColor(self, action: ActionDict | None,
+      actionIdOrTypes: list[str | ActionType], pipeInfo: PipeInfoDict) -> AnyActionReturnType:
     """
     :param action:
     :param actionIdOrTypes:
@@ -1112,12 +1186,13 @@ class Recognizer():
     """
     self._pipeExecuteActionComparePixelColor(action, [], pipeInfo)
     if len(actionIdOrTypes) == 0:
+      assert 'pixelColorDifference' in pipeInfo
       return pipeInfo['pixelColorDifference'] == 0
     else:
       return self._pipeExecute(actionIdOrTypes, pipeInfo)
 
-  def _pipeExecuteActionImageHash(self, action: dict | None,
-      actionIdOrTypes: list[str | ActionType], pipeInfo: dict) -> AnyActionReturnType:
+  def _pipeExecuteActionImageHash(self, action: ActionDict | None,
+      actionIdOrTypes: list[str | ActionType], pipeInfo: PipeInfoDict) -> AnyActionReturnType:
     """
     :param action:
     :param actionIdOrTypes:
@@ -1133,11 +1208,12 @@ class Recognizer():
           return self._pipeExecute(actionIdOrTypes, pipeInfo)
     self._pipeExecuteActionSelection(action, [], pipeInfo)
     self._checkSelectedAreaAndNotJustSelectedPoint(pipeInfo)
+    assert 'selectedArea' in pipeInfo
     pipeInfo['imageHash'] = self.getImageHash(pipeInfo['selectedArea'])
     return self._pipeExecuteActionImageHash(action, actionIdOrTypes, pipeInfo)
 
-  def _pipeExecuteActionCompareImageHash(self, action: dict | None,
-      actionIdOrTypes: list[str | ActionType], pipeInfo: dict) -> AnyActionReturnType:
+  def _pipeExecuteActionCompareImageHash(self, action: ActionDict | None,
+      actionIdOrTypes: list[str | ActionType], pipeInfo: PipeInfoDict) -> AnyActionReturnType:
     """
     :param action:
     :param actionIdOrTypes:
@@ -1160,11 +1236,12 @@ class Recognizer():
       raise RecognizerValueError('With given action types, option imageHashReference is required.')
     if not self.isImageHashDataValid(pipeInfo['imageHashReference']):
       raise RecognizerValueError('Invalid image hash reference value: \'{imageHash}\'.'.format(imageHash=pipeInfo['imageHashReference']))
+    assert 'imageHash' in pipeInfo
     pipeInfo['imageHashDifference'] = self.getImageHashDifference(pipeInfo['imageHash'], pipeInfo['imageHashReference'])
     return self._pipeExecuteActionCompareImageHash(action, actionIdOrTypes, pipeInfo)
 
-  def _pipeExecuteActionIsSameImageHash(self, action: dict | None,
-      actionIdOrTypes: list[str | ActionType], pipeInfo: dict) -> AnyActionReturnType:
+  def _pipeExecuteActionIsSameImageHash(self, action: ActionDict | None,
+      actionIdOrTypes: list[str | ActionType], pipeInfo: PipeInfoDict) -> AnyActionReturnType:
     """
     :param action:
     :param actionIdOrTypes:
@@ -1172,12 +1249,13 @@ class Recognizer():
     """
     self._pipeExecuteActionCompareImageHash(action, [], pipeInfo)
     if len(actionIdOrTypes) == 0:
+      assert 'imageHashDifference' in pipeInfo
       return pipeInfo['imageHashDifference'] == 0
     else:
       return self._pipeExecute(actionIdOrTypes, pipeInfo)
 
-  def _pipeExecuteActionText(self, action: dict | None,
-      actionIdOrTypes: list[str | ActionType], pipeInfo: dict) -> AnyActionReturnType:
+  def _pipeExecuteActionText(self, action: ActionDict | None,
+      actionIdOrTypes: list[str | ActionType], pipeInfo: PipeInfoDict) -> AnyActionReturnType:
     """
     :param action:
     :param actionIdOrTypes:
@@ -1186,12 +1264,13 @@ class Recognizer():
     self._pipeExecuteActionSelection(action, [], pipeInfo)
     if len(actionIdOrTypes) == 0:
       self._checkSelectedAreaAndNotJustSelectedPoint(pipeInfo)
+      assert 'selectedArea' in pipeInfo
       return self.getText(pipeInfo['selectedArea'])
     else:
       return self._pipeExecute(actionIdOrTypes, pipeInfo)
 
-  def _pipeExecuteActionNumber(self, action: dict | None,
-      actionIdOrTypes: list[str | ActionType], pipeInfo: dict) -> AnyActionReturnType:
+  def _pipeExecuteActionNumber(self, action: ActionDict | None,
+      actionIdOrTypes: list[str | ActionType], pipeInfo: PipeInfoDict) -> AnyActionReturnType:
     """
     :param action:
     :param actionIdOrTypes:
@@ -1200,6 +1279,7 @@ class Recognizer():
     self._pipeExecuteActionSelection(action, [], pipeInfo)
     if len(actionIdOrTypes) == 0:
       self._checkSelectedAreaAndNotJustSelectedPoint(pipeInfo)
+      assert 'selectedArea' in pipeInfo
       return self.getNumber(pipeInfo['selectedArea'])
     else:
       return self._pipeExecute(actionIdOrTypes, pipeInfo)

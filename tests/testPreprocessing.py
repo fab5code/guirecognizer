@@ -1,11 +1,16 @@
 import logging
 import sys
 import unittest
+from typing import cast
+
 from PIL import Image, ImageOps
 
-from guirecognizer import Preprocessing, PreprocessingType, RecognizerValueError, \
-    GrayscalePreprocessor, ColorMapMethod, ColorMapPreprocessor, \
-    ThresholdMethod, ThresholdPreprocessor, ThresholdType, ResizeMethod, ResizePreprocessor
+from guirecognizer import (ColorMapMethod, ColorMapPreprocessor,
+                           GrayscalePreprocessor, Preprocessing,
+                           PreprocessingType, RecognizerValueError,
+                           ResizeMethod, ResizePreprocessor, ThresholdMethod,
+                           ThresholdPreprocessor, ThresholdType)
+
 
 class LoggedTestCase(unittest.TestCase):
   def setUp(self):
@@ -18,7 +23,7 @@ class LoggedTestCase(unittest.TestCase):
 class TestPreprocessing(LoggedTestCase):
   def test_error_invalidOperations(self):
     with self.assertRaises(RecognizerValueError):
-      Preprocessing('invalid')
+      Preprocessing('invalid') # type: ignore
     with self.assertRaises(RecognizerValueError):
       Preprocessing({'operations': 'invalid'})
     with self.assertRaises(RecognizerValueError):
@@ -54,9 +59,9 @@ class TestPreprocessing(LoggedTestCase):
         {'id': 'operationId', 'suboperations': [{'type': PreprocessingType.COLOR_MAP.value, 'colorMap': {}}]}]})
     image = Image.open('tests/data/img/img1.png')
     with self.assertRaises(RecognizerValueError):
-      preprocessing.process('invalid', 'operationId')
+      preprocessing.process('invalid', 'operationId') # type: ignore
     with self.assertRaises(RecognizerValueError):
-      preprocessing.process(image, 1)
+      preprocessing.process(image, 1) # type: ignore
     with self.assertRaises(RecognizerValueError):
       preprocessing.process(image, 'unknownId')
 
@@ -73,7 +78,7 @@ class TestGrayscale(LoggedTestCase):
   def test_error_invalidImage(self):
     preprocessor = GrayscalePreprocessor()
     with self.assertRaises(RecognizerValueError):
-      preprocessor.process('invalid')
+      preprocessor.process('invalid') # type: ignore
 
   def test_grayscale(self):
     image = Image.open('tests/data/img/img4.png')
@@ -91,7 +96,7 @@ class TestColorMap(LoggedTestCase):
   def test_error_invalidImage(self):
     preprocessor = ColorMapPreprocessor()
     with self.assertRaises(RecognizerValueError):
-      preprocessor.process('invalid')
+      preprocessor.process('invalid') # type: ignore
 
   def test_error_invalidMethod(self):
     with self.assertRaises(RecognizerValueError):
@@ -99,27 +104,27 @@ class TestColorMap(LoggedTestCase):
 
   def test_error_invalidInputColor1(self):
     with self.assertRaises(RecognizerValueError):
-      ColorMapPreprocessor(inputColor1='invalid')
+      ColorMapPreprocessor(inputColor1='invalid') # type: ignore
 
   def test_error_invalidOutputColor1(self):
     with self.assertRaises(RecognizerValueError):
-      ColorMapPreprocessor(outputColor1='invalid')
+      ColorMapPreprocessor(outputColor1='invalid') # type: ignore
 
   def test_error_invalidDifference(self):
     with self.assertRaises(RecognizerValueError):
-      ColorMapPreprocessor(outputColor1='invalid')
+      ColorMapPreprocessor(outputColor1='invalid') # type: ignore
 
   def test_error_invalidInputColor2(self):
     with self.assertRaises(RecognizerValueError):
-      ColorMapPreprocessor(method=ColorMapMethod.RANGE_TO_ONE, inputColor2='invalid')
+      ColorMapPreprocessor(method=ColorMapMethod.RANGE_TO_ONE, inputColor2='invalid') # type: ignore
 
   def test_error_invalidOutputColor2(self):
     with self.assertRaises(RecognizerValueError):
-      ColorMapPreprocessor(method=ColorMapMethod.RANGE_TO_RANGE, outputColor2='invalid')
+      ColorMapPreprocessor(method=ColorMapMethod.RANGE_TO_RANGE, outputColor2='invalid') # type: ignore
 
   def test_oneToOne(self):
     image = Image.open('tests/data/img/img1.png')
-    color = image.getpixel((5, 5))[:3]
+    color = cast(tuple[int, int, int, int], image.getpixel((5, 5)))[:3]
     outputColor = (255, 0, 0)
     preprocessor = ColorMapPreprocessor(method=ColorMapMethod.ONE_TO_ONE, inputColor1=color,
         difference=0, outputColor1=outputColor)
@@ -129,7 +134,7 @@ class TestColorMap(LoggedTestCase):
 
   def test_oneToOne_grayImage(self):
     image = ImageOps.grayscale(Image.open('tests/data/img/img1.png'))
-    color = image.getpixel((5, 5))
+    color = cast(int, image.getpixel((5, 5)))
     inputColor = (color, color, color)
     outputColor = (255, 0, 0)
     preprocessor = ColorMapPreprocessor(method=ColorMapMethod.ONE_TO_ONE, inputColor1=inputColor,
@@ -140,7 +145,7 @@ class TestColorMap(LoggedTestCase):
 
   def test_rangeToOne_sameInputColors(self):
     image = Image.open('tests/data/img/img1.png')
-    color = image.getpixel((6, 6))[:3]
+    color = cast(tuple[int, int, int, int], image.getpixel((6, 6)))[:3]
     outputColor = (255, 0, 0)
     preprocessor = ColorMapPreprocessor(method=ColorMapMethod.RANGE_TO_ONE, inputColor1=color, inputColor2=color,
         difference=0, outputColor1=outputColor)
@@ -150,8 +155,8 @@ class TestColorMap(LoggedTestCase):
 
   def test_rangeToOne(self):
     image = Image.open('tests/data/img/img4.png')
-    inputColor1 = image.getpixel((1, 0))[:3]
-    inputColor2 = image.getpixel((3, 0))[:3]
+    inputColor1 = cast(tuple[int, int, int, int], image.getpixel((1, 0)))[:3]
+    inputColor2 = cast(tuple[int, int, int, int], image.getpixel((3, 0)))[:3]
     outputColor = (255, 0, 0)
     preprocessor = ColorMapPreprocessor(method=ColorMapMethod.RANGE_TO_ONE, inputColor1=inputColor1, inputColor2=inputColor2,
         difference=0.05, outputColor1=outputColor)
@@ -163,7 +168,7 @@ class TestColorMap(LoggedTestCase):
 
   def test_rangeToRange_sameInputColors(self):
     image = Image.open('tests/data/img/img1.png')
-    color = image.getpixel((6, 6))[:3]
+    color = cast(tuple[int, int, int, int], image.getpixel((6, 6)))[:3]
     outputColor1 = (200, 0, 0)
     outputColor2 = (100, 0, 0)
     preprocessor = ColorMapPreprocessor(method=ColorMapMethod.RANGE_TO_RANGE, inputColor1=color, inputColor2=color,
@@ -174,8 +179,8 @@ class TestColorMap(LoggedTestCase):
 
   def test_rangeToRange_sameOutputColors(self):
     image = Image.open('tests/data/img/img4.png')
-    inputColor1 = image.getpixel((1, 0))[:3]
-    inputColor2 = image.getpixel((3, 0))[:3]
+    inputColor1 = cast(tuple[int, int, int, int], image.getpixel((1, 0)))[:3]
+    inputColor2 = cast(tuple[int, int, int, int], image.getpixel((3, 0)))[:3]
     outputColor = (255, 0, 0)
     preprocessor = ColorMapPreprocessor(method=ColorMapMethod.RANGE_TO_RANGE, inputColor1=inputColor1, inputColor2=inputColor2,
         difference=0.05, outputColor1=outputColor, outputColor2=outputColor)
@@ -187,8 +192,8 @@ class TestColorMap(LoggedTestCase):
 
   def test_rangeToRange(self):
     image = Image.open('tests/data/img/img4.png')
-    inputColor1 = image.getpixel((1, 0))[:3]
-    inputColor2 = image.getpixel((3, 0))[:3]
+    inputColor1 = cast(tuple[int, int, int, int], image.getpixel((1, 0)))[:3]
+    inputColor2 = cast(tuple[int, int, int, int], image.getpixel((3, 0)))[:3]
     outputColor1 = (200, 0, 0)
     outputColor2 = (100, 0, 0)
     preprocessor = ColorMapPreprocessor(method=ColorMapMethod.RANGE_TO_RANGE, inputColor1=inputColor1, inputColor2=inputColor2,
@@ -226,7 +231,7 @@ class TestColorMap(LoggedTestCase):
 
   def test_preprocessing_oneToOne(self):
     image = Image.open('tests/data/img/img4.png')
-    color = image.getpixel((3, 0))[:3]
+    color = cast(tuple[int, int, int, int], image.getpixel((3, 0)))[:3]
     outputColor = (255, 0, 0)
     preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.COLOR_MAP.value,
         'colorMap': {'method': ColorMapMethod.ONE_TO_ONE.value, 'inputColor1': color, 'difference': 0,
@@ -237,8 +242,8 @@ class TestColorMap(LoggedTestCase):
 
   def test_preprocessing_rangeToOne(self):
     image = Image.open('tests/data/img/img4.png')
-    inputColor1 = image.getpixel((1, 0))[:3]
-    inputColor2 = image.getpixel((3, 0))[:3]
+    inputColor1 = cast(tuple[int, int, int, int], image.getpixel((1, 0)))[:3]
+    inputColor2 = cast(tuple[int, int, int, int], image.getpixel((3, 0)))[:3]
     outputColor = (255, 0, 0)
     preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.COLOR_MAP.value,
         'colorMap': {'method': ColorMapMethod.RANGE_TO_ONE.value, 'inputColor1': inputColor1, 'inputColor2': inputColor2,
@@ -251,8 +256,8 @@ class TestColorMap(LoggedTestCase):
 
   def test_preprocessing_rangeToRange(self):
     image = Image.open('tests/data/img/img4.png')
-    inputColor1 = image.getpixel((1, 0))[:3]
-    inputColor2 = image.getpixel((3, 0))[:3]
+    inputColor1 = cast(tuple[int, int, int, int], image.getpixel((1, 0)))[:3]
+    inputColor2 = cast(tuple[int, int, int, int], image.getpixel((3, 0)))[:3]
     outputColor1 = (200, 0, 0)
     outputColor2 = (100, 0, 0)
     preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.COLOR_MAP.value,
@@ -268,7 +273,7 @@ class TestThreshold(LoggedTestCase):
   def test_error_invalidImage(self):
     preprocessor = ThresholdPreprocessor()
     with self.assertRaises(RecognizerValueError):
-      preprocessor.process('invalid')
+      preprocessor.process('invalid') # type: ignore
 
   def test_error_invalidMethod(self):
     with self.assertRaises(RecognizerValueError):
@@ -294,19 +299,19 @@ class TestThreshold(LoggedTestCase):
 
   def test_error_invalidMaxValue(self):
     with self.assertRaises(RecognizerValueError):
-      ThresholdPreprocessor(maxValue='invalid')
+      ThresholdPreprocessor(maxValue='invalid') # type: ignore
 
   def test_error_invalidThreshold(self):
     with self.assertRaises(RecognizerValueError):
-      ThresholdPreprocessor(threshold='invalid')
+      ThresholdPreprocessor(threshold='invalid') # type: ignore
 
   def test_error_invalidBlockSize(self):
     with self.assertRaises(RecognizerValueError):
-      ThresholdPreprocessor(method=ThresholdMethod.ADAPTIVE_MEAN, thresholdType=ThresholdType.BINARY, blockSize='invalid')
+      ThresholdPreprocessor(method=ThresholdMethod.ADAPTIVE_MEAN, thresholdType=ThresholdType.BINARY, blockSize='invalid') # type: ignore
 
   def test_error_invalidCConstant(self):
     with self.assertRaises(RecognizerValueError):
-      ThresholdPreprocessor(method=ThresholdMethod.ADAPTIVE_MEAN, thresholdType=ThresholdType.BINARY, cConstant='invalid')
+      ThresholdPreprocessor(method=ThresholdMethod.ADAPTIVE_MEAN, thresholdType=ThresholdType.BINARY, cConstant='invalid') # type: ignore
 
   def test_simple(self):
     image = Image.open('tests/data/img/img1.png')
@@ -357,31 +362,31 @@ class TestResize(LoggedTestCase):
   def test_error_invalidImage(self):
     preprocessor = ResizePreprocessor()
     with self.assertRaises(RecognizerValueError):
-      preprocessor.process('invalid')
+      preprocessor.process('invalid') # type: ignore
 
   def test_error_invalidWidth(self):
     with self.assertRaises(RecognizerValueError):
-      ResizePreprocessor(width='invalid', method=ResizeMethod.UNFIXED_RATIO)
+      ResizePreprocessor(width='invalid', method=ResizeMethod.UNFIXED_RATIO) # type: ignore
     with self.assertRaises(RecognizerValueError):
       ResizePreprocessor(width=0, method=ResizeMethod.UNFIXED_RATIO)
     with self.assertRaises(RecognizerValueError):
-      ResizePreprocessor(width=30.1, method=ResizeMethod.UNFIXED_RATIO)
+      ResizePreprocessor(width=30.1, method=ResizeMethod.UNFIXED_RATIO) # type: ignore
     with self.assertRaises(RecognizerValueError):
-      ResizePreprocessor(width=40.0, method=ResizeMethod.UNFIXED_RATIO)
+      ResizePreprocessor(width=40.0, method=ResizeMethod.UNFIXED_RATIO) # type: ignore
 
   def test_error_invalidHeight(self):
     with self.assertRaises(RecognizerValueError):
-      ResizePreprocessor(height='invalid', method=ResizeMethod.UNFIXED_RATIO)
+      ResizePreprocessor(height='invalid', method=ResizeMethod.UNFIXED_RATIO) # type: ignore
     with self.assertRaises(RecognizerValueError):
       ResizePreprocessor(height=0, method=ResizeMethod.UNFIXED_RATIO)
     with self.assertRaises(RecognizerValueError):
-      ResizePreprocessor(height=30.1, method=ResizeMethod.UNFIXED_RATIO)
+      ResizePreprocessor(height=30.1, method=ResizeMethod.UNFIXED_RATIO) # type: ignore
     with self.assertRaises(RecognizerValueError):
-      ResizePreprocessor(height=40.0, method=ResizeMethod.UNFIXED_RATIO)
+      ResizePreprocessor(height=40.0, method=ResizeMethod.UNFIXED_RATIO) # type: ignore
 
   def test_error_invalidMethod(self):
     with self.assertRaises(RecognizerValueError):
-      ResizePreprocessor(method='invalid')
+      ResizePreprocessor(method='invalid') # type: ignore
 
   def test_resize_unfixedRatio(self):
     image = Image.open('tests/data/img/img1.png')
