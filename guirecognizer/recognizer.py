@@ -636,11 +636,14 @@ class Recognizer():
       return
 
     filename = 'tesseract.exe'
-    for root, _, files in os.walk(os.path.abspath(os.sep)):
-      for name in files:
-        if name == filename:
-          pytesseract.pytesseract.tesseract_cmd = os.path.abspath(os.path.join(root, name))
-          return
+    # TODO: solution works on windows but may not work on linux
+    drives = [chr(x) + ":" for x in range(65,91) if os.path.exists(chr(x) + ":")]
+    for drive in drives:
+      for root, _, files in os.walk(os.path.abspath(drive + os.sep)):
+        for name in files:
+          if name == filename:
+            pytesseract.pytesseract.tesseract_cmd = os.path.abspath(os.path.join(root, name))
+            return
     raise RecognizerValueError('Could not automatically find the filepath of tesseract.exe.'
         ' Maybe tesseract is not installed. More information is available in the documentation of pytesseract.'
         ' Installation link: https://github.com/tesseract-ocr/tesseract')

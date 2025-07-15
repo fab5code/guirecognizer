@@ -5,17 +5,12 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "guirecognizer"
 dynamic = ["version"]
-dependencies = [
-  "numpy",
-  "opencv-python",
-  "imagehash",
-  "pyautogui"
-]
+dependencies = ["numpy", "opencv-python", "imagehash", "pyautogui"]
 # TODO: add an email
-authors = [{name = "FAB V"}]
+authors = [{ name = "FAB V" }]
 keywords = ["GUI", "recognizer"]
 license = "MIT"
-readme = {file = "README.rst", content-type = "text/x-rst"}
+readme = { file = "README.rst", content-type = "text/x-rst" }
 requires-python = ">=3.10"
 classifiers = [
   "Private :: Do Not Upload",
@@ -24,31 +19,24 @@ classifiers = [
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
-  "Programming Language :: Python :: 3.13"
+  "Programming Language :: Python :: 3.13",
 ]
 
 [project.optional-dependencies]
-dev = [
-  "packaging",
-  "coverage",
-  "build",
-  "twine",
-  "pytesseract",
-  "easyocr"
-]
+dev = ["packaging", "coverage", "build", "twine", "pytesseract", "easyocr"]
 
 # [project.urls]
 # Repository = "https://github.com/me/spam.git"
 # Issues = "https://github.com/me/spam/issues"
 
 [tool.setuptools.dynamic]
-version = {attr = "guirecognizer.__version__"}
+version = { attr = "guirecognizer.__version__" }
 
 [tool.setuptools.packages.find]
 where = ["."]
 
 [tool.coverage.run]
-omit = [
-  "config.py",
-  "config-3.py",
-]
+omit = ["config.py", "config-3.py"]
+
+[tool.coverage.report]
+exclude_also = ["@(abc\\.)?abstractmethod"]

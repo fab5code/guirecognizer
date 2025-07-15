@@ -388,6 +388,8 @@ class TestRecognizer(LoggedTestCase):
     self.assertFalse(Recognizer.isOcrOrderDataValid([OcrType.EASY_OCR.value, OcrType.EASY_OCR.value]))
     self.assertTrue(Recognizer.isOcrOrderDataValid([]))
     self.assertTrue(Recognizer.isOcrOrderDataValid([OcrType.EASY_OCR.value]))
+    self.assertTrue(Recognizer.isOcrOrderDataValid([OcrType.TESSERACT.value]))
+    self.assertTrue(Recognizer.isOcrOrderDataValid([OcrType.TESSERACT.value, OcrType.EASY_OCR.value]))
 
 class TestSelectionType(LoggedTestCase):
   def test_error_selectionType(self):
@@ -421,13 +423,13 @@ class TestExecuteAction(LoggedTestCase):
 
   def test_error_optionScreenshot(self):
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('selection1', screenshot='invalid')
+      self.recognizer.execute('selection1', screenshot='invalid') # type: ignore
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('selection1', screenshot=42)
+      self.recognizer.execute('selection1', screenshot=42) # type: ignore
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('selection2', screenshot='invalid')
+      self.recognizer.execute('selection2', screenshot='invalid') # type: ignore
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('selection2', screenshot=42)
+      self.recognizer.execute('selection2', screenshot=42) # type: ignore
 
   def test_error_optionScreenshotFilepath(self):
     with self.assertRaises(RecognizerValueError):
@@ -442,13 +444,13 @@ class TestExecuteAction(LoggedTestCase):
 
   def test_error_optionBordersImage(self):
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('selection1', bordersImage='invalid')
+      self.recognizer.execute('selection1', bordersImage='invalid') # type: ignore
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('selection1', bordersImage=42)
+      self.recognizer.execute('selection1', bordersImage=42) # type: ignore
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('selection2', bordersImage='invalid')
+      self.recognizer.execute('selection2', bordersImage='invalid') # type: ignore
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('selection2', bordersImage=42)
+      self.recognizer.execute('selection2', bordersImage=42) # type: ignore
 
     bordersImage = Image.open('tests/data/img/img1.png')
     self.recognizer.execute('coordinates1', bordersImage=bordersImage)
@@ -477,15 +479,15 @@ class TestExecuteAction(LoggedTestCase):
 
   def test_error_optionCoord(self):
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('coordinates1', coord='invalid')
+      self.recognizer.execute('coordinates1', coord='invalid') # type: ignore
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('coordinates1', coord=42)
+      self.recognizer.execute('coordinates1', coord=42) # type: ignore
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('coordinates1', coord=(1))
+      self.recognizer.execute('coordinates1', coord=(1)) # type: ignore
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('coordinates1', coord=(1, 2, 3))
+      self.recognizer.execute('coordinates1', coord=(1, 2, 3)) # type: ignore
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('coordinates1', coord=(1, 2, 3, 4, 5))
+      self.recognizer.execute('coordinates1', coord=(1, 2, 3, 4, 5)) # type: ignore
     with self.assertRaises(RecognizerValueError):
       self.recognizer.execute('coordinates1', coord=(1.0, 2)) # type: ignore
     with self.assertRaises(RecognizerValueError):
@@ -495,11 +497,11 @@ class TestExecuteAction(LoggedTestCase):
 
   def test_error_optionSelectedPoint(self):
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('selection1', selectedPoint='invalid')
+      self.recognizer.execute('selection1', selectedPoint='invalid') # type: ignore
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('selection1', selectedPoint=(42, 42))
+      self.recognizer.execute('selection1', selectedPoint=(42, 42)) # type: ignore
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('selection1', selectedPoint=(42, 42, 42, 42, 42))
+      self.recognizer.execute('selection1', selectedPoint=(42, 42, 42, 42, 42)) # type: ignore
     with self.assertRaises(RecognizerValueError):
       self.recognizer.execute('selection1', selectedPoint=(42, 420, 42))
     with self.assertRaises(RecognizerValueError):
@@ -507,25 +509,25 @@ class TestExecuteAction(LoggedTestCase):
 
   def test_error_optionPixelColor(self):
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('pixelColor1', pixelColor='invalid')
+      self.recognizer.execute('pixelColor1', pixelColor='invalid') # type: ignore
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('pixelColor1', pixelColor=42)
+      self.recognizer.execute('pixelColor1', pixelColor=42) # type: ignore
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('pixelColor1', pixelColor=(42, 42, 42, 42))
+      self.recognizer.execute('pixelColor1', pixelColor=(42, 42, 42, 42)) # type: ignore
     with self.assertRaises(RecognizerValueError):
       self.recognizer.execute('pixelColor1', pixelColor=(42, 42.0, 42)) # type: ignore
 
   def test_error_optionPixelColorReference(self):
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('comparePixelColor1', pixelColorReference='invalid')
+      self.recognizer.execute('comparePixelColor1', pixelColorReference='invalid') # type: ignore
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('comparePixelColor1', pixelColorReference=42)
+      self.recognizer.execute('comparePixelColor1', pixelColorReference=42) # type: ignore
 
   def test_error_optionPixelColorDifference(self):
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('comparePixelColor1', pixelColorDifference='invalid')
+      self.recognizer.execute('comparePixelColor1', pixelColorDifference='invalid') # type: ignore
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('comparePixelColor1', pixelColorDifference=(42, 42, 42))
+      self.recognizer.execute('comparePixelColor1', pixelColorDifference=(42, 42, 42)) # type: ignore
     with self.assertRaises(RecognizerValueError):
       self.recognizer.execute('comparePixelColor1', pixelColorDifference=2)
     with self.assertRaises(RecognizerValueError):
@@ -537,9 +539,9 @@ class TestExecuteAction(LoggedTestCase):
 
   def test_error_optionSelectedArea(self):
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('selection2', selectedArea='invalid')
+      self.recognizer.execute('selection2', selectedArea='invalid') # type: ignore
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('selection2', selectedArea=42)
+      self.recognizer.execute('selection2', selectedArea=42) # type: ignore
 
   def test_error_optionSelectedAreaFilepath(self):
     with self.assertRaises(RecognizerValueError):
@@ -556,7 +558,7 @@ class TestExecuteAction(LoggedTestCase):
     with self.assertRaises(RecognizerValueError):
       self.recognizer.execute('imageHash1', imageHash='invalid')
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('imageHash1', imageHash=42)
+      self.recognizer.execute('imageHash1', imageHash=42) # type: ignore
     with self.assertRaises(RecognizerValueError):
       self.recognizer.execute('imageHash1', imageHash='b88cf69dd66c8960,')
     with self.assertRaises(RecognizerValueError):
@@ -572,7 +574,7 @@ class TestExecuteAction(LoggedTestCase):
     with self.assertRaises(RecognizerValueError):
       self.recognizer.execute('compareImageHash1', imageHashReference='invalid')
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('compareImageHash1', imageHashReference=42)
+      self.recognizer.execute('compareImageHash1', imageHashReference=42) # type: ignore
     with self.assertRaises(RecognizerValueError):
       self.recognizer.execute('compareImageHash1', imageHashReference='a1e24e1f1372761e,1b00b0')
     with self.assertRaises(RecognizerValueError):
@@ -580,11 +582,11 @@ class TestExecuteAction(LoggedTestCase):
 
   def test_error_optionImageHashDifference(self):
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('compareImageHash1', imageHashDifference='invalid')
+      self.recognizer.execute('compareImageHash1', imageHashDifference='invalid') # type: ignore
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('compareImageHash1', imageHashDifference=2.72)
+      self.recognizer.execute('compareImageHash1', imageHashDifference=2.72) # type: ignore
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('compareImageHash1', imageHashDifference=3.0)
+      self.recognizer.execute('compareImageHash1', imageHashDifference=3.0) # type: ignore
     with self.assertRaises(RecognizerValueError):
       self.recognizer.execute('compareImageHash1', imageHashDifference=-1)
 
@@ -611,9 +613,9 @@ class TestExecuteAction(LoggedTestCase):
 
   def test_error_reinterpret(self):
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('selection1', reinterpret='invalid', screenshotFilepath='tests/data/img/img1.png')
+      self.recognizer.execute('selection1', reinterpret='invalid', screenshotFilepath='tests/data/img/img1.png') # type: ignore
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('selection1', reinterpret=42, screenshotFilepath='tests/data/img/img1.png')
+      self.recognizer.execute('selection1', reinterpret=42, screenshotFilepath='tests/data/img/img1.png') # type: ignore
     with self.assertRaises(RecognizerValueError):
       self.recognizer.execute('selection1', reinterpret=ActionType.FIND_IMAGE, screenshotFilepath='tests/data/img/img1.png')
     with self.assertRaises(RecognizerValueError):
@@ -771,7 +773,8 @@ class TestExecuteAction(LoggedTestCase):
     self.assertEqual(type(result), bool)
     self.assertFalse(result)
 
-  def test_actionText(self):
+  def test_actionText_easyOcr(self):
+    self.recognizer.setOcrOrder([OcrType.EASY_OCR])
     result = self.recognizer.execute('text1', screenshotFilepath='tests/data/img/img1.png')
     self.assertEqual(type(result), str)
     self.assertNotIn('Love', cast(str, result))
@@ -780,7 +783,18 @@ class TestExecuteAction(LoggedTestCase):
     self.assertEqual(type(result), str)
     self.assertIn('Love', cast(str, result))
 
-  def test_actionNumber(self):
+  def test_actionText_tesseract(self):
+    self.recognizer.setOcrOrder([OcrType.TESSERACT])
+    result = self.recognizer.execute('text1', screenshotFilepath='tests/data/img/img1.png')
+    self.assertEqual(type(result), str)
+    self.assertNotIn('L\n', cast(str, result))
+
+    result = self.recognizer.execute('text1', screenshotFilepath='tests/data/img/img3.png')
+    self.assertEqual(type(result), str)
+    self.assertIn('L\n', cast(str, result))
+
+  def test_actionNumber_easyOcr(self):
+    self.recognizer.setOcrOrder([OcrType.EASY_OCR])
     result = self.recognizer.execute('number1', screenshotFilepath='tests/data/img/img1.png')
     self.assertIsNone(result)
 
@@ -790,6 +804,15 @@ class TestExecuteAction(LoggedTestCase):
 
     result = self.recognizer.execute('number2', screenshotFilepath='tests/data/img/img3.png')
     self.assertIsNone(result)
+
+  def test_actionNumber_tesseract(self):
+    self.recognizer.setOcrOrder([OcrType.TESSERACT])
+    result = self.recognizer.execute('number1', screenshotFilepath='tests/data/img/img1.png')
+    self.assertIsNone(result)
+
+    result = self.recognizer.execute('number1', screenshotFilepath='tests/data/img/img3.png')
+    self.assertEqual(type(result), float)
+    self.assertEqual(result, 42)
 
   def test_optionScreenshot(self):
     screenshot = Image.open('tests/data/img/img1.png')
