@@ -1,7 +1,7 @@
 import logging
 from abc import ABC, abstractmethod
 from enum import Enum, unique
-from typing import Any, TypeGuard, TypeIs
+from typing import Any, TypeGuard, TypeIs, assert_never
 
 import numpy as np
 from PIL import Image, ImageOps
@@ -100,6 +100,8 @@ class ColorMapPreprocessor(Preprocessor):
         return self._processRangeToOne(image)
       case ColorMapMethod.RANGE_TO_RANGE:
         return self._processRangeToRange(image)
+      case _ as unreachable:
+        assert_never(self.method)
 
   def _processOneToOne(self, image: Image.Image) -> Image.Image:
     """
@@ -307,6 +309,8 @@ class ThresholdPreprocessor(Preprocessor):
         thresholdType = cv.THRESH_TOZERO
       case ThresholdType.TO_ZERO_INVERSE:
         thresholdType = cv.THRESH_TOZERO_INV
+      case _ as unreachable:
+        assert_never(self.thresholdType)
     match self.method:
       case ThresholdMethod.SIMPLE | ThresholdMethod.OTSU:
         if self.thresholdType in [ThresholdType.BINARY, ThresholdType.BINARY_INVERSE]:
@@ -325,7 +329,11 @@ class ThresholdPreprocessor(Preprocessor):
             adaptiveType = cv.ADAPTIVE_THRESH_MEAN_C
           case ThresholdMethod.ADAPTIVE_GAUSSIAN:
             adaptiveType = cv.ADAPTIVE_THRESH_GAUSSIAN_C
+          case _ as unreachable:
+            assert_never(self.method)
         newImageCv = cv.adaptiveThreshold(imageCv, self.maxValue, adaptiveType, thresholdType, self.blockSize, self.cConstant)
+      case _ as unreachable:
+        assert_never(self.method)
     return Image.fromarray(newImageCv)
 
 @unique
@@ -388,15 +396,9 @@ class ResizePreprocessor(Preprocessor):
     self.checkImage(image)
     match self.method:
       case ResizeMethod.FIXED_RATIO_WIDTH:
-        if image.size[0] == 0:
-          self.height = 1
-        else:
-          self.height = max(round(image.size[1] / image.size[0] * self.width), 1)
+        self.height = max(round(image.size[1] / image.size[0] * self.width), 1)
       case ResizeMethod.FIXED_RATIO_HEIGHT:
-        if image.size[1] == 0:
-          self.width = 1
-        else:
-          self.width = max(round(image.size[0] / image.size[1] * self.height), 1)
+        self.width = max(round(image.size[0] / image.size[1] * self.height), 1)
     return image.resize((self.width, self.height))
 
 class Preprocessing:
@@ -510,6 +512,16 @@ class Preprocessing:
 
     self.operationById[operation['id']] = operation
 
+  def _isSuboperationDataMissing(self, preprocessingType: PreprocessingType, data: dict) -> bool:
+    match preprocessingType:
+      case PreprocessingType.COLOR_MAP:
+        return 'colorMap' not in data or not isinstance(data['colorMap'], dict)
+      case PreprocessingType.THRESHOLD:
+        return 'threshold' not in data or not isinstance(data['threshold'], dict)
+      case PreprocessingType.RESIZE:
+        return 'resize' not in data or not isinstance(data['resize'], dict)
+    return False
+
   def _createPreprocessor(self, data: dict) -> Preprocessor:
     """
     Create a preprocessing suboperation or preprocessor to be added to the list of suboperations of an operation.
@@ -525,21 +537,20 @@ class Preprocessing:
     else:
       raise RecognizerValueError('Invalid preprocessing type.')
 
+    if self._isSuboperationDataMissing(preprocessingType, data):
+      raise RecognizerValueError('Invalid suboperation data.')
+
     match preprocessingType:
       case PreprocessingType.GRAYSCALE:
         return GrayscalePreprocessor()
       case PreprocessingType.COLOR_MAP:
-        if 'colorMap' not in data or not isinstance(data['colorMap'], dict):
-          raise RecognizerValueError('Invalid suboperation data.')
         return ColorMapPreprocessor(**data['colorMap'])
       case PreprocessingType.THRESHOLD:
-        if 'threshold' not in data or not isinstance(data['threshold'], dict):
-          raise RecognizerValueError('Invalid suboperation data.')
         return ThresholdPreprocessor(**data['threshold'])
       case PreprocessingType.RESIZE:
-        if 'resize' not in data or not isinstance(data['resize'], dict):
-          raise RecognizerValueError('Invalid suboperation data.')
         return ResizePreprocessor(**data['resize'])
+      case _ as unreachable:
+        assert_never(preprocessingType)
 
   def checkProcessInput(self, operationId: str) -> None:
     """

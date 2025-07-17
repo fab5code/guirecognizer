@@ -7,7 +7,7 @@ from io import BytesIO
 from math import ceil
 from statistics import mean
 from typing import (Annotated, Any, Required, TypedDict, TypeGuard, TypeIs,
-                    Unpack, cast, overload)
+                    Unpack, assert_never, cast, overload)
 
 import numpy as np
 from imagehash import ImageHash, colorhash, hex_to_flathash, hex_to_hash, phash
@@ -234,8 +234,7 @@ class Recognizer():
     imageSize = (image.width, image.height)
     if resizeInterval is not None:
       imageSize = (int(imageSize[0] * resizeInterval[1]), int(imageSize[1] * resizeInterval[1]))
-    # TODO: should it be "<="" instead of "<"? The actual computation does floor the value with int. Also change the app checking image to find.
-    return imageSize[0] < areaSize[0] and imageSize[1] < areaSize[1]
+    return imageSize[0] <= areaSize[0] and imageSize[1] <= areaSize[1]
 
   @classmethod
   def isImageHashDataValid(cls, imageHashData: Any) -> TypeGuard[str]:
@@ -691,6 +690,8 @@ class Recognizer():
         return self.getTextTesseractOcr(area, self.tesseractOptions['lang'], self.tesseractOptions['textConfig'])
       case OcrType.EASY_OCR:
         return self.getTextEasyOcr(area)
+      case _ as unreachable:
+        assert_never(ocrType)
 
   def getNumber(self, area: Image.Image) -> float | None:
     """
@@ -715,6 +716,8 @@ class Recognizer():
         result = self.getTextTesseractOcr(area, self.tesseractOptions['lang'], self.tesseractOptions['numberConfig'])
       case OcrType.EASY_OCR:
         result = self.getTextEasyOcr(area)
+      case _ as unreachable:
+        assert_never(ocrType)
     if result is None:
       return None
     result = result.replace('o', '0').replace('O', '0').replace('Q', '0')
@@ -793,12 +796,8 @@ class Recognizer():
         assert self.borders is not None
         if not self.isImageToFindCompatibleWithSelection(action['imageToFind'], self.borders, cast(AreaRatios, action['ratios']),
             cast(ResizeInterval, action['resizeInterval'])):
-          # TODO: Is this relevant? Only the version with max size ration is going to be used (and max size ratio could be < 1)
-          if self.isImageToFindCompatibleWithSelection(action['imageToFind'], self.borders, cast(AreaRatios, action['ratios'])):
-            logger.warning('The size of the image to find is too big for the selected area considering the max size ratio.'
-                f' This action \'{actionId}\' is ignored.')
-          else:
-            logger.warning(f'The size of the image to find is too big for the selected area. This action \'{actionId}\' is ignored.')
+          logger.warning('The size of the image to find is too big for the selected area considering the max size ratio.'
+              f' This action \'{actionId}\' is ignored.')
           return
       case ActionType.COMPARE_PIXEL_COLOR | ActionType.IS_SAME_PIXEL_COLOR:
         if 'pixelColor' in data and self.isPixelColorDataValid(data['pixelColor']):
@@ -960,6 +959,8 @@ class Recognizer():
         return self._pipeExecuteActionText(action, actionIdOrTypes, pipeInfo)
       case ActionType.NUMBER:
         return self._pipeExecuteActionNumber(action, actionIdOrTypes, pipeInfo)
+      case _ as unreachable:
+        assert_never(actionType)
 
   def _pipeExecuteActionCoordinates(self, action: ActionDict | None,
       actionIdOrTypes: list[str | ActionType], pipeInfo: PipeInfoDict) -> AnyActionReturnType:
@@ -1105,19 +1106,19 @@ class Recognizer():
     self._pipeExecuteActionCoordinates(action, [], pipeInfo)
     options = {}
     if 'clickPauseDuration' in pipeInfo:
-      if not isinstance(pipeInfo['clickPauseDuration'], float):
+      if not isinstance(pipeInfo['clickPauseDuration'], float | int) or pipeInfo['clickPauseDuration'] < 0:
         raise RecognizerValueError('Invalid clickPauseDuration value: \'{duration}\'.'
             .format(duration=pipeInfo['clickPauseDuration']))
       options['pauseDuration'] = pipeInfo['clickPauseDuration']
     if 'nbClicks' in pipeInfo:
-      if not isinstance(pipeInfo['nbClicks'], int):
+      if not isinstance(pipeInfo['nbClicks'], int) or pipeInfo['nbClicks'] < 0:
         raise RecognizerValueError('Invalid nbClicks value: \'{nbClicks}\'.'
             .format(nbClicks=pipeInfo['nbClicks']))
       options['nbClicks'] = pipeInfo['nbClicks']
     if len(actionIdOrTypes) == 0:
       assert 'coord' in pipeInfo
-      # TODO: test manually if can click by giving coord with 4 values or has issue and should fix
-      MouseHelper.clickOnPosition(pipeInfo['coord'], **options)
+      coord = pipeInfo['coord']
+      MouseHelper.clickOnPosition((coord[0], coord[1]), **options)
       return None
     else:
       return self._pipeExecute(actionIdOrTypes, pipeInfo)

@@ -20,3 +20,7 @@ Some visual studio code settings of visualStudioCodeSettings.json should be used
 In Visual Studio Code, install extensions
 - isort to sort python automatically
 - Pylance for type checking
+
+Manually generate coverage html report (with branches)
+coverage run --branch -m unittest discover
+coverage html

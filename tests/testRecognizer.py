@@ -94,11 +94,11 @@ class TestLoad(LoggedTestCase):
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
         'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value,
-        'maxResults': 5, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]]}]})
+        'maxResults': 5, 'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC'}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
         'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
-        'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]]}]})
+        'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC'}]})
     self.assertEqual(len(recognizer.actionById), 0)
 
     # Wrong parameter imageToFind.
@@ -108,91 +108,83 @@ class TestLoad(LoggedTestCase):
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
         'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
-        'maxResults': 5, 'imageToFind': [[]]}]})
+        'maxResults': 5, 'imageToFind': ''}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
         'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
-        'maxResults': 5, 'imageToFind': [94, 94, 94, 255]}]})
+        'maxResults': 5, 'imageToFind': 42}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
         'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
-        'maxResults': 5, 'imageToFind': [[94, 94, 94, 255], [243, 243, 243]]}]})
-    self.assertEqual(len(recognizer.actionById), 0)
-    recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
-        'maxResults': 5, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]]}]})
-    self.assertEqual(len(recognizer.actionById), 0)
-    recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.01, 0.01), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
-        'maxResults': 5, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]]}]})
+        'maxResults': 5, 'imageToFind': 'iVBORw0KGAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC'}]})
     self.assertEqual(len(recognizer.actionById), 0)
 
     # Wrong parameter threshold.
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
         'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 'invalid',
-        'maxResults': 5, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]]}]})
+        'maxResults': 5, 'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC'}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
         'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold':-1,
-        'maxResults': 5, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]]}]})
+        'maxResults': 5, 'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC'}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
         'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10.0,
-        'maxResults': 5, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]]}]})
+        'maxResults': 5, 'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC'}]})
     self.assertEqual(len(recognizer.actionById), 0)
 
     # Wrong parameter maxResults.
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
         'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
-        'maxResults': 'invalid', 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]]}]})
+        'maxResults': 'invalid', 'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC'}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
         'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
-        'maxResults': 0, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]]}]})
+        'maxResults': 0, 'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC'}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
         'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
-        'maxResults':-1, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]]}]})
+        'maxResults':-1, 'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC'}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
         'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
-        'maxResults': 5.0, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]]}]})
+        'maxResults': 5.0, 'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC'}]})
     self.assertEqual(len(recognizer.actionById), 0)
 
     # Wrong parameter resizeInterval.
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
         'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
-        'maxResults': 5, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]],
+        'maxResults': 5, 'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC',
         'resizeInterval': None}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
         'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
-        'maxResults': 5, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]],
+        'maxResults': 5, 'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC',
         'resizeInterval': 'invalid'}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
         'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
-        'maxResults': 5, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]],
+        'maxResults': 5, 'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC',
         'resizeInterval': 1.1}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
         'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
-        'maxResults': 5, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]],
+        'maxResults': 5, 'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC',
         'resizeInterval': (1.1,)}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
         'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
-        'maxResults': 5, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]],
+        'maxResults': 5, 'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC',
         'resizeInterval': (1.1, 0.9)}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
         'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
-        'maxResults': 5, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]],
+        'maxResults': 5, 'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC',
         'resizeInterval': (0.9, 1.1, 1.3)}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
         'actions': [{'id': 'action1', 'ratios': (0, 0, 0.2, 0.2), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
-        'maxResults': 5, 'imageToFind': [[[94, 94, 94, 255], [243, 243, 243, 255]], [[69, 69, 69, 255], [185, 185, 185, 255]]],
+        'maxResults': 5, 'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC',
         'resizeInterval': (1, 5)}]})
     self.assertEqual(len(recognizer.actionById), 0)
 
@@ -379,7 +371,12 @@ class TestRecognizer(LoggedTestCase):
       recognizer.setOcrOrder([OcrType.EASY_OCR, OcrType.EASY_OCR])
 
   def test_getCoord(self):
-    Recognizer.getCoord((0, 0, 39, 39), (0.2, 0.2, 0.2001, 0.2001))
+    coord = Recognizer.getCoord((0, 0, 39, 39), (0.2, 0.2, 0.2001, 0.2001))
+    self.assertEqual(coord, (8, 8, 9, 9))
+
+  def test_getPoint(self):
+    coord = Recognizer.getPoint((-5000000, -5000000))
+    self.assertEqual(coord, (0, 0, 0))
 
   def test_ocrOrder(self):
     self.assertFalse(Recognizer.isOcrOrderDataValid('invalid'))
@@ -597,9 +594,9 @@ class TestExecuteAction(LoggedTestCase):
   def test_error_actionFindImage(self):
     area = self.recognizer.execute('selection4', screenshotFilepath='tests/data/img/img1.png')
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('findImage1', selectedArea=area)
+      self.recognizer.execute('findImage1', selectedArea=cast(Image.Image, area))
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('findImage2', selectedArea=area)
+      self.recognizer.execute('findImage2', selectedArea=cast(Image.Image, area))
     with self.assertRaises(RecognizerValueError):
       self.recognizer.execute(ActionType.FIND_IMAGE, screenshotFilepath='tests/data/img/img1.png', coord=(7, 7, 10, 10))
 
@@ -610,6 +607,20 @@ class TestExecuteAction(LoggedTestCase):
   def test_error_actionCompareImageHash(self):
     with self.assertRaises(RecognizerValueError):
       self.recognizer.execute(ActionType.COMPARE_IMAGE_HASH, screenshotFilepath='tests/data/img/img1.png', coord=(7, 7, 10, 10))
+
+  def test_error_optionClickPauseDuration(self):
+    with self.assertRaises(RecognizerValueError):
+      self.recognizer.execute('click1', clickPauseDuration='invalid') # type: ignore
+    with self.assertRaises(RecognizerValueError):
+      self.recognizer.execute('click1', clickPauseDuration=-42)
+
+  def test_error_optionNbClicks(self):
+    with self.assertRaises(RecognizerValueError):
+      self.recognizer.execute('click1', nbClicks='invalid') # type: ignore
+    with self.assertRaises(RecognizerValueError):
+      self.recognizer.execute('click1', nbClicks=2.2) # type: ignore
+    with self.assertRaises(RecognizerValueError):
+      self.recognizer.execute('click1', nbClicks=-42)
 
   def test_error_reinterpret(self):
     with self.assertRaises(RecognizerValueError):
@@ -670,6 +681,11 @@ class TestExecuteAction(LoggedTestCase):
     self.assertEqual(len(cast(list, result)), 0)
 
     result = self.recognizer.execute('findImage2', screenshotFilepath='tests/data/img/img1.png')
+    self.assertEqual(type(result), list)
+    self.assertEqual(len(cast(list, result)), 2)
+    self.assertEqual(result, [(7, 28, 13, 29), (6, 27, 15, 28)])
+
+    result = self.recognizer.execute('findImage3', screenshotFilepath='tests/data/img/img1.png')
     self.assertEqual(type(result), list)
     self.assertEqual(len(cast(list, result)), 2)
     self.assertEqual(result, [(7, 28, 13, 29), (6, 27, 15, 28)])
@@ -995,10 +1011,10 @@ class TestExecuteActions(LoggedTestCase):
 
   def test_actions_Selection_Text(self):
     result = self.recognizer.execute('selection3', 'text1', screenshotFilepath='tests/data/img/img3.png')
-    self.assertIn('2', result)
+    self.assertIn('2', cast(str, result))
 
     result = self.recognizer.execute('text1', 'text1', screenshotFilepath='tests/data/img/img3.png')
-    self.assertIn('Love', result)
+    self.assertIn('Love', cast(str, result))
 
   def test_actions_Selection_Number(self):
     result = self.recognizer.execute('selection3', 'number1', screenshotFilepath='tests/data/img/img3.png')
@@ -1011,6 +1027,15 @@ class TestExecuteActions(LoggedTestCase):
     result = self.recognizer.execute('findImage1', 'imageHash1', screenshotFilepath='tests/data/img/img1.png')
     self.assertEqual(result, '9aa5e4ca304967b7,07000000000')
 
+  def test_actions_Click_Coordinates(self):
+    result = self.recognizer.execute('click1', 'coordinates1', screenshotFilepath='tests/data/img/img1.png')
+    self.assertEqual(type(result), tuple)
+    self.assertEqual(result, (20, 20))
+
+    result = self.recognizer.execute('click1', 'coordinates2', screenshotFilepath='tests/data/img/img1.png', clickPauseDuration=0.1, nbClicks=0)
+    self.assertEqual(type(result), tuple)
+    self.assertEqual(result, (20, 20))
+
 class TestPreprocessing(LoggedTestCase):
   def setUp(self):
     super().setUp()
@@ -1019,7 +1044,7 @@ class TestPreprocessing(LoggedTestCase):
 
   def test_error_invalidPreprocessingId(self):
     with self.assertRaises(RecognizerValueError):
-      self.recognizer.execute('pixelColor1', screenshotFilepath='tests/data/img/img1.png', preprocessing=42)
+      self.recognizer.execute('pixelColor1', screenshotFilepath='tests/data/img/img1.png', preprocessing=42) # type: ignore
     with self.assertRaises(RecognizerValueError):
       self.recognizer.execute('pixelColor1', screenshotFilepath='tests/data/img/img1.png', preprocessing='unknown')
 

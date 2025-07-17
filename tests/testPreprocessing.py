@@ -331,6 +331,61 @@ class TestThreshold(LoggedTestCase):
     self.assertEqual(newImage.getpixel((6, 9)), maxValue)
     self.assertEqual(newImage.getpixel((6, 11)), 0)
 
+  def test_adaptiveMean(self):
+    image = Image.open('tests/data/img/img1.png')
+    preprocessor = ThresholdPreprocessor(method=ThresholdMethod.ADAPTIVE_MEAN, thresholdType=ThresholdType.BINARY)
+    newImage = preprocessor.process(image)
+    self.assertEqual(newImage.getpixel((0, 0)), 255)
+    self.assertEqual(newImage.getpixel((5, 4)), 255)
+    self.assertEqual(newImage.getpixel((6, 9)), 0)
+
+    preprocessor = ThresholdPreprocessor(method=ThresholdMethod.ADAPTIVE_MEAN, thresholdType=ThresholdType.BINARY_INVERSE)
+    newImage = preprocessor.process(image)
+    self.assertEqual(newImage.getpixel((0, 0)), 0)
+    self.assertEqual(newImage.getpixel((5, 4)), 0)
+    self.assertEqual(newImage.getpixel((6, 9)), 255)
+
+  def test_adaptiveGaussian(self):
+    image = Image.open('tests/data/img/img1.png')
+    preprocessor = ThresholdPreprocessor(method=ThresholdMethod.ADAPTIVE_GAUSSIAN, thresholdType=ThresholdType.BINARY)
+    newImage = preprocessor.process(image)
+    self.assertEqual(newImage.getpixel((0, 0)), 255)
+    self.assertEqual(newImage.getpixel((5, 4)), 0)
+    self.assertEqual(newImage.getpixel((6, 9)), 0)
+
+    preprocessor = ThresholdPreprocessor(method=ThresholdMethod.ADAPTIVE_GAUSSIAN, thresholdType=ThresholdType.BINARY_INVERSE)
+    newImage = preprocessor.process(image)
+    self.assertEqual(newImage.getpixel((0, 0)), 0)
+    self.assertEqual(newImage.getpixel((5, 4)), 255)
+    self.assertEqual(newImage.getpixel((6, 9)), 255)
+
+  def test_adaptiveOtsu(self):
+    image = Image.open('tests/data/img/img1.png')
+    preprocessor = ThresholdPreprocessor(method=ThresholdMethod.OTSU, thresholdType=ThresholdType.BINARY)
+    newImage = preprocessor.process(image)
+    self.assertEqual(newImage.getpixel((0, 0)), 255)
+    self.assertEqual(newImage.getpixel((10, 10)), 0)
+
+    preprocessor = ThresholdPreprocessor(method=ThresholdMethod.OTSU, thresholdType=ThresholdType.BINARY_INVERSE)
+    newImage = preprocessor.process(image)
+    self.assertEqual(newImage.getpixel((0, 0)), 0)
+    self.assertEqual(newImage.getpixel((10, 10)), 255)
+
+    preprocessor = ThresholdPreprocessor(method=ThresholdMethod.OTSU, thresholdType=ThresholdType.TRUNCATE)
+    newImage = preprocessor.process(image)
+    self.assertEqual(newImage.getpixel((0, 0)), 169)
+    self.assertEqual(newImage.getpixel((10, 10)), 155)
+
+    preprocessor = ThresholdPreprocessor(method=ThresholdMethod.OTSU, thresholdType=ThresholdType.TO_ZERO)
+    newImage = preprocessor.process(image)
+    self.assertEqual(newImage.getpixel((0, 0)), 255)
+    self.assertEqual(newImage.getpixel((10, 10)), 0)
+
+    preprocessor = ThresholdPreprocessor(method=ThresholdMethod.OTSU, thresholdType=ThresholdType.TO_ZERO_INVERSE)
+    newImage = preprocessor.process(image)
+    self.assertEqual(newImage.getpixel((0, 0)), 0)
+    self.assertEqual(newImage.getpixel((10, 10)), 155)
+
   def test_preprocessing_error(self):
     preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.THRESHOLD.value,
         'threshold': {'method': 'invalid', 'thresholdType': ThresholdType.BINARY.value}}]}]})
@@ -387,6 +442,12 @@ class TestResize(LoggedTestCase):
   def test_error_invalidMethod(self):
     with self.assertRaises(RecognizerValueError):
       ResizePreprocessor(method='invalid') # type: ignore
+
+  def test_error_resize_emptyImage(self):
+    preprocessor = ResizePreprocessor(width=50, method=ResizeMethod.FIXED_RATIO_WIDTH)
+    image = Image.Image()
+    with self.assertRaises(RecognizerValueError):
+      preprocessor.process(image)
 
   def test_resize_unfixedRatio(self):
     image = Image.open('tests/data/img/img1.png')

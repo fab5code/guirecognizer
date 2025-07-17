@@ -34,4 +34,4 @@ def isImageDataValid(imageData: Any) -> TypeIs[Image.Image]:
   """
   :param imageData:
   """
-  return isinstance(imageData, Image.Image)
+  return isinstance(imageData, Image.Image) and imageData.width != 0 and imageData.height != 0

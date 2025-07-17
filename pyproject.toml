@@ -39,4 +39,9 @@ where = ["."]
 omit = ["config.py", "config-3.py"]
 
 [tool.coverage.report]
-exclude_also = ["@(abc\\.)?abstractmethod"]
+exclude_also = [
+  '@(abc\\.)?abstractmethod',
+  '^ +assert_never\(.*?\)$',
+  '^ +case _ as unreachable:$',
+  '@overload',
+]
