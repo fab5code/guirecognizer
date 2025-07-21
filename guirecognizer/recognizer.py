@@ -305,11 +305,8 @@ class Recognizer():
     :return: rgb colors - If outside screen (0, 0, 0).
     """
     imageCoord = (coord[0], coord[1], coord[0] + 1, coord[1] + 1)
-    try:
-      image = ImageGrab.grab(imageCoord)
-      return image.getpixel((0, 0)) # type: ignore
-    except:
-      return (0, 0, 0)
+    image = ImageGrab.grab(imageCoord)
+    return image.getpixel((0, 0)) # type: ignore
 
   @classmethod
   def getPointFromScreenshot(cls, screenshot: Image.Image, coord: Coord) -> Point:
@@ -545,6 +542,18 @@ class Recognizer():
     return result
 
   @classmethod
+  def tryGetTesseractFilepath(cls) -> str | None:
+    filename = 'tesseract.exe'
+    # TODO: solution works on windows but may not work on linux
+    drives = [chr(x) + ":" for x in range(65,91) if os.path.exists(chr(x) + ":")]
+    for drive in drives:
+      for root, _, files in os.walk(os.path.abspath(drive + os.sep)):
+        for name in files:
+          if name == filename:
+            return os.path.abspath(os.path.join(root, name))
+    return None
+
+  @classmethod
   def _getEasyOcrPredictions(cls, image: Image.Image, reader) -> list[str]:
     """
     :param image:
@@ -634,18 +643,13 @@ class Recognizer():
       pytesseract.pytesseract.tesseract_cmd = tesseract_cmd
       return
 
-    filename = 'tesseract.exe'
-    # TODO: solution works on windows but may not work on linux
-    drives = [chr(x) + ":" for x in range(65,91) if os.path.exists(chr(x) + ":")]
-    for drive in drives:
-      for root, _, files in os.walk(os.path.abspath(drive + os.sep)):
-        for name in files:
-          if name == filename:
-            pytesseract.pytesseract.tesseract_cmd = os.path.abspath(os.path.join(root, name))
-            return
-    raise RecognizerValueError('Could not automatically find the filepath of tesseract.exe.'
-        ' Maybe tesseract is not installed. More information is available in the documentation of pytesseract.'
-        ' Installation link: https://github.com/tesseract-ocr/tesseract')
+    filepath = Recognizer.tryGetTesseractFilepath()
+    if filepath is not None:
+      pytesseract.pytesseract.tesseract_cmd = filepath
+    else:
+      raise RecognizerValueError('Could not automatically find the filepath of tesseract.exe.'
+          ' Maybe tesseract is not installed. More information is available in the documentation of pytesseract.'
+          ' Installation link: https://github.com/tesseract-ocr/tesseract')
 
   def setEasyOcr(self, languages: list[str]=['en'], gpu: bool=False) -> None:
     """

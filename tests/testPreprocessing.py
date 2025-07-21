@@ -1,5 +1,3 @@
-import logging
-import sys
 import unittest
 from typing import cast
 
@@ -10,15 +8,8 @@ from guirecognizer import (ColorMapMethod, ColorMapPreprocessor,
                            PreprocessingType, RecognizerValueError,
                            ResizeMethod, ResizePreprocessor, ThresholdMethod,
                            ThresholdPreprocessor, ThresholdType)
+from tests.test_utility import LoggedTestCase
 
-
-class LoggedTestCase(unittest.TestCase):
-  def setUp(self):
-    logger = logging.getLogger('guirecognizer')
-    logger.level = logging.DEBUG
-    stream_handler = logging.StreamHandler(sys.stdout)
-    stream_handler.setFormatter(logging.Formatter(fmt='%(levelname)s: %(message)s'))
-    logger.addHandler(stream_handler)
 
 class TestPreprocessing(LoggedTestCase):
   def test_error_invalidOperations(self):

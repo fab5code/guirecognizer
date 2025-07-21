@@ -1,21 +1,13 @@
-import logging
-import sys
 import unittest
 from typing import cast
+from unittest.mock import patch
 
 from PIL import Image, ImageOps
 
 from guirecognizer import (ActionType, OcrType, Recognizer,
                            RecognizerValueError, SelectionType)
+from tests.test_utility import LoggedTestCase
 
-
-class LoggedTestCase(unittest.TestCase):
-  def setUp(self):
-    logger = logging.getLogger('guirecognizer')
-    logger.level = logging.DEBUG
-    stream_handler = logging.StreamHandler(sys.stdout)
-    stream_handler.setFormatter(logging.Formatter(fmt='%(levelname)s: %(message)s'))
-    logger.addHandler(stream_handler)
 
 class TestLoad(LoggedTestCase):
   def test_error_unexistentFile(self):
@@ -388,6 +380,24 @@ class TestRecognizer(LoggedTestCase):
     self.assertTrue(Recognizer.isOcrOrderDataValid([OcrType.TESSERACT.value]))
     self.assertTrue(Recognizer.isOcrOrderDataValid([OcrType.TESSERACT.value, OcrType.EASY_OCR.value]))
 
+  def test_getBorders(self):
+    recognizer = Recognizer('tests/data/json/config1.json')
+    area = recognizer.getBordersImage()
+    self.assertEqual(type(area), Image.Image)
+    width, height = cast(Image.Image, area).size
+    self.assertEqual(width, 39)
+    self.assertEqual(height, 39)
+
+  def test_findTesseractFilepath_fail(self):
+    import os
+    with patch.object(os, 'walk', return_value=[['', [], []]]):
+      filepath = Recognizer.tryGetTesseractFilepath()
+      self.assertIsNone(filepath)
+
+  def test_findTesseractFilepath_success(self):
+    filepath = Recognizer.tryGetTesseractFilepath()
+    self.assertIsNotNone(filepath)
+
 class TestSelectionType(LoggedTestCase):
   def test_error_selectionType(self):
     with self.assertRaises(ValueError):
@@ -401,6 +411,11 @@ class TestSelectionType(LoggedTestCase):
     self.assertFalse(selectionType.isRightSelection((1, 1, 3, 3)))
 
 class TestExecuteAction(LoggedTestCase):
+  @classmethod
+  def setUpClass(cls) -> None:
+    super().setUpClass()
+    cls.tesseractFilepath = Recognizer.tryGetTesseractFilepath()
+
   def setUp(self):
     super().setUp()
     self.recognizer = Recognizer('tests/data/json/config1.json')
@@ -622,6 +637,12 @@ class TestExecuteAction(LoggedTestCase):
     with self.assertRaises(RecognizerValueError):
       self.recognizer.execute('click1', nbClicks=-42)
 
+  def test_error_actionText_missinghTesseractFilepath(self):
+    self.recognizer.setOcrOrder([OcrType.TESSERACT])
+    with self.assertRaises(RecognizerValueError):
+      with patch.object(Recognizer, 'tryGetTesseractFilepath', return_value=None):
+        self.recognizer.execute('text1', screenshotFilepath='tests/data/img/img3.png')
+
   def test_error_reinterpret(self):
     with self.assertRaises(RecognizerValueError):
       self.recognizer.execute('selection1', reinterpret='invalid', screenshotFilepath='tests/data/img/img1.png') # type: ignore
@@ -689,6 +710,13 @@ class TestExecuteAction(LoggedTestCase):
     self.assertEqual(type(result), list)
     self.assertEqual(len(cast(list, result)), 2)
     self.assertEqual(result, [(7, 28, 13, 29), (6, 27, 15, 28)])
+
+  def test_actionClick(self):
+    with patch('pyautogui.click') as clickMock, patch('pyautogui.moveTo') as moveToMock:
+      result = self.recognizer.execute('click1', screenshotFilepath='tests/data/img/img1.png')
+      self.assertEqual(result, None)
+      moveToMock.assert_called_once()
+      clickMock.assert_called_once()
 
   def test_actionPixelColor(self):
     result = self.recognizer.execute('pixelColor1', screenshotFilepath='tests/data/img/img1.png')
@@ -801,13 +829,29 @@ class TestExecuteAction(LoggedTestCase):
 
   def test_actionText_tesseract(self):
     self.recognizer.setOcrOrder([OcrType.TESSERACT])
+    self.assertIsNotNone(self.tesseractFilepath)
+    self.recognizer.setTesseractOcr(tesseract_cmd=self.tesseractFilepath)
     result = self.recognizer.execute('text1', screenshotFilepath='tests/data/img/img1.png')
     self.assertEqual(type(result), str)
-    self.assertNotIn('L\n', cast(str, result))
+    self.assertNotIn('L', cast(str, result))
 
     result = self.recognizer.execute('text1', screenshotFilepath='tests/data/img/img3.png')
     self.assertEqual(type(result), str)
-    self.assertIn('L\n', cast(str, result))
+    self.assertEqual('L\n', cast(str, result))
+
+  def test_actionText_tesseract_findTesseractFilepathAtExecution(self):
+    self.recognizer.setOcrOrder([OcrType.TESSERACT])
+    result = self.recognizer.execute('text1', screenshotFilepath='tests/data/img/img1.png')
+    self.assertEqual(type(result), str)
+    self.assertNotIn('L', cast(str, result))
+
+  def test_actionText_tesseract_newConfig(self):
+    self.recognizer.setOcrOrder([OcrType.TESSERACT])
+    self.assertIsNotNone(self.tesseractFilepath)
+    self.recognizer.setTesseractOcr(tesseract_cmd=self.tesseractFilepath, textConfig='--psm 7 --oem 3 -c tessedit_char_whitelist=Z|0°@')
+    result = self.recognizer.execute('text1', screenshotFilepath='tests/data/img/img3.png')
+    self.assertEqual(type(result), str)
+    self.assertEqual('', cast(str, result))
 
   def test_actionNumber_easyOcr(self):
     self.recognizer.setOcrOrder([OcrType.EASY_OCR])
@@ -823,12 +867,19 @@ class TestExecuteAction(LoggedTestCase):
 
   def test_actionNumber_tesseract(self):
     self.recognizer.setOcrOrder([OcrType.TESSERACT])
+    self.assertIsNotNone(self.tesseractFilepath)
+    self.recognizer.setTesseractOcr(tesseract_cmd=self.tesseractFilepath)
     result = self.recognizer.execute('number1', screenshotFilepath='tests/data/img/img1.png')
     self.assertIsNone(result)
 
     result = self.recognizer.execute('number1', screenshotFilepath='tests/data/img/img3.png')
     self.assertEqual(type(result), float)
     self.assertEqual(result, 42)
+
+  def test_actionNumber_tesseract_findTesseractFilepathAtExecution(self):
+    self.recognizer.setOcrOrder([OcrType.TESSERACT])
+    result = self.recognizer.execute('number1', screenshotFilepath='tests/data/img/img1.png')
+    self.assertIsNone(result)
 
   def test_optionScreenshot(self):
     screenshot = Image.open('tests/data/img/img1.png')
@@ -857,6 +908,20 @@ class TestExecuteAction(LoggedTestCase):
     self.assertEqual(result, (42, 42, 42, 42))
     result = self.recognizer.execute('pixelColor1', selectedPoint=42)
     self.assertEqual(result, (42, 42, 42))
+
+  def test_optionClickPauseDuration(self):
+    with patch('pyautogui.click') as clickMock, patch('pyautogui.moveTo') as moveToMock:
+      result = self.recognizer.execute('click1', screenshotFilepath='tests/data/img/img1.png', clickPauseDuration=0.5)
+      self.assertEqual(result, None)
+      moveToMock.assert_called_once()
+      clickMock.assert_called_once()
+
+  def test_optionNbClicks(self):
+    with patch('pyautogui.click') as clickMock, patch('pyautogui.moveTo') as moveToMock:
+      result = self.recognizer.execute('click1', screenshotFilepath='tests/data/img/img1.png', nbClicks=5)
+      self.assertEqual(result, None)
+      moveToMock.assert_called_once()
+      self.assertEqual(clickMock.call_count, 5)
 
   def test_optionPixelColor(self):
     result = self.recognizer.execute('pixelColor1', pixelColor=(1, 42, 1))
