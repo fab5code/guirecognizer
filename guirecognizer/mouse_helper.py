@@ -2,7 +2,7 @@ import time
 
 import pyautogui
 
-from .types import PointCoord
+from guirecognizer.types import PointCoord
 
 
 class MouseHelper:

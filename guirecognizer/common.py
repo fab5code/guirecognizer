@@ -2,7 +2,7 @@ from typing import Any, TypeGuard, TypeIs
 
 from PIL import Image
 
-from .types import PixelColor
+from guirecognizer.types import PixelColor
 
 
 class RecognizerValueError(ValueError):

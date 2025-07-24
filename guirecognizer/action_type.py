@@ -1,6 +1,6 @@
 from enum import Enum, Flag, auto, unique
 
-from .types import Coord, Ratios
+from guirecognizer.types import Coord, Ratios
 
 
 @unique

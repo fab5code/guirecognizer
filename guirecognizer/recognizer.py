@@ -13,13 +13,14 @@ import numpy as np
 from imagehash import ImageHash, colorhash, hex_to_flathash, hex_to_hash, phash
 from PIL import Image, ImageGrab, ImageOps, ImageStat
 
-from .action_type import ActionType, SelectionType
-from .common import (RecognizerValueError, isIdDataValid, isImageDataValid,
-                     isPixelColorDataValid, isPixelColorDifferenceDataValid)
-from .mouse_helper import MouseHelper
-from .preprocessing import Preprocessing
-from .types import (AreaCoord, AreaRatios, Coord, PixelColor, PointRatios,
-                    Ratios)
+from guirecognizer.action_type import ActionType, SelectionType
+from guirecognizer.common import (RecognizerValueError, isIdDataValid,
+                                  isImageDataValid, isPixelColorDataValid,
+                                  isPixelColorDifferenceDataValid)
+from guirecognizer.mouse_helper import MouseHelper
+from guirecognizer.preprocessing import Preprocessing
+from guirecognizer.types import (AreaCoord, AreaRatios, Coord, PixelColor,
+                                 PointRatios, Ratios)
 
 logger = logging.getLogger(__name__)
 

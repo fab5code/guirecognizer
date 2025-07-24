@@ -1,12 +1,13 @@
-from .action_type import ActionType, SelectionType
-from .common import RecognizerValueError
-from .mouse_helper import MouseHelper
-from .preprocessing import (ColorMapMethod, ColorMapPreprocessor,
-                            GrayscalePreprocessor, Preprocessing, ResizeMethod,
-                            ResizePreprocessor, ThresholdMethod,
-                            ThresholdPreprocessor, ThresholdType)
-from .preprocessing_type import PreprocessingType
-from .recognizer import OcrType, Recognizer
+from guirecognizer.action_type import ActionType, SelectionType
+from guirecognizer.common import RecognizerValueError
+from guirecognizer.mouse_helper import MouseHelper
+from guirecognizer.preprocessing import (ColorMapMethod, ColorMapPreprocessor,
+                                         GrayscalePreprocessor, Preprocessing,
+                                         ResizeMethod, ResizePreprocessor,
+                                         ThresholdMethod,
+                                         ThresholdPreprocessor, ThresholdType)
+from guirecognizer.preprocessing_type import PreprocessingType
+from guirecognizer.recognizer import OcrType, Recognizer
 
 """A library to help recognize some patterns on screen and make GUI actions."""
 

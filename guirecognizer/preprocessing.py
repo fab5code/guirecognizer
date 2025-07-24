@@ -6,10 +6,11 @@ from typing import Any, TypeGuard, TypeIs, assert_never
 import numpy as np
 from PIL import Image, ImageOps
 
-from .common import (RecognizerValueError, isIdDataValid, isImageDataValid,
-                     isPixelColorDataValid, isPixelColorDifferenceDataValid)
-from .preprocessing_type import PreprocessingType
-from .types import PixelColor
+from guirecognizer.common import (RecognizerValueError, isIdDataValid,
+                                  isImageDataValid, isPixelColorDataValid,
+                                  isPixelColorDifferenceDataValid)
+from guirecognizer.preprocessing_type import PreprocessingType
+from guirecognizer.types import PixelColor
 
 logger = logging.getLogger(__name__)
 
