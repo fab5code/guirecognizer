@@ -37,6 +37,8 @@ where = ["."]
 include = ["guirecognizer*"]
 
 [tool.coverage.run]
+command_line = "-m unittest discover"
+branch = true
 omit = ["config.py", "config-3.py"]
 
 [tool.coverage.report]

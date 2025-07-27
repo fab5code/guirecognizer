@@ -22,5 +22,5 @@ In Visual Studio Code, install extensions
 - Pylance for type checking
 
 Manually generate coverage html report (with branches)
-coverage run --branch -m unittest discover
+coverage run
 coverage html
