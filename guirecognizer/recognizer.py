@@ -424,7 +424,7 @@ class Recognizer():
       results = []
       # Multiprocessing seemed like a good idea but the overhead is too high.
       for ratio in np.linspace(resizeInterval[0], resizeInterval[1], num=nbMatches):
-        newSize = (int(imageToFind.size[0] * ratio), int(imageToFind.size[1] * ratio))
+        newSize = (max(int(imageToFind.size[0] * ratio), 1), max(int(imageToFind.size[1] * ratio), 1))
         if newSize == precedentSize:
           continue
         precedentSize = newSize

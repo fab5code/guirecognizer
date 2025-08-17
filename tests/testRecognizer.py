@@ -711,6 +711,15 @@ class TestExecuteAction(LoggedTestCase):
     self.assertEqual(len(cast(list, result)), 2)
     self.assertEqual(result, [(7, 28, 13, 29), (6, 27, 15, 28)])
 
+  def test_actionFindImage_resizeToNearZero(self):
+    recognizer = Recognizer({'borders': (1, 1, 39, 39),
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.06, 0.06), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
+        'maxResults': 5, 'imageToFind': "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC",
+        'resizeInterval': (0.05, 1)}]})
+    result = recognizer.execute('action1', screenshotFilepath='tests/data/img/img1.png')
+    self.assertEqual(type(result), list)
+    self.assertEqual(len(cast(list, result)), 0)
+
   def test_actionClick(self):
     with patch('pyautogui.click') as clickMock, patch('pyautogui.moveTo') as moveToMock:
       result = self.recognizer.execute('click1', screenshotFilepath='tests/data/img/img1.png')
