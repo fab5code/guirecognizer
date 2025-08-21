@@ -79,7 +79,7 @@ class ActionType(Enum):
 
   Expects **a point or an area selection**.
 
-  **Return type:** :obj:`tuple`\ [:obj:`int`] | :obj:`list`\ [:obj:`int`]
+  **Return type:** :obj:`tuple`\\ [:obj:`int`] | :obj:`list`\\ [:obj:`int`]
 
   **Returns:** point or area coordinates
   """
@@ -89,7 +89,7 @@ class ActionType(Enum):
 
   Expects **a point or an area selection**.
 
-  **Return type:** :obj:`tuple`\ [:obj:`int`] | :obj:`list`\ [:obj:`int`] | :obj:`int` | :obj:`PIL.Image.Image`
+  **Return type:** :obj:`tuple`\\ [:obj:`int`] | :obj:`list`\\ [:obj:`int`] | :obj:`int` | :obj:`PIL.Image.Image`
 
   **Returns:** point or area
   """
@@ -101,7 +101,7 @@ class ActionType(Enum):
 
   Expects **an area selection**.
 
-  **Return type:** :obj:`list`\ [:obj:`tuple`\ [:obj:`int`]]
+  **Return type:** :obj:`list`\\ [:obj:`tuple`\\ [:obj:`int`]]
 
   **Returns:** tuple containing the coordinates of each location
   """
@@ -119,7 +119,7 @@ class ActionType(Enum):
 
   Expects **a point or an area selection**.
 
-  **Return type:** :obj:`tuple`\ [:obj:`int`]
+  **Return type:** :obj:`tuple`\\ [:obj:`int`]
 
   **Returns:** rgb values between 0 and 255
   """

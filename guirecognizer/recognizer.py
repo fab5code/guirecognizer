@@ -40,25 +40,49 @@ class ActionDict(TypedDict, total=False):
   resizeInterval: ResizeInterval | None
 
 class PipeInfoDict(TypedDict, total=False):
+  """
+  Optional arguments for pipeline execution.
+  """
+  #: Screenshot image to use instead of taking a live one.
   screenshot: Image.Image
+  #: Image of the borders area.
   bordersImage: Image.Image
+  #: Absolute coordinates.
   coord: Coord
+  #: RGB colors with or without alpha, or grayscale value.
   selectedPoint: Point
+  #: Preselected image region.
   selectedArea: Image.Image
+  #: Pause duration of the click in seconds (default: 0.02).
   clickPauseDuration: float
+  #: Number of clicks (default: 1).
   nbClicks: int
+  #: RGB colors.
   pixelColor: PixelColor
+  #: Reference RGB colors.
   pixelColorReference: PixelColor
+  #: Difference between pixel colors.
   pixelColorDifference: int | float
+  #: Image hash value.
   imageHash: str
+  #: Reference image hash value.
   imageHashReference: str
+  #: Image hash difference.
   imageHashDifference: int
+  #: Reinterpret the last action as this type.
   reinterpret: ActionType
+  #: ID of a preprocessing operation.
   preprocessing: str
 
 class ExecuteParams(PipeInfoDict, total=False):
+  """
+  Extended keyword arguments for :meth:`guirecognizer.Recognizer.execute`.
+  """
+  #: Filepath of the screenshot.
   screenshotFilepath: str
+  #: Filepath of the borders image.
   bordersImageFilepath: str
+  #: Filepath of the selected area image.
   selectedAreaFilepath: str
 
 @unique
@@ -833,9 +857,9 @@ class Recognizer():
 
     When many action ids or action types are specified, actions are executed as a pipeline.
 
-    :param \*args: actions ids or types: At least one must be given.
-    :type \*args: :obj:`str`
-    :param \**kwargs: (optional) see below
+    :param args: Action ids or types. At least one must be given.
+    :param kwargs: Extra parameters, see :class:`.ExecuteParams`
+    :return: The result of the last action in the pipeline.
 
     If none of the parameters **screenshot**, **screenshotFilepath**, **bordersImage** and **bordersImageFilepath** is given,
     the screen is used when necessary.
@@ -845,35 +869,13 @@ class Recognizer():
 
     The selected area can be preprocessed using the id of a defined preprocessing operation with option **preprocessing**.
 
-    :Keyword Arguments:
-      * **screenshot** (:obj:`PIL.Image.Image`) -- (optional)
-      * **screenshotFilepath** (:obj:`str`) -- (optional) filepath of the screenshot
-      * **bordersImage** (:obj:`PIL.Image.Image`) -- (optional)
-      * **bordersImageFilepath** (:obj:`str`) -- (optional) filepath of the bordersImage
-      * **coord** (:obj:`Union`\ [:obj:`tuple`\ [:obj:`int`], :obj:`list`\ [:obj:`int`]]) -- (optional) absolute coordinates
-      * **selectedPoint** (:obj:`Union`\ [:obj:`tuple`\ [:obj:`int`], :obj:`list`\ [:obj:`int`], :obj:`int`]) -- (optional)
-        rgb colors with or without alpha or gray value
-      * **selectedArea** (:obj:`PIL.Image.Image`) -- (optional)
-      * **selectedAreaFilepath** (:obj:`str`) -- (optional) filepath of the selected area image
-      * **clickPauseDuration** (:obj:`float`) -- (optional) pause duration of the click in second - default: 0.02s
-      * **nbClicks** (:obj:`int`) -- (optional) number of clicks - default: 1
-      * **pixelColor** (:obj:`Union`\ [:obj:`tuple`\ [:obj:`int`], :obj:`list`\ [:obj:`int`]]) -- (optional) rgb colors
-      * **pixelColorReference** (:obj:`Union`\ [:obj:`tuple`\ [:obj:`int`], :obj:`list`\ [:obj:`int`]]) -- (optional) rgb colors
-      * **pixelColorDifference** (:obj:`float`) -- (optional)
-      * **imageHash** (:obj:`str`) -- (optional)
-      * **imageHashReference** (:obj:`str`) -- (optional)
-      * **imageHashDifference** (:obj:`int`) -- (optional)
-      * **reinterpret** (:obj:`ActionType`) -- (optional)
-      * **preprocessing** (:obj:`str`) -- (optional) id of a preprocessing operation
-    :return: last action output
-
-    :raise RecognizerValueError:
-      * no action id or type is specified
-      * an action id is unknown
-      * could not open image from the borders filepath
-      * could not open image from the selected area filepath
-      * one of the parameters is invalid
-      * a needed parameter is missing while using an action type
+    :raises RecognizerValueError:
+      * No action id or type is specified
+      * An action id is unknown
+      * Could not open image from the borders filepath
+      * Could not open image from the selected area filepath
+      * One of the parameters is invalid
+      * A needed parameter is missing while using an action type
     """
     actionIdOrTypes = []
     for actionIdOrType in args:

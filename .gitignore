@@ -80,3 +80,6 @@ cover/
 .vscode
 
 guirecognizer.egg-info
+
+# Sphinx docs
+docsBuild/

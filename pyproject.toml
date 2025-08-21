@@ -23,7 +23,17 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-dev = ["packaging", "coverage", "build", "twine", "pytesseract", "easyocr"]
+dev = [
+  "packaging",
+  "coverage",
+  "build",
+  "twine",
+  "pytesseract",
+  "easyocr",
+  "sphinx",
+  "sphinx_rtd_theme",
+  "sphinx-autodoc-typehints",
+]
 
 # [project.urls]
 # Repository = "https://github.com/me/spam.git"
