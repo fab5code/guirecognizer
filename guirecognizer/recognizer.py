@@ -6,8 +6,8 @@ from enum import Enum, unique
 from io import BytesIO
 from math import ceil
 from statistics import mean
-from typing import (Annotated, Any, Required, TypedDict, TypeGuard, TypeIs,
-                    Unpack, assert_never, cast, overload)
+from typing import (Annotated, Any, Literal, Required, TypedDict, TypeGuard,
+                    TypeIs, Unpack, assert_never, cast, overload)
 
 import numpy as np
 from imagehash import ImageHash, colorhash, hex_to_flathash, hex_to_hash, phash
@@ -294,11 +294,9 @@ class Recognizer():
   @overload
   @classmethod
   def getCoord(cls, borders: AreaCoord, ratios: AreaRatios) -> tuple[int, int, int, int]: ...
-
   @overload
   @classmethod
   def getCoord(cls, borders: AreaCoord, ratios: PointRatios) -> tuple[int, int]: ...
-
   @classmethod
   def getCoord(cls, borders: AreaCoord, ratios: Ratios) -> tuple[int, int] | tuple[int, int, int, int]:
     """
@@ -851,13 +849,112 @@ class Recognizer():
       raise RecognizerValueError('No borders data.')
     return self.getArea(self.borders)
 
-  def execute(self, *args: str | ActionType, **kwargs: Unpack[ExecuteParams]) -> AnyActionReturnType:
+  def executeCoordinates(self, *args: str | ActionType, **kwargs: Unpack[ExecuteParams]) -> Coord:
+    """
+    Wrapper with more precise type hinting for :meth:`execute`.
+    """
+    return self.execute(*args, expectedActionType=ActionType.COORDINATES, **kwargs)
+
+  def executeSelection(self, *args: str | ActionType, **kwargs: Unpack[ExecuteParams]) -> Point | Image.Image:
+    """
+    Wrapper with more precise type hinting for :meth:`execute`.
+    """
+    return self.execute(*args, expectedActionType=ActionType.SELECTION, **kwargs)
+
+  def executeFindImage(self, *args: str | ActionType, **kwargs: Unpack[ExecuteParams]) -> list[AreaCoord]:
+    """
+    Wrapper with more precise type hinting for :meth:`execute`.
+    """
+    return self.execute(*args, expectedActionType=ActionType.FIND_IMAGE, **kwargs)
+
+  def executeClick(self, *args: str | ActionType, **kwargs: Unpack[ExecuteParams]) -> None:
+    """
+    Wrapper with more precise type hinting for :meth:`execute`.
+    """
+    return self.execute(*args, expectedActionType=ActionType.CLICK, **kwargs)
+
+  def executePixelColor(self, *args: str | ActionType, **kwargs: Unpack[ExecuteParams]) -> PixelColor:
+    """
+    Wrapper with more precise type hinting for :meth:`execute`.
+    """
+    return self.execute(*args, expectedActionType=ActionType.PIXEL_COLOR, **kwargs)
+
+  def executeComparePixelColor(self, *args: str | ActionType, **kwargs: Unpack[ExecuteParams]) -> int | float:
+    """
+    Wrapper with more precise type hinting for :meth:`execute`.
+    """
+    return self.execute(*args, expectedActionType=ActionType.COMPARE_PIXEL_COLOR, **kwargs)
+
+  def executeIsSamePixelColor(self, *args: str | ActionType, **kwargs: Unpack[ExecuteParams]) -> bool:
+    """
+    Wrapper with more precise type hinting for :meth:`execute`.
+    """
+    return self.execute(*args, expectedActionType=ActionType.IS_SAME_PIXEL_COLOR, **kwargs)
+
+  def executeImageHash(self, *args: str | ActionType, **kwargs: Unpack[ExecuteParams]) -> str:
+    """
+    Wrapper with more precise type hinting for :meth:`execute`.
+    """
+    return self.execute(*args, expectedActionType=ActionType.IMAGE_HASH, **kwargs)
+
+  def executeCompareImageHash(self, *args: str | ActionType, **kwargs: Unpack[ExecuteParams]) -> int:
+    """
+    Wrapper with more precise type hinting for :meth:`execute`.
+    """
+    return self.execute(*args, expectedActionType=ActionType.COMPARE_IMAGE_HASH, **kwargs)
+
+  def executeIsSameImageHash(self, *args: str | ActionType, **kwargs: Unpack[ExecuteParams]) -> bool:
+    """
+    Wrapper with more precise type hinting for :meth:`execute`.
+    """
+    return self.execute(*args, expectedActionType=ActionType.IS_SAME_IMAGE_HASH, **kwargs)
+
+  def executeText(self, *args: str | ActionType, **kwargs: Unpack[ExecuteParams]) -> str:
+    """
+    Wrapper with more precise type hinting for :meth:`execute`.
+    """
+    return self.execute(*args, expectedActionType=ActionType.TEXT, **kwargs)
+
+  def executeNumber(self, *args: str | ActionType, **kwargs: Unpack[ExecuteParams]) -> float | None:
+    """
+    Wrapper with more precise type hinting for :meth:`execute`.
+    """
+    return self.execute(*args, expectedActionType=ActionType.NUMBER, **kwargs)
+
+  @overload
+  def execute(self, *args: str | ActionType, expectedActionType: Literal[ActionType.COORDINATES], **kwargs: Unpack[ExecuteParams]) -> Coord: ...
+  @overload
+  def execute(self, *args: str | ActionType, expectedActionType: Literal[ActionType.SELECTION], **kwargs: Unpack[ExecuteParams]) -> Point | Image.Image: ...
+  @overload
+  def execute(self, *args: str | ActionType, expectedActionType: Literal[ActionType.FIND_IMAGE], **kwargs: Unpack[ExecuteParams]) -> list[AreaCoord]: ...
+  @overload
+  def execute(self, *args: str | ActionType, expectedActionType: Literal[ActionType.CLICK], **kwargs: Unpack[ExecuteParams]) -> None: ...
+  @overload
+  def execute(self, *args: str | ActionType, expectedActionType: Literal[ActionType.PIXEL_COLOR], **kwargs: Unpack[ExecuteParams]) -> PixelColor: ...
+  @overload
+  def execute(self, *args: str | ActionType, expectedActionType: Literal[ActionType.COMPARE_PIXEL_COLOR], **kwargs: Unpack[ExecuteParams]) -> int | float: ...
+  @overload
+  def execute(self, *args: str | ActionType, expectedActionType: Literal[ActionType.IS_SAME_PIXEL_COLOR], **kwargs: Unpack[ExecuteParams]) -> bool: ...
+  @overload
+  def execute(self, *args: str | ActionType, expectedActionType: Literal[ActionType.IMAGE_HASH], **kwargs: Unpack[ExecuteParams]) -> str: ...
+  @overload
+  def execute(self, *args: str | ActionType, expectedActionType: Literal[ActionType.COMPARE_IMAGE_HASH], **kwargs: Unpack[ExecuteParams]) -> int: ...
+  @overload
+  def execute(self, *args: str | ActionType, expectedActionType: Literal[ActionType.IS_SAME_IMAGE_HASH], **kwargs: Unpack[ExecuteParams]) -> bool: ...
+  @overload
+  def execute(self, *args: str | ActionType, expectedActionType: Literal[ActionType.TEXT], **kwargs: Unpack[ExecuteParams]) -> str: ...
+  @overload
+  def execute(self, *args: str | ActionType, expectedActionType: Literal[ActionType.NUMBER], **kwargs: Unpack[ExecuteParams]) -> float | None: ...
+  @overload
+  def execute(self, *args: str | ActionType, **kwargs: Unpack[ExecuteParams]) -> AnyActionReturnType: ...
+  def execute(self, *args: str | ActionType, expectedActionType: ActionType | None=None, **kwargs: Unpack[ExecuteParams]) -> AnyActionReturnType:
     r"""
     Return the result of the given action(s).
 
     When many action ids or action types are specified, actions are executed as a pipeline.
 
     :param args: Action ids or types. At least one must be given.
+    :param expectedActionType: Expected last action type or through reinterpret option. Raises an exception if wrong type.
     :param kwargs: Extra parameters, see :class:`.ExecuteParams`
     :return: The result of the last action in the pipeline.
 
@@ -876,6 +973,7 @@ class Recognizer():
       * Could not open image from the selected area filepath
       * One of the parameters is invalid
       * A needed parameter is missing while using an action type
+      * Last action type is not the expected one
     """
     actionIdOrTypes = []
     for actionIdOrType in args:
@@ -925,6 +1023,18 @@ class Recognizer():
       except:
         raise RecognizerValueError('Could not open selected area filepath \'{filepath}\''
             .format(filepath=kwargs['selectedAreaFilepath']))
+
+    if expectedActionType is not None:
+      if 'reinterpret' in kwargs:
+        lastAction = kwargs['reinterpret']
+      elif isinstance(actionIdOrTypes[-1], str):
+        action = self.actionById[actionIdOrTypes[-1]]
+        lastAction = action['type']
+      else:
+        lastAction = actionIdOrTypes[-1]
+      if lastAction != expectedActionType:
+        raise RecognizerValueError('Last action type is not the expected one.')
+
     return self._pipeExecute(actionIdOrTypes, kwargs)
 
   def _pipeExecute(self, actionIdOrTypes: list[str | ActionType], pipeInfo: PipeInfoDict) -> AnyActionReturnType:

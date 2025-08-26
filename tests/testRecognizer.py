@@ -659,6 +659,14 @@ class TestExecuteAction(LoggedTestCase):
     with self.assertRaises(RecognizerValueError):
       self.recognizer.execute('isSameImageHash1', reinterpret=ActionType.COMPARE_PIXEL_COLOR, screenshotFilepath='tests/data/img/img1.png')
 
+  def test_error_unexpectedLastActionType(self):
+    with self.assertRaises(RecognizerValueError):
+      self.recognizer.execute('isSameImageHash1', expectedActionType=ActionType.COMPARE_PIXEL_COLOR, screenshotFilepath='tests/data/img/img1.png')
+    with self.assertRaises(RecognizerValueError):
+      self.recognizer.execute(ActionType.PIXEL_COLOR, expectedActionType=ActionType.TEXT, screenshotFilepath='tests/data/img/img1.png')
+    with self.assertRaises(RecognizerValueError):
+      self.recognizer.execute('isSameImageHash1', expectedActionType=ActionType.IMAGE_HASH, reinterpret=ActionType.COMPARE_IMAGE_HASH, screenshotFilepath='tests/data/img/img1.png')
+
   def test_actionCoordinates(self):
     result = self.recognizer.execute('coordinates1', screenshotFilepath='tests/data/img/img1.png')
     self.assertEqual(type(result), tuple)
@@ -671,6 +679,9 @@ class TestExecuteAction(LoggedTestCase):
     result = self.recognizer.execute(ActionType.COORDINATES, coord=(7, 7))
     self.assertEqual(type(result), tuple)
     self.assertEqual(result, (7, 7))
+
+    result = self.recognizer.executeCoordinates('coordinates1', screenshotFilepath='tests/data/img/img1.png')
+    self.assertEqual(result, (20, 33))
 
   def test_actionSelection(self):
     result = self.recognizer.execute('selection1', screenshotFilepath='tests/data/img/img1.png')
@@ -690,6 +701,9 @@ class TestExecuteAction(LoggedTestCase):
     self.assertEqual(type(result), Image.Image)
     width, height = cast(Image.Image, result).size
     self.assertEqual(width * height, 35)
+
+    result = self.recognizer.executeSelection('selection1', screenshotFilepath='tests/data/img/img1.png')
+    self.assertEqual(result, (178, 178, 178, 255))
 
   def test_actionFindImage(self):
     result = self.recognizer.execute('findImage1', screenshotFilepath='tests/data/img/img1.png')
@@ -711,6 +725,9 @@ class TestExecuteAction(LoggedTestCase):
     self.assertEqual(len(cast(list, result)), 2)
     self.assertEqual(result, [(7, 28, 13, 29), (6, 27, 15, 28)])
 
+    result = self.recognizer.executeFindImage('findImage1', screenshotFilepath='tests/data/img/img1.png')
+    self.assertEqual(result, [(12, 12, 19, 18)])
+
   def test_actionFindImage_resizeToNearZero(self):
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
         'actions': [{'id': 'action1', 'ratios': (0, 0, 0.06, 0.06), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
@@ -726,6 +743,9 @@ class TestExecuteAction(LoggedTestCase):
       self.assertEqual(result, None)
       moveToMock.assert_called_once()
       clickMock.assert_called_once()
+
+      result = self.recognizer.executeClick('click1', screenshotFilepath='tests/data/img/img1.png')
+      self.assertEqual(result, None)
 
   def test_actionPixelColor(self):
     result = self.recognizer.execute('pixelColor1', screenshotFilepath='tests/data/img/img1.png')
@@ -777,6 +797,9 @@ class TestExecuteAction(LoggedTestCase):
     self.assertEqual(type(result), tuple)
     self.assertEqual(result, (42, 42, 42))
 
+    result = self.recognizer.executePixelColor('pixelColor1', screenshotFilepath='tests/data/img/img1.png')
+    self.assertEqual(result, (114, 114, 114))
+
   def test_actionComparePixelColor(self):
     result = self.recognizer.execute('comparePixelColor1', screenshotFilepath='tests/data/img/img1.png')
     self.assertEqual(type(result), float)
@@ -786,6 +809,9 @@ class TestExecuteAction(LoggedTestCase):
     self.assertEqual(type(result), float)
     self.assertNotEqual(result, 0)
 
+    result = self.recognizer.executeComparePixelColor('comparePixelColor1', screenshotFilepath='tests/data/img/img1.png')
+    self.assertEqual(result, 0)
+
   def test_actionIsSamePixelColor(self):
     result = self.recognizer.execute('isSamePixelColor1', screenshotFilepath='tests/data/img/img1.png')
     self.assertEqual(type(result), bool)
@@ -794,6 +820,10 @@ class TestExecuteAction(LoggedTestCase):
     result = self.recognizer.execute('isSamePixelColor1', screenshotFilepath='tests/data/img/img2.png')
     self.assertEqual(type(result), bool)
     self.assertFalse(result)
+
+    result = self.recognizer.executeIsSamePixelColor('isSamePixelColor1', screenshotFilepath='tests/data/img/img1.png')
+    self.assertEqual(type(result), bool)
+    self.assertTrue(result)
 
   def test_actionImageHash(self):
     result = self.recognizer.execute('imageHash1', screenshotFilepath='tests/data/img/img1.png')
@@ -808,6 +838,9 @@ class TestExecuteAction(LoggedTestCase):
     self.assertEqual(type(result), str)
     self.assertEqual(result, '8000000000000000,07000000000')
 
+    result = self.recognizer.executeImageHash('imageHash1', screenshotFilepath='tests/data/img/img1.png')
+    self.assertEqual(result, 'b88cf69dd66c8960,07000000000')
+
   def test_actionCompareImageHash(self):
     result = self.recognizer.execute('compareImageHash1', screenshotFilepath='tests/data/img/img1.png')
     self.assertEqual(type(result), int)
@@ -816,6 +849,9 @@ class TestExecuteAction(LoggedTestCase):
     result = self.recognizer.execute('compareImageHash1', screenshotFilepath='tests/data/img/img2.png')
     self.assertEqual(type(result), int)
     self.assertEqual(result, 65)
+
+    result = self.recognizer.executeCompareImageHash('compareImageHash1', screenshotFilepath='tests/data/img/img1.png')
+    self.assertEqual(result, 0)
 
   def test_actionIsSameImageHash(self):
     result = self.recognizer.execute('isSameImageHash1', screenshotFilepath='tests/data/img/img1.png')
@@ -826,6 +862,9 @@ class TestExecuteAction(LoggedTestCase):
     self.assertEqual(type(result), bool)
     self.assertFalse(result)
 
+    result = self.recognizer.executeIsSameImageHash('isSameImageHash1', screenshotFilepath='tests/data/img/img1.png')
+    self.assertTrue(result)
+
   def test_actionText_easyOcr(self):
     self.recognizer.setOcrOrder([OcrType.EASY_OCR])
     result = self.recognizer.execute('text1', screenshotFilepath='tests/data/img/img1.png')
@@ -835,6 +874,9 @@ class TestExecuteAction(LoggedTestCase):
     result = self.recognizer.execute('text1', screenshotFilepath='tests/data/img/img3.png')
     self.assertEqual(type(result), str)
     self.assertIn('Love', cast(str, result))
+
+    result = self.recognizer.executeText('text1', screenshotFilepath='tests/data/img/img1.png')
+    self.assertNotIn('Love', cast(str, result))
 
   def test_actionText_tesseract(self):
     self.recognizer.setOcrOrder([OcrType.TESSERACT])
@@ -872,6 +914,9 @@ class TestExecuteAction(LoggedTestCase):
     self.assertEqual(result, 42)
 
     result = self.recognizer.execute('number2', screenshotFilepath='tests/data/img/img3.png')
+    self.assertIsNone(result)
+
+    result = self.recognizer.executeNumber('number1', screenshotFilepath='tests/data/img/img1.png')
     self.assertIsNone(result)
 
   def test_actionNumber_tesseract(self):
@@ -1012,6 +1057,9 @@ class TestExecuteAction(LoggedTestCase):
         screenshotFilepath='tests/data/img/img1.png')
     self.assertEqual(type(result), bool)
     self.assertTrue(result)
+
+    result = self.recognizer.executeCoordinates('selection1', reinterpret=ActionType.COORDINATES, screenshotFilepath='tests/data/img/img1.png')
+    self.assertEqual(result, (9, 7))
 
 class TestExecuteActions(LoggedTestCase):
   def setUp(self):
