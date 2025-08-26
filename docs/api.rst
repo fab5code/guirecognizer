@@ -17,7 +17,7 @@ Recognizer class
   :members: loadFilepath, loadData, clearAllData,
     executeCoordinates, executeSelection, executeFindImage, executeClick, executePixelColor, executeComparePixelColor, executeIsSamePixelColor,
     executeImageHash, executeCompareImageHash, executeIsSameImageHash, executeText, executeNumber, execute,
-    setOcrOrder, setEasyOcr, setTesseractOcr
+    setAllScreens, setOcrOrder, setEasyOcr, setTesseractOcr
 
 .. autoclass:: guirecognizer.recognizer.ExecuteParams
    :members:

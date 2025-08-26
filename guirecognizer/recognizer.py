@@ -112,6 +112,7 @@ class Recognizer():
     """
     self.borders = None
     self.actionById = {}
+    self.allScreens = False
     self.ocrOrder = [OcrType.EASY_OCR, OcrType.TESSERACT]
     self.easyOcrReader = None
     self.tesseractOptions = None
@@ -322,13 +323,13 @@ class Recognizer():
     raise RecognizerValueError('Parameters borders or ratios are invalid.')
 
   @classmethod
-  def getPoint(cls, coord: Coord) -> Point:
+  def getPoint(cls, coord: Coord, allScreens: bool=False) -> Point:
     """
     :param coord:
     :return: rgb colors - If outside screen (0, 0, 0).
     """
     imageCoord = (coord[0], coord[1], coord[0] + 1, coord[1] + 1)
-    image = ImageGrab.grab(imageCoord)
+    image = ImageGrab.grab(imageCoord, all_screens=allScreens)
     return image.getpixel((0, 0)) # type: ignore
 
   @classmethod
@@ -386,11 +387,11 @@ class Recognizer():
     return mean(tuple(map(lambda x, y: abs(x - y) / 255, pixelColorA, pixelColorB)))
 
   @classmethod
-  def getArea(cls, coord: AreaCoord) -> Image.Image:
+  def getArea(cls, coord: AreaCoord, allScreens: bool=False) -> Image.Image:
     """
     :param coord:
     """
-    return ImageGrab.grab(coord) # type: ignore
+    return ImageGrab.grab(coord, all_screens=allScreens) # type: ignore
 
   @classmethod
   def getAreaFromScreenshot(cls, screenshot: Image.Image, coord: AreaCoord) -> Image.Image:
@@ -635,6 +636,14 @@ class Recognizer():
     self.actionById.clear()
     self.preprocessing.clearAllData()
 
+  def setAllScreens(self, allScreens: bool) -> None:
+    """
+    Set to True to grab all monitors when grabbing a screenshot.
+
+    :param allScreens:
+    """
+    self.allScreens = allScreens
+
   def setOcrOrder(self, ocrOrder: tuple[OcrType, ...] | list[OcrType]) -> None:
     """
     :param ocrOrder:
@@ -847,7 +856,7 @@ class Recognizer():
     """
     if self.borders is None:
       raise RecognizerValueError('No borders data.')
-    return self.getArea(self.borders)
+    return self.getArea(self.borders, self.allScreens)
 
   def executeCoordinates(self, *args: str | ActionType, **kwargs: Unpack[ExecuteParams]) -> Coord:
     """
@@ -1141,7 +1150,7 @@ class Recognizer():
           pipeInfo['selectedPoint'] = self.getPointFromBordersImage(pipeInfo['bordersImage'], pipeInfo['coord'], self.borders)
           return self._pipeExecuteActionSelection(action, actionIdOrTypes, pipeInfo)
       assert 'coord' in pipeInfo
-      pipeInfo['selectedPoint'] = self.getPoint(pipeInfo['coord'])
+      pipeInfo['selectedPoint'] = self.getPoint(pipeInfo['coord'], self.allScreens)
       return self._pipeExecuteActionSelection(action, actionIdOrTypes, pipeInfo)
     else:
       if 'selectedArea' in pipeInfo:
@@ -1170,7 +1179,7 @@ class Recognizer():
           pipeInfo['selectedArea'] = self.getAreaFromBordersImage(pipeInfo['bordersImage'], cast(AreaCoord, pipeInfo['coord']), self.borders)
           return self._pipeExecuteActionSelection(action, actionIdOrTypes, pipeInfo)
       assert 'coord' in pipeInfo
-      pipeInfo['selectedArea'] = self.getArea(cast(AreaCoord, pipeInfo['coord']))
+      pipeInfo['selectedArea'] = self.getArea(cast(AreaCoord, pipeInfo['coord']), self.allScreens)
       return self._pipeExecuteActionSelection(action, actionIdOrTypes, pipeInfo)
 
   def _pipeExecuteActionFindImage(self, action: ActionDict | None,

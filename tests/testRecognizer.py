@@ -2,7 +2,7 @@ import unittest
 from typing import cast
 from unittest.mock import patch
 
-from PIL import Image, ImageOps
+from PIL import Image, ImageGrab, ImageOps
 
 from guirecognizer import (ActionType, OcrType, Recognizer,
                            RecognizerValueError, SelectionType)
@@ -934,6 +934,32 @@ class TestExecuteAction(LoggedTestCase):
     self.recognizer.setOcrOrder([OcrType.TESSERACT])
     result = self.recognizer.execute('number1', screenshotFilepath='tests/data/img/img1.png')
     self.assertIsNone(result)
+
+  def test_allScreens(self):
+    recognizer = Recognizer('tests/data/json/config1.json')
+
+    with patch('guirecognizer.recognizer.ImageGrab.grab', wraps=ImageGrab.grab) as mock:
+      result = recognizer.executeSelection('selection1')
+      self.assertEqual(type(result), tuple)
+      mock.assert_called_once_with((9, 7, 10, 8), all_screens=False)
+
+    with patch('guirecognizer.recognizer.ImageGrab.grab', wraps=ImageGrab.grab) as mock:
+      recognizer.setAllScreens(True)
+      result = recognizer.executeSelection('selection1')
+      self.assertEqual(type(result), tuple)
+      mock.assert_called_once_with((9, 7, 10, 8), all_screens=True)
+
+    with patch('guirecognizer.recognizer.ImageGrab.grab', wraps=ImageGrab.grab) as mock:
+      recognizer.setAllScreens(False)
+      result = recognizer.execute('selection2')
+      self.assertEqual(type(result), Image.Image)
+      mock.assert_called_once_with((7, 11, 12, 18), all_screens=False)
+
+    with patch('guirecognizer.recognizer.ImageGrab.grab', wraps=ImageGrab.grab) as mock:
+      recognizer.setAllScreens(True)
+      result = recognizer.execute('selection2')
+      self.assertEqual(type(result), Image.Image)
+      mock.assert_called_once_with((7, 11, 12, 18), all_screens=True)
 
   def test_optionScreenshot(self):
     screenshot = Image.open('tests/data/img/img1.png')
