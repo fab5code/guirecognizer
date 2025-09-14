@@ -93,6 +93,9 @@ class OcrType(Enum):
   TESSERACT = 'tesseract'
   EASY_OCR = 'easyOcr'
 
+def isArea(coord: Coord) -> TypeIs[AreaCoord]:
+  return SelectionType.fromSelection(coord) == SelectionType.AREA
+
 class Recognizer():
   borders: AreaCoord | None
   actionById: dict[str, ActionDict]
@@ -798,10 +801,6 @@ class Recognizer():
       logger.warning('Size of action ratios (2) is too small for action type \'{actionType}\'. This action \'{actionId}\' is ignored.'
           .format(actionType=action['type'].value, actionId=actionId))
       return
-    elif not action['type'].isRightSelection(action['ratios']):
-      logger.warning('Size of action ratios (4) is bigger than necessary for action type \'{actionType}\'.'
-          ' This action \'{actionId}\' is still processed.'.format(actionType=action['type'].value, actionId=actionId))
-      action['ratios'] = action['ratios'][0:2]
 
     match action['type']:
       case ActionType.FIND_IMAGE:
@@ -1244,6 +1243,8 @@ class Recognizer():
     if len(actionIdOrTypes) == 0:
       assert 'coord' in pipeInfo
       coord = pipeInfo['coord']
+      if isArea(coord):
+        coord = (round((coord[0] + coord[2]) / 2), round((coord[1] + coord[3]) / 2))
       MouseHelper.clickOnPosition((coord[0], coord[1]), **options)
       return None
     else:

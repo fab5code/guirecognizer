@@ -105,7 +105,7 @@ class ActionType(Enum):
 
   **Returns:** tuple containing the coordinates of each location
   """
-  CLICK = ('click', SelectionType.POINT)
+  CLICK = ('click', SelectionType.POINT_OR_AREA)
   """
   Click on the selected point.
 
@@ -217,19 +217,3 @@ class ActionType(Enum):
     param selection: either coordinates or ratios
     """
     return self.isCompatibleWithSelectionType(SelectionType.fromSelection(selection))
-
-  def isRightSelectionType(self, selectionType: SelectionType) -> bool:
-    """
-    Return whether the selection type is a right one for this action.
-
-    param selectionType:
-    """
-    return self.selectionType.isRightSelectionType(selectionType)
-
-  def isRightSelection(self, selection: Coord | Ratios) -> bool:
-    """
-    Return whether the selection has a right form for this action.
-
-    param selection: either coordinates or ratios
-    """
-    return self.isRightSelectionType(SelectionType.fromSelection(selection))

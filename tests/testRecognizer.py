@@ -744,8 +744,17 @@ class TestExecuteAction(LoggedTestCase):
       moveToMock.assert_called_once()
       clickMock.assert_called_once()
 
+    with patch('pyautogui.click') as clickMock, patch('pyautogui.moveTo') as moveToMock:
+      result = self.recognizer.execute('click2', screenshotFilepath='tests/data/img/img1.png')
+      self.assertEqual(result, None)
+      moveToMock.assert_called_once()
+      clickMock.assert_called_once()
+
+    with patch('pyautogui.click') as clickMock, patch('pyautogui.moveTo') as moveToMock:
       result = self.recognizer.executeClick('click1', screenshotFilepath='tests/data/img/img1.png')
       self.assertEqual(result, None)
+      moveToMock.assert_called_once()
+      clickMock.assert_called_once()
 
   def test_actionPixelColor(self):
     result = self.recognizer.execute('pixelColor1', screenshotFilepath='tests/data/img/img1.png')

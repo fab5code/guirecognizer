@@ -114,3 +114,8 @@ In Visual Studio Code, install extensions
 
 - isort to sort python automatically
 - Pylance for type checking
+
+Improvements
+------------
+
+**Improve logger usage**: in code and tests.
