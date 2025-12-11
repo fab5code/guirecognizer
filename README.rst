@@ -105,6 +105,15 @@ Generate doc
 
 Then open *docsBuild/index.html*
 
+Use the script *scripts/optimizeImages.sh* in a bash console to reduce the size of images before pushing them in git.
+Image files are converted to webp files.
+
+For instance:
+
+.. code-block:: console
+
+  $ ./scripts/optimizeImages.sh docs/_static/examples/otteretto
+
 Coding style
 ^^^^^^^^^^^^
 

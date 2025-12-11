@@ -35,4 +35,4 @@ Finally run the bot.
 
 .. code-block:: console
 
-  (venv) $ python otteretto
+  (venv) $ python otteretto.py

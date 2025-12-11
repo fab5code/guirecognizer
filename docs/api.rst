@@ -10,6 +10,8 @@ Actions
   :members: COORDINATES, SELECTION, FIND_IMAGE, CLICK, PIXEL_COLOR, COMPARE_PIXEL_COLOR, IS_SAME_PIXEL_COLOR,
     IMAGE_HASH, COMPARE_IMAGE_HASH, IS_SAME_IMAGE_HASH, TEXT, NUMBER
 
+.. _recognizer-class:
+
 Recognizer class
 ----------------
 
@@ -37,5 +39,12 @@ TODO
 
 OCRs
 ----
+
+TODO
+
+.. _mouse-helper:
+
+Mouse helper
+------------
 
 TODO

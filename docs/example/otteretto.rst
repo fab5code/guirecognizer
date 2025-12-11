@@ -1,0 +1,250 @@
+Otteretto
+=========
+
+The code is available at
+`https://github.com/fab5code/guirecognizer/tree/main/examples/otteretto <https://github.com/fab5code/guirecognizer/tree/main/examples/otteretto>`_
+with instructions to run the bot. The bot plays the game automatically.
+
+Let's explain how to retrieve some game information using the pixels of the screen.
+
+What is Otteretto?
+------------------
+Otteretto is a game about palindromes. Blocks of different colors are arranged on a grid of 4 by 10.
+The goal is to find palindromes of colored blocks inside the grid. Bigger palindromes awards more points.
+
+.. figure:: /_static/examples/otteretto/gridExample.webp
+   :alt: Example of the grid.
+   :width: 50%
+   :align: center
+
+   Example of the grid.
+
+Retrieve the grid values from the screen
+----------------------------------------
+Let's create a python script to retrieve the grid information from the screen using guirecognizer.
+
+Create the bot configuration file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Install *guirecognizerapp* (it will also install *guirecognizer*)
+
+.. code-block:: console
+
+  (venv) $ pip install guirecognizerapp
+
+Launch the app.
+
+.. code-block:: console
+
+  (venv) $ python -m guirecognizerapp
+
+In parallel open `https://otteretto.app/classic/ <https://otteretto.app/classic/>`_. Play or skip the tutorial until the game with the grid starts.
+
+In *guirecognizerapp* take a screenshot of the game: *Capture -> Take Screenshot* or shortcut *Ctrl+Alt+T*.
+
+Then define the borders which represent absolute coordinates of the screen portion that is used as reference to define all actions.
+
+.. figure:: /_static/examples/otteretto/setBorders1.webp
+   :alt: Setting the borders instructions: click on borders button.
+   :width: 50%
+   :align: center
+
+   Click on the button to set the borders.
+
+.. figure:: /_static/examples/otteretto/setBorders2.webp
+   :alt: Setting the borders instructions: select the screen portion.
+   :width: 50%
+   :align: center
+
+   Select the screen portion. It's also possible to select the whole screenshot.
+
+To retrieve the grid information we need to know where the grid is. Let's add three actions to get the coordinates of the grid at the top left,
+top right and bottom left corners.
+
+Add a *Get Coordinates* action: *Manage Actions -> Add Action Get Coordinates*.
+Name it *topLeft* and make the action selection. Select the point at the top left of the grid with some offset from the grid frame.
+Try to select the top left of where a colored block is and could be.
+
+.. figure:: /_static/examples/otteretto/getCoordinates1.webp
+   :alt: Setting the borders instructions: click on borders button.
+   :width: 50%
+   :align: center
+
+   Click on the button to make the action selection.
+
+.. figure:: /_static/examples/otteretto/getCoordinates2.webp
+   :alt: Setting the borders instructions: select the screen portion.
+   :width: 50%
+   :align: center
+
+   Select the point at the top left of the grid.
+
+Do the same thing with the top right and bottom left corners. Try to select the top left of where a colored block is and could be.
+
+Save the file *otterettoConfig.json* in your project folder: *File -> Save* or *Ctrl+S*.
+
+Loop through the grid blocks
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Create a python file *bot.py*. Use *guirecognizer* class :ref:`Recognizer <recognizer-class>` to load the configuration file.
+
+Check the action called *topLeft* defined earlier is working.
+
+.. code-block:: python
+
+  from guirecognizer import Recognizer
+
+  recognizer = Recognizer('otterettoConfig.json')
+  topLeft = recognizer.executeCoordinates('topLeft')
+  print('Top left coord:', topLeft)
+
+.. code-block:: console
+
+   Top left coord: (752, 310)
+
+We are going to loop through each block of the grid and retrieve the pixel color. Test retrieving the color of a specific pixel on the screen.
+
+.. code-block:: python
+
+  from guirecognizer import ActionType, Recognizer
+
+  recognizer = Recognizer('otterettoConfig.json')
+  pixelColor = recognizer.executePixelColor(ActionType.PIXEL_COLOR, coord=(752, 310))
+  print(pixelColor)
+
+.. code-block:: console
+
+   (42, 63, 148)
+
+Here is the code to loop through the blocks and get the color of each block.
+
+.. code-block:: python
+
+  from guirecognizer import ActionType, Recognizer
+
+  recognizer = Recognizer('otterettoConfig.json')
+  width = 4
+  height = 10
+  topLeft = recognizer.executeCoordinates('topLeft')
+  topRight = recognizer.executeCoordinates('topRight')
+  bottomLeft = recognizer.executeCoordinates('bottomLeft')
+  xGap = abs(topRight[0] - topLeft[0]) / (width - 1)
+  yGap = abs(bottomLeft[1] - topLeft[1]) / (height - 1)
+  for x in range(width):
+    for y in range(height):
+      coord = (int(bottomLeft[0] + x * xGap), int(bottomLeft[1] - y * yGap))
+      pixelColor = recognizer.executePixelColor(ActionType.PIXEL_COLOR, coord=coord)
+
+But to identify a block we need to know their color. Let's extend the configuration file.
+
+Identify the block colors
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Using *guirecognizerapp* add an action *Is Same Pixel Color* for each of the five types of blocks: *Manage Actions -> Add Action Is Same Pixel Color*.
+For each action, name it then select on the screenshot a pixel corresponding to the color of the block.
+
+.. figure:: /_static/examples/otteretto/identifyColor.webp
+   :alt: Add actions Is Same Pixel Color to identify block colors.
+   :width: 50%
+   :align: center
+
+   Add actions Is Same Pixel Color to identify block colors.
+
+Now we can identify each block. The following code prints in the console the full grid.
+Make sure the window with the game is displayed. You may want to add a sleep command at the start of script if you need the time to display the game window.
+
+.. code-block:: python
+
+  from guirecognizer import ActionType, Recognizer
+
+  recognizer = Recognizer('otterettoConfig.json')
+  width = 4
+  height = 10
+  topLeft = recognizer.executeCoordinates('topLeft')
+  topRight = recognizer.executeCoordinates('topRight')
+  bottomLeft = recognizer.executeCoordinates('bottomLeft')
+  xGap = abs(topRight[0] - topLeft[0]) / (width - 1)
+  yGap = abs(bottomLeft[1] - topLeft[1]) / (height - 1)
+  for y in reversed(range(height)):
+    line = ''
+    for x in range(width):
+      coord = (int(bottomLeft[0] + x * xGap), int(bottomLeft[1] - y * yGap))
+      color = recognizer.executePixelColor(ActionType.PIXEL_COLOR, coord=coord)
+      if recognizer.executeIsSamePixelColor('typeSquare', pixelColor=color):
+        line += ' 🟦'
+      elif recognizer.executeIsSamePixelColor('typeStar', pixelColor=color):
+        line += ' 🟪'
+      elif recognizer.executeIsSamePixelColor('typeCircle', pixelColor=color):
+        line += ' 🟥'
+      elif recognizer.executeIsSamePixelColor('typeTriangle', pixelColor=color):
+        line += ' 🟩'
+      elif recognizer.executeIsSamePixelColor('typeDiamond', pixelColor=color):
+        line += ' 🟨'
+      else:
+        line += '  '
+    print(line)
+
+.. code-block:: console
+
+   <empty>
+   <empty>
+   <empty>
+   <empty>
+   🟥 🟪 🟥 🟦
+   🟪 🟨 🟥 🟪
+   🟩 🟥 🟥 🟦
+   🟩 🟪 🟥 🟪
+   🟪 🟦 🟪 🟨
+   🟨 🟦 🟨 🟦
+
+Improve performance
+~~~~~~~~~~~~~~~~~~~
+
+Right now each call *recognizer.executePixelColor* retrieves some information on the screen by making a call to the OS screen api.
+The whole loop takes around a second. Instead let's retrieve the whole borders portion of the screen once and get the pixel colors from this image.
+
+To retrieve the borders portion of the screen, call *recognizer.getBordersImage*. Then pass the image as a parameter of *recognizer.executePixelColor*.
+
+.. code-block:: python
+
+  from guirecognizer import ActionType, Recognizer
+
+  recognizer = Recognizer('otterettoConfig.json')
+  width = 4
+  height = 10
+  topLeft = recognizer.executeCoordinates('topLeft')
+  topRight = recognizer.executeCoordinates('topRight')
+  bottomLeft = recognizer.executeCoordinates('bottomLeft')
+  xGap = abs(topRight[0] - topLeft[0]) / (width - 1)
+  yGap = abs(bottomLeft[1] - topLeft[1]) / (height - 1)
+  bordersImage = recognizer.getBordersImage()
+  for y in reversed(range(height)):
+    line = ''
+    for x in range(width):
+      coord = (int(bottomLeft[0] + x * xGap), int(bottomLeft[1] - y * yGap))
+      color = recognizer.executePixelColor(ActionType.PIXEL_COLOR, coord=coord, bordersImage=bordersImage)
+      if recognizer.executeIsSamePixelColor('typeSquare', pixelColor=color):
+        line += ' 🟦'
+      elif recognizer.executeIsSamePixelColor('typeStar', pixelColor=color):
+        line += ' 🟪'
+      elif recognizer.executeIsSamePixelColor('typeCircle', pixelColor=color):
+        line += ' 🟥'
+      elif recognizer.executeIsSamePixelColor('typeTriangle', pixelColor=color):
+        line += ' 🟩'
+      elif recognizer.executeIsSamePixelColor('typeDiamond', pixelColor=color):
+        line += ' 🟨'
+      else:
+        line += '  '
+    print(line)
+
+Now it only takes about 0.3s instead of 1s.
+
+What's next?
+------------
+
+Now that you have information about the grid, you can try to write a solver to find the best palindrome
+but *guirecognizer* won't help you with that.
+
+You can try to run the bot available at
+`https://github.com/fab5code/guirecognizer/tree/main/examples/otteretto <https://github.com/fab5code/guirecognizer/tree/main/examples/otteretto>`_.
+It uses *MouseHelper.dragCoords* from the utility class :ref:`MouseHelper <mouse-helper>` to move the mouse through the blocks to select palindromes.

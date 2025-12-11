@@ -35,9 +35,9 @@ dev = [
   "sphinx-autodoc-typehints",
 ]
 
-# [project.urls]
-# Repository = "https://github.com/me/spam.git"
-# Issues = "https://github.com/me/spam/issues"
+[project.urls]
+Repository = "https://github.com/fab5code/guirecognizer.git"
+Issues = "https://github.com/fab5code/guirecognizer/issues"
 
 [tool.setuptools.dynamic]
 version = { attr = "guirecognizer.__version__" }
