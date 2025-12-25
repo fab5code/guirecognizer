@@ -9,13 +9,29 @@
         0.975609756097561
       ],
       "type": "pixelColor"
+    },
+    {
+      "type": "findImage",
+      "context": {
+        "comment": ""
+      },
+      "id": "findImage1",
+      "ratios": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "imageToFind": "iVBORw0KGgoAAAANSUhEUgAAAAUAAAAGCAYAAAAL+1RLAAAAdklEQVR4ARzJrQ3FIBhG4TdfOkFtbUMYAcMYeKZhGCQJW4BiBQR/AoUi4ab3JEc91Hs/c87ztdY6rbVDxhg45xBCgPf+P6WUkHNGjBF7b5RSQM/zYIwBay2u64KUEvS+LxhjUEpBCAHOOajWig+01rjvG0SEHwAAAP//XOjl8gAAAAZJREFUAwAo9TgOkMzMeAAAAABJRU5ErkJggg==",
+      "threshold": 5,
+      "maxResults": 1
     }
   ],
   "borders": [
     0,
     0,
     40,
-    41
+    40
   ],
   "operations": [
     {
@@ -84,6 +100,19 @@
           }
         }
       ]
+    },
+    {
+      "suboperations": [
+        {
+          "type": "resize",
+          "resize": {
+            "method": "fixedRatioWidth",
+            "width": 10,
+            "height": 100
+          }
+        }
+      ],
+      "id": "resize2"
     }
   ]
 }

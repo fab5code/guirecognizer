@@ -1213,7 +1213,18 @@ class TestPreprocessing(LoggedTestCase):
     result = self.recognizer.execute('pixelColor1', screenshotFilepath='tests/data/img/img1.png', preprocessing='threshold1')
     self.assertEqual(result, (186, 186, 186))
     result = self.recognizer.execute('pixelColor1', screenshotFilepath='tests/data/img/img1.png', preprocessing='resize1')
-    self.assertEqual(result, (197, 197, 197))
+    self.assertEqual(result, (196, 196, 196))
+
+  def test_preprocessing_FindImage(self):
+    result = self.recognizer.execute('findImage1', screenshotFilepath='tests/data/img/img1.png')
+    self.assertEqual(type(result), list)
+    self.assertEqual(len(cast(list, result)), 0)
+
+    result = self.recognizer.execute('findImage1', screenshotFilepath='tests/data/img/img1.png', preprocessing='resize2')
+    self.assertEqual(type(result), list)
+    self.assertEqual(len(cast(list, result)), 1)
+    self.assertEqual(result, [(4, 4, 24, 28)])
+
 
 if __name__ == '__main__':
   unittest.main()

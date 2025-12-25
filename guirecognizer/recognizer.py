@@ -1,6 +1,7 @@
 import base64
 import json
 import logging
+import math
 import os
 from enum import Enum, unique
 from io import BytesIO
@@ -99,6 +100,7 @@ def isArea(coord: Coord) -> TypeIs[AreaCoord]:
 class Recognizer():
   borders: AreaCoord | None
   actionById: dict[str, ActionDict]
+  sizeRatio: tuple[float, float]
 
   """
   Recognize given patterns and make GUI actions.
@@ -415,8 +417,8 @@ class Recognizer():
     return cls.getAreaFromScreenshot(bordersImage, relativeCoord)
 
   @classmethod
-  def findImageCoordinates(cls, areaCoord: AreaCoord, area: Image.Image, imageToFindValue: str,
-      threshold: int, maxResults: int, resizeInterval: ResizeInterval | None=None) -> list[AreaCoord]:
+  def findImageCoordinates(cls, areaCoord: AreaCoord, area: Image.Image, imageToFindValue: str, threshold: int,
+      maxResults: int, resizeInterval: ResizeInterval | None=None, sizeRatio: tuple[float, float]=(1, 1)) -> list[AreaCoord]:
     """
     :param areaCoord:
     :param area:
@@ -426,11 +428,11 @@ class Recognizer():
     :param resizeInterval: (optional)
     """
     imageToFind = cls.getImageToFindFromData(imageToFindValue)
-    return cls.findImageCoordinatesWithImageToFindAsImage(areaCoord, area, imageToFind, threshold, maxResults, resizeInterval)
+    return cls.findImageCoordinatesWithImageToFindAsImage(areaCoord, area, imageToFind, threshold, maxResults, resizeInterval, sizeRatio)
 
   @classmethod
   def findImageCoordinatesWithImageToFindAsImage(cls, areaCoord: AreaCoord, area: Image.Image, imageToFind: Image.Image,
-      threshold: int, maxResults: int, resizeInterval: ResizeInterval | None=None) -> list[AreaCoord]:
+      threshold: int, maxResults: int, resizeInterval: ResizeInterval | None=None, sizeRatio: tuple[float, float]=(1, 1)) -> list[AreaCoord]:
     """
     :param areaCoord:
     :param area:
@@ -467,8 +469,8 @@ class Recognizer():
       if nbInspections == maxResultsToInspect or len(coords) == maxResults:
         break
       relativeCoord = (int(result[0]), int(result[1]), int(result[0] + result[3][0]), int(result[1] + result[3][1]))
-      coord = (areaCoord[0] + relativeCoord[0], areaCoord[1] + relativeCoord[1],
-          areaCoord[0] + relativeCoord[2], areaCoord[1] + relativeCoord[3])
+      coord = (areaCoord[0] + math.floor(relativeCoord[0] * sizeRatio[0]), math.ceil(areaCoord[1] + relativeCoord[1] * sizeRatio[1]),
+          math.floor(areaCoord[0] + relativeCoord[2] * sizeRatio[0]), math.ceil(areaCoord[1] + relativeCoord[3] * sizeRatio[1]))
       if cls._doesOverlay(coord, coords):
         continue
       nbInspections += 1
@@ -1043,6 +1045,7 @@ class Recognizer():
       if lastAction != expectedActionType:
         raise RecognizerValueError('Last action type is not the expected one.')
 
+    self.sizeRatio = (1, 1)
     return self._pipeExecute(actionIdOrTypes, kwargs)
 
   def _pipeExecute(self, actionIdOrTypes: list[str | ActionType], pipeInfo: PipeInfoDict) -> AnyActionReturnType:
@@ -1157,7 +1160,9 @@ class Recognizer():
           raise RecognizerValueError('Invalid area value.')
         else:
           if 'preprocessing' in pipeInfo:
+            originalSize = pipeInfo['selectedArea'].size
             pipeInfo['selectedArea'] = self.preprocessing.process(pipeInfo['selectedArea'], pipeInfo['preprocessing'])
+            self.sizeRatio = (originalSize[0] / pipeInfo['selectedArea'].width, originalSize[1] / pipeInfo['selectedArea'].height)
           if len(actionIdOrTypes) == 0:
             return pipeInfo['selectedArea']
           else:
@@ -1209,8 +1214,8 @@ class Recognizer():
       assert 'threshold' in action
       assert 'maxResults' in action
       assert 'coord' in pipeInfo
-      return self.findImageCoordinates(cast(AreaCoord, pipeInfo['coord']), pipeInfo['selectedArea'], action['imageToFind'], action['threshold'],
-          action['maxResults'], action['resizeInterval'])
+      return self.findImageCoordinates(cast(AreaCoord, pipeInfo['coord']), pipeInfo['selectedArea'], action['imageToFind'],
+          action['threshold'], action['maxResults'], action['resizeInterval'], self.sizeRatio)
     else:
       return self._pipeExecute(actionIdOrTypes, pipeInfo)
 

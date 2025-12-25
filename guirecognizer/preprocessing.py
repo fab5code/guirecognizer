@@ -1,7 +1,7 @@
 import logging
 from abc import ABC, abstractmethod
 from enum import Enum, unique
-from typing import Any, TypeGuard, TypeIs, assert_never
+from typing import Any, TypedDict, TypeGuard, TypeIs, assert_never
 
 import numpy as np
 from PIL import Image, ImageOps
@@ -402,12 +402,17 @@ class ResizePreprocessor(Preprocessor):
         self.width = max(round(image.size[0] / image.size[1] * self.height), 1)
     return image.resize((self.width, self.height))
 
+class OperationDict(TypedDict):
+  id: str
+  suboperations: list[Preprocessor]
+
 class Preprocessing:
   """
   Preprocess images.
 
   Can be used to load preprocessing operations (:class:`PreprocessingType`) defined in config data.
   """
+  operationById: dict[str, OperationDict]
 
   def __init__(self, data: dict | None=None) -> None:
     """
@@ -494,7 +499,7 @@ class Preprocessing:
       if operationId in self.operationById:
         logger.warning(f'Operation id \'{operationId}\' is already used. This operation is ignored.')
         return
-      operation = {'id': operationId, 'suboperations': []}
+      operation: OperationDict = {'id': operationId, 'suboperations': []}
     else:
       logger.warning('Invalid operation id. This operation is ignored.')
       return
