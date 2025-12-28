@@ -6,8 +6,7 @@ This is a bot for the popular idle game Cookie Clicker: `https://orteil.dashnet.
 Cookie Clicker
 --------------
 
-Otteretto is a game about palindromes. Blocks of different colors are arranged on a grid of 4 by 10.
-The goal is to find palindromes of colored blocks inside the grid. Bigger palindromes awards more points.
+Cookie Clicker is an idle game where you click to bake cookies and use them to buy upgrades that automatically produce even more cookies over time.
 
 Run the bot
 -----------

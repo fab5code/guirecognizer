@@ -8,8 +8,11 @@ The algorithms to build the rest of the bot are not explained.
 
 - :doc:`example/otteretto`: A game about palindromes on a grid.
 
+- :doc:`example/cookieClicker`: A popular idle game about producing as many cookies as possible.
+
 .. toctree::
    :maxdepth: 1
    :hidden:
 
    example/otteretto
+   example/cookieClicker

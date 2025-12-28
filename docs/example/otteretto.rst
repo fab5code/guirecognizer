@@ -3,7 +3,7 @@ Otteretto
 
 The code is available at
 `https://github.com/fab5code/guirecognizer/tree/main/examples/otteretto <https://github.com/fab5code/guirecognizer/tree/main/examples/otteretto>`_
-with instructions to run the bot. The bot plays the game automatically.
+and includes instructions to run the bot. The bot plays the game automatically.
 
 Let's explain how to retrieve some game information using the pixels of the screen.
 
@@ -66,14 +66,14 @@ Name it *topLeft* and make the action selection. Select the point at the top lef
 Try to select the top left of where a colored block is and could be.
 
 .. figure:: /_static/examples/otteretto/getCoordinates1.webp
-   :alt: Setting the borders instructions: click on borders button.
+   :alt: Click on the button to make the action selection.
    :width: 50%
    :align: center
 
    Click on the button to make the action selection.
 
 .. figure:: /_static/examples/otteretto/getCoordinates2.webp
-   :alt: Setting the borders instructions: select the screen portion.
+   :alt: Select the point at the top left of the grid.
    :width: 50%
    :align: center
 
@@ -86,11 +86,12 @@ Save the file *otterettoConfig.json* in your project folder: *File -> Save* or *
 Loop through the grid blocks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Create a python file *bot.py*. Use *guirecognizer* class :ref:`Recognizer <recognizer-class>` to load the configuration file.
+Create a python file *bot.py*. Use the *guirecognizer* class :ref:`Recognizer <recognizer-class>` to load the configuration file.
 
 Check the action called *topLeft* defined earlier is working.
 
 .. code-block:: python
+  :linenos:
 
   from guirecognizer import Recognizer
 
@@ -105,6 +106,7 @@ Check the action called *topLeft* defined earlier is working.
 We are going to loop through each block of the grid and retrieve the pixel color. Test retrieving the color of a specific pixel on the screen.
 
 .. code-block:: python
+  :linenos:
 
   from guirecognizer import ActionType, Recognizer
 
@@ -119,6 +121,7 @@ We are going to loop through each block of the grid and retrieve the pixel color
 Here is the code to loop through the blocks and get the color of each block.
 
 .. code-block:: python
+  :linenos:
 
   from guirecognizer import ActionType, Recognizer
 
@@ -154,6 +157,7 @@ Now we can identify each block. The following code prints in the console the ful
 Make sure the window with the game is displayed. You may want to add a sleep command at the start of script if you need the time to display the game window.
 
 .. code-block:: python
+  :linenos:
 
   from guirecognizer import ActionType, Recognizer
 
@@ -206,6 +210,7 @@ The whole loop takes around a second. Instead let's retrieve the whole borders p
 To retrieve the borders portion of the screen, call *recognizer.getBordersImage*. Then pass the image as a parameter of *recognizer.executePixelColor*.
 
 .. code-block:: python
+  :linenos:
 
   from guirecognizer import ActionType, Recognizer
 

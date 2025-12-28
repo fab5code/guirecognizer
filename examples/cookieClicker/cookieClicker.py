@@ -1,6 +1,5 @@
 import logging
 import multiprocessing as mp
-import os
 import random
 
 import keyboard
@@ -22,17 +21,17 @@ class CookieManager(Manager):
   def run(self):
     while not self.stopEvent.wait(0.001):
       self.mouseLock.acquire()
-      self.recognizer.executeClick('cookie', clickPauseDuration=0.02, nbClicks=20)
+      self.recognizer.executeClick('cookie', clickPauseDuration=0.025, nbClicks=20)
       self.mouseLock.release()
 
 class UpdateManager(Manager):
   def __init__(self, recognizerConfig, stopEvent, mouseLock):
     super().__init__(recognizerConfig, stopEvent, mouseLock)
-    self.nbBuildingsInScreen = 9
-    self.maxNbBuildings = 15
-    self.maxNbCursors = 50
+    self.nbBuildingsInScreen = 10
+    self.maxNbBuildings = 10
+    self.maxNbCursors = 20
 
-    self.nbBuildings = [27, 5, 3, 0, 0, 0, 0, 0, 0]
+    self.nbBuildings = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     self.initBuildingCoords()
 
   @classmethod
@@ -43,10 +42,10 @@ class UpdateManager(Manager):
   def initBuildingCoords(self):
     self.buildingCoords = []
     topCoord = self.recognizer.executeCoordinates('buildingTop')
-    bottomCoord = self.recognizer.executeCoordinates('buildingBottom')
-    yStep = (bottomCoord[1] - topCoord[1]) / (self.nbBuildingsInScreen - 1)
+    coord = self.recognizer.executeCoordinates('buildingHeight')
+    height = coord[3] - coord[1]
     for i in range(self.nbBuildingsInScreen):
-      coord = (topCoord[0], int(topCoord[1] + i * yStep))
+      coord = (topCoord[0], int(topCoord[1] + i * height))
       self.buildingCoords.append(coord)
 
   def run(self):
@@ -76,12 +75,10 @@ class UpdateManager(Manager):
     for building in reversed(range(self.nbBuildingsInScreen)):
       if (building == 0 and self.nbBuildings[building] >= self.maxNbCursors) or (building != 0 and self.nbBuildings[building] >= self.maxNbBuildings):
         continue
-      pixels = (self.buildingCoords[building][0], self.buildingCoords[building][1], self.buildingCoords[building][0] + 8, self.buildingCoords[building][1] + 7)
+      pixels = (self.buildingCoords[building][0], self.buildingCoords[building][1], self.buildingCoords[building][0] + 76, self.buildingCoords[building][1] + 13)
       color = self.recognizer.executePixelColor(ActionType.PIXEL_COLOR, coord=pixels)
       availableDiff = self.recognizer.executeComparePixelColor('buildingAvailableDiff', pixelColor=color)
       unavailableDiff = self.recognizer.executeComparePixelColor('buildingUnavailableDiff', pixelColor=color)
-      if building == 1:
-        print('Building 1', availableDiff, '<', unavailableDiff, availableDiff < unavailableDiff)
       if availableDiff < unavailableDiff:
         return building
     return None
@@ -100,14 +97,14 @@ class GoldenManager(Manager):
 
   def run(self):
     while not self.stopEvent.wait(0.1):
-      for action in ['findGolden1', 'findGolden2', 'findGolden3', 'findGolden4']:
-        coords = self.recognizer.executeFindImage(action)
+      for action in ['findGolden1', 'findGolden2', 'deer1', 'deer2']:
+        coords = self.recognizer.executeFindImage(action, preprocessing='golden')
         if len(coords) == 0:
           continue
         self.mouseLock.acquire()
         for coord in coords:
           center = (int((coord[0] + coord[2]) / 2), int((coord[1] + coord[3]) / 2))
-          self.recognizer.execute(ActionType.CLICK, coord=center)
+          self.recognizer.executeClick(ActionType.CLICK, coord=center)
         self.mouseLock.release()
 
 class Bot:
@@ -128,7 +125,7 @@ class Bot:
     args = (self.recognizerConfig, self.stopEvent, mouseLock)
     processes.append(mp.Process(target=CookieManager.runNewManager, args=args))
     processes.append(mp.Process(target=UpdateManager.runNewManager, args=args))
-    # processes.append(mp.Process(target=GoldenManager.runNewManager, args=args))
+    processes.append(mp.Process(target=GoldenManager.runNewManager, args=args))
     for process in processes:
       process.start()
     for process in processes:
