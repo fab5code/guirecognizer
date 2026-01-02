@@ -6,6 +6,8 @@ APIs
 Actions
 -------
 
+TODO
+
 .. autoclass:: guirecognizer.ActionType
   :members: COORDINATES, SELECTION, FIND_IMAGE, CLICK, PIXEL_COLOR, COMPARE_PIXEL_COLOR, IS_SAME_PIXEL_COLOR,
     IMAGE_HASH, COMPARE_IMAGE_HASH, IS_SAME_IMAGE_HASH, TEXT, NUMBER
@@ -28,6 +30,8 @@ Recognizer class
 .. autoclass:: guirecognizer.recognizer.PipeInfoDict
    :members:
 
+.. autoexception:: guirecognizer.RecognizerValueError
+
 .. _api-preprocessing:
 
 Preprocessing
@@ -48,3 +52,6 @@ Mouse helper
 ------------
 
 TODO
+
+.. autoclass:: guirecognizer.MouseHelper
+   :members:

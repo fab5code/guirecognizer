@@ -5,12 +5,13 @@ The code is available at
 `https://github.com/fab5code/guirecognizer/tree/main/examples/otteretto <https://github.com/fab5code/guirecognizer/tree/main/examples/otteretto>`_
 and includes instructions to run the bot. The bot plays the game automatically.
 
-Let's explain how to retrieve some game information using the pixels of the screen.
+Let's explain how to retrieve game information using screen pixels.
 
 What is Otteretto?
 ------------------
-Otteretto is a game about palindromes. Blocks of different colors are arranged on a grid of 4 by 10.
-The goal is to find palindromes of colored blocks inside the grid. Bigger palindromes awards more points.
+
+`Otteretto <https://otteretto.app/classic/>`_ is a game about palindromes. Blocks of different colors are arranged on a grid of 4 by 10.
+The goal is to find palindromes of colored blocks inside the grid. Larger palindromes award more points.
 
 .. figure:: /_static/examples/otteretto/gridExample.webp
    :alt: Example of the grid.
@@ -21,7 +22,8 @@ The goal is to find palindromes of colored blocks inside the grid. Bigger palind
 
 Retrieve the grid values from the screen
 ----------------------------------------
-Let's create a python script to retrieve the grid information from the screen using guirecognizer.
+
+Let's create a Python script to retrieve grid information from the screen using guirecognizer.
 
 Create the bot configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -42,7 +44,7 @@ In parallel open `https://otteretto.app/classic/ <https://otteretto.app/classic/
 
 In *guirecognizerapp* take a screenshot of the game: *Capture -> Take Screenshot* or shortcut *Ctrl+Alt+T*.
 
-Then define the borders which represent absolute coordinates of the screen portion that is used as reference to define all actions.
+Then define the borders, which represent the absolute coordinates of the screen portion used as a reference to define all actions.
 
 .. figure:: /_static/examples/otteretto/setBorders1.webp
    :alt: Setting the borders instructions: click on borders button.
@@ -58,12 +60,12 @@ Then define the borders which represent absolute coordinates of the screen porti
 
    Select the screen portion. It's also possible to select the whole screenshot.
 
-To retrieve the grid information we need to know where the grid is. Let's add three actions to get the coordinates of the grid at the top left,
-top right and bottom left corners.
+To retrieve the grid information we need to know where the grid is.
+Let's add three actions to retrieve the coordinates of the grid at the top-left, top-right, and bottom-left corners.
 
 Add a *Get Coordinates* action: *Manage Actions -> Add Action Get Coordinates*.
 Name it *topLeft* and make the action selection. Select the point at the top left of the grid with some offset from the grid frame.
-Try to select the top left of where a colored block is and could be.
+Try to select a point near the top-left corner of where a colored block appears.
 
 .. figure:: /_static/examples/otteretto/getCoordinates1.webp
    :alt: Click on the button to make the action selection.
@@ -79,7 +81,7 @@ Try to select the top left of where a colored block is and could be.
 
    Select the point at the top left of the grid.
 
-Do the same thing with the top right and bottom left corners. Try to select the top left of where a colored block is and could be.
+Do the same for the top-right and bottom-left corners, again selecting a point near where a colored block appears.
 
 Save the file *otterettoConfig.json* in your project folder: *File -> Save* or *Ctrl+S*.
 
@@ -88,7 +90,7 @@ Loop through the grid blocks
 
 Create a python file *bot.py*. Use the *guirecognizer* class :ref:`Recognizer <recognizer-class>` to load the configuration file.
 
-Check the action called *topLeft* defined earlier is working.
+Check that the action called *topLeft*, defined earlier, is working correctly.
 
 .. code-block:: python
   :linenos:
@@ -103,7 +105,7 @@ Check the action called *topLeft* defined earlier is working.
 
    Top left coord: (752, 310)
 
-We are going to loop through each block of the grid and retrieve the pixel color. Test retrieving the color of a specific pixel on the screen.
+We are going to loop through each block of the grid and retrieve the pixel color. First, test retrieving the color of a specific pixel on the screen.
 
 .. code-block:: python
   :linenos:
@@ -118,7 +120,7 @@ We are going to loop through each block of the grid and retrieve the pixel color
 
    (42, 63, 148)
 
-Here is the code to loop through the blocks and get the color of each block.
+Here is the code that loops through the grid blocks and retrieves the color of each one.
 
 .. code-block:: python
   :linenos:
@@ -138,12 +140,12 @@ Here is the code to loop through the blocks and get the color of each block.
       coord = (int(bottomLeft[0] + x * xGap), int(bottomLeft[1] - y * yGap))
       pixelColor = recognizer.executePixelColor(ActionType.PIXEL_COLOR, coord=coord)
 
-But to identify a block we need to know their color. Let's extend the configuration file.
+However, to identify a block, we need to know its color. Let's extend the configuration file.
 
 Identify the block colors
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Using *guirecognizerapp* add an action *Is Same Pixel Color* for each of the five types of blocks: *Manage Actions -> Add Action Is Same Pixel Color*.
+Using *guirecognizerapp* add a *Is Same Pixel Color* action for each of the five block types: *Manage Actions -> Add Action Is Same Pixel Color*.
 For each action, name it then select on the screenshot a pixel corresponding to the color of the block.
 
 .. figure:: /_static/examples/otteretto/identifyColor.webp
@@ -153,7 +155,7 @@ For each action, name it then select on the screenshot a pixel corresponding to 
 
    Add actions Is Same Pixel Color to identify block colors.
 
-Now we can identify each block. The following code prints in the console the full grid.
+Now we can identify each block. The following code prints the full grid to the console.
 Make sure the window with the game is displayed. You may want to add a sleep command at the start of script if you need the time to display the game window.
 
 .. code-block:: python
@@ -204,8 +206,8 @@ Make sure the window with the game is displayed. You may want to add a sleep com
 Improve performance
 ~~~~~~~~~~~~~~~~~~~
 
-Right now each call *recognizer.executePixelColor* retrieves some information on the screen by making a call to the OS screen api.
-The whole loop takes around a second. Instead let's retrieve the whole borders portion of the screen once and get the pixel colors from this image.
+At this point, each call to *recognizer.executePixelColor* retrieves screen information by calling the operating system's screen API.
+The whole loop takes around a second. Instead, retrieve the entire borders portion of the screen once and extract pixel colors directly from this image.
 
 To retrieve the borders portion of the screen, call *recognizer.getBordersImage*. Then pass the image as a parameter of *recognizer.executePixelColor*.
 
@@ -242,14 +244,14 @@ To retrieve the borders portion of the screen, call *recognizer.getBordersImage*
         line += '  '
     print(line)
 
-Now it only takes about 0.3s instead of 1s.
+With this approach, execution time drops to about 0.3 s instead of 1 s.
 
 What's next?
 ------------
 
-Now that you have information about the grid, you can try to write a solver to find the best palindrome
-but *guirecognizer* won't help you with that.
+Now that you have access to the grid information, you can try to write a solver to find the best palindrome.
+*guirecognizer* does not help with this part.
 
-You can try to run the bot available at
+You can try running a functional bot at
 `https://github.com/fab5code/guirecognizer/tree/main/examples/otteretto <https://github.com/fab5code/guirecognizer/tree/main/examples/otteretto>`_.
-It uses *MouseHelper.dragCoords* from the utility class :ref:`MouseHelper <mouse-helper>` to move the mouse through the blocks to select palindromes.
+It uses :meth:`MouseHelper.dragCoords` from the utility class :ref:`MouseHelper <mouse-helper>` to drag the mouse across blocks and select palindromes.

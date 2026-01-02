@@ -8,9 +8,9 @@ and includes instructions to run the bot. The bot plays the game automatically.
 Let's explain how *guirecognizer* is used to handle different parts of the gameplay.
 
 What is Cookie Clicker?
-----------------------
+-----------------------
 
-Cookie Clicker is an idle game where you click to bake cookies and use them to buy upgrades that automatically produce even more cookies over time.
+`Cookie Clicker <https://orteil.dashnet.org/cookieclicker/>`_ is an idle game where you click to bake cookies and use them to buy upgrades that automatically produce even more cookies over time.
 
 Continuously click on the cookie
 --------------------------------
@@ -346,7 +346,7 @@ Assembling the pieces together
 The bot handles three independent tasks: clicking on the cookie, managing updates and finding golden cookies.
 Since at least clicking on the cookie and searching golden cookies are full time jobs, multiple processes are necessary.
 As an analogy, instead of one employee multitasking, we assign one employee to each task.
-This is why we are going to use python library `multiprocessing <https://realpython.com/ref/stdlib/multiprocessing/>`_.
+This is why we are going to use the python library `multiprocessing <https://realpython.com/ref/stdlib/multiprocessing/>`_.
 
 We are going to spawn one process for each task then wait for them to finish. They are multiple processes but only one mouse.
 So we are going to use a *multiprocessing.Lock* to handle the mouse between the tasks.
@@ -402,7 +402,7 @@ On lines 30, 31, and 32, a new process is created for each task. Line 36 is esse
 
 You can stop the bot with Ctrl+C or implement a cleaner way to stop it with *multiprocessing.Event* for instance.
 
-Here is a part of what the console output.
+Here is a part of the console output.
 
 .. code-block:: console
 
@@ -430,5 +430,5 @@ What's next?
 
 You can extend the bot by buying upgrades, supporting more than the first buildings, fine tune the golden cookie detection and more.
 
-You can try to run a functional bot at
+You can try running a functional bot at
 `https://github.com/fab5code/guirecognizer/tree/main/examples/cookieClicker <https://github.com/fab5code/guirecognizer/tree/main/examples/cookieClicker>`_.

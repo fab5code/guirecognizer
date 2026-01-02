@@ -27,7 +27,7 @@ class MouseHelper:
   @classmethod
   def dragCoords(cls, coords: tuple[PointCoord, ...] | list[PointCoord], pauseDuration: float=0.1, moveDuration: float=0.25) -> None:
     """
-    :param xy:
+    :param coords:
     :param pauseDuration: (optional) pause duration at the beginning and end of the drag - default: 0.01
     :param moveDuration: (optional) move duration between two coordinates - default: 0.25
     """
