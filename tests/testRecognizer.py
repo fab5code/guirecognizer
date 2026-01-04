@@ -6,6 +6,7 @@ from PIL import Image, ImageGrab, ImageOps
 
 from guirecognizer import (ActionType, OcrType, Recognizer,
                            RecognizerValueError, SelectionType)
+from guirecognizer.recognizer import RecognizerData
 from tests.test_utility import LoggedTestCase
 
 
@@ -35,18 +36,18 @@ class TestLoad(LoggedTestCase):
 
   def test_error_noBorder(self):
     with self.assertRaises(RecognizerValueError):
-      Recognizer({'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.CLICK.value}]})
+      Recognizer({'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.CLICK.value}]}) # type: ignore
 
   def test_error_noAction(self):
     with self.assertRaises(RecognizerValueError):
-      Recognizer({'borders': (1, 1, 39, 39)})
+      Recognizer({'borders': (1, 1, 39, 39)}) # type: ignore
 
   def test_error_invalidActionData(self):
     with self.assertRaises(RecognizerValueError):
-      Recognizer({'borders': (1, 1, 39, 39), 'actions': [42]})
+      Recognizer({'borders': (1, 1, 39, 39), 'actions': [42]}) # type: ignore
 
   def test_error_invalidId(self):
-    recognizer = Recognizer({'borders': (1, 1, 39, 39), 'actions': [{'id': 42, 'ratios': (0, 0), 'type': ActionType.CLICK.value}]})
+    recognizer = Recognizer({'borders': (1, 1, 39, 39), 'actions': [{'id': 42, 'ratios': (0, 0), 'type': ActionType.CLICK.value}]}) # type: ignore
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39), 'actions': [{'id': '', 'ratios': (0, 0), 'type': ActionType.CLICK.value}]})
     self.assertEqual(len(recognizer.actionById), 0)
@@ -56,13 +57,13 @@ class TestLoad(LoggedTestCase):
     self.assertEqual(len(recognizer.actionById), 1)
 
   def test_error_invalidRatios(self):
-    recognizer = Recognizer({'borders': (1, 1, 39, 39), 'actions': [{'id': 'action1', 'ratios': 42, 'type': ActionType.CLICK.value}]})
+    recognizer = Recognizer({'borders': (1, 1, 39, 39), 'actions': [{'id': 'action1', 'ratios': 42, 'type': ActionType.CLICK.value}]}) # type: ignore
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, '0'), 'type': ActionType.CLICK.value}]})
+        'actions': [{'id': 'action1', 'ratios': (0, '0'), 'type': ActionType.CLICK.value}]}) # type: ignore
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.1), 'type': ActionType.CLICK.value}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.1), 'type': ActionType.CLICK.value}]}) # type: ignore
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
         'actions': [{'id': 'action1', 'ratios': (0, 0, 0.1, 0.1), 'type': ActionType.CLICK.value}]})
@@ -104,7 +105,7 @@ class TestLoad(LoggedTestCase):
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
         'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
-        'maxResults': 5, 'imageToFind': 42}]})
+        'maxResults': 5, 'imageToFind': 42}]}) # type: ignore
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
         'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
@@ -113,22 +114,22 @@ class TestLoad(LoggedTestCase):
 
     # Wrong parameter threshold.
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 'invalid',
-        'maxResults': 5, 'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC'}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 'invalid', 'maxResults': 5,
+        'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC'}]}) # type: ignore
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold':-1,
-        'maxResults': 5, 'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC'}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold':-1, 'maxResults': 5,
+        'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC'}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10.0,
-        'maxResults': 5, 'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC'}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10.0, 'maxResults': 5,
+        'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC'}]}) # type: ignore
     self.assertEqual(len(recognizer.actionById), 0)
 
     # Wrong parameter maxResults.
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
-        'maxResults': 'invalid', 'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC'}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10, 'maxResults': 'invalid',
+        'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC'}]}) # type: ignore
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
         'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
@@ -139,8 +140,8 @@ class TestLoad(LoggedTestCase):
         'maxResults':-1, 'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC'}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
-        'maxResults': 5.0, 'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC'}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10, 'maxResults': 5.0,
+        'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC'}]}) # type: ignore
     self.assertEqual(len(recognizer.actionById), 0)
 
     # Wrong parameter resizeInterval.
@@ -150,19 +151,19 @@ class TestLoad(LoggedTestCase):
         'resizeInterval': None}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
-        'maxResults': 5, 'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC',
-        'resizeInterval': 'invalid'}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10, 'maxResults': 5,
+        'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC',
+        'resizeInterval': 'invalid'}]}) # type: ignore
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
-        'maxResults': 5, 'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC',
-        'resizeInterval': 1.1}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10, 'maxResults': 5,
+        'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC',
+        'resizeInterval': 1.1}]}) # type: ignore
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
-        'maxResults': 5, 'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC',
-        'resizeInterval': (1.1,)}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10, 'maxResults': 5,
+        'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC',
+        'resizeInterval': (1.1,)}]}) # type: ignore
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
         'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
@@ -170,9 +171,9 @@ class TestLoad(LoggedTestCase):
         'resizeInterval': (1.1, 0.9)}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
-        'maxResults': 5, 'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC',
-        'resizeInterval': (0.9, 1.1, 1.3)}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10, 'maxResults': 5,
+        'imageToFind': 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC',
+        'resizeInterval': (0.9, 1.1, 1.3)}]}) # type: ignore
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
         'actions': [{'id': 'action1', 'ratios': (0, 0, 0.2, 0.2), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
@@ -185,7 +186,7 @@ class TestLoad(LoggedTestCase):
         'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.COMPARE_PIXEL_COLOR.value}]})
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.COMPARE_PIXEL_COLOR.value, 'pixelColor': (1, 2)}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.COMPARE_PIXEL_COLOR.value, 'pixelColor': (1, 2)}]}) # type: ignore
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
         'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.COMPARE_PIXEL_COLOR.value, 'pixelColor': (1, 2, 256)}]})
@@ -193,10 +194,10 @@ class TestLoad(LoggedTestCase):
 
   def test_error_actionCompareImageHash(self):
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.COMPARE_IMAGE_HASH.value, 'imageHash': 42}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.COMPARE_IMAGE_HASH.value, 'imageHash': 42}]}) # type: ignore
     self.assertEqual(len(recognizer.actionById), 0)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.1, 0.1), 'type': ActionType.COMPARE_IMAGE_HASH.value, 'imageHash': (0, 0)}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.1, 0.1), 'type': ActionType.COMPARE_IMAGE_HASH.value, 'imageHash': (0, 0)}]}) # type: ignore
     self.assertEqual(len(recognizer.actionById), 0)
 
   def test_noData(self):
@@ -215,9 +216,9 @@ class TestLoad(LoggedTestCase):
     self.assertEqual(len(recognizer.actionById), 16)
 
   def test_loadData(self):
-    data1 = {'borders': (1, 1, 39, 39), 'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.SELECTION.value},
+    data1: RecognizerData = {'borders': (1, 1, 39, 39), 'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.SELECTION.value},
         {'id': 'action2', 'ratios': (0, 0), 'type': ActionType.SELECTION.value}]}
-    data2 = {'borders': (1, 1, 39, 39), 'actions': [{'id': 'action3', 'ratios': (0, 0), 'type': ActionType.SELECTION.value},
+    data2: RecognizerData = {'borders': (1, 1, 39, 39), 'actions': [{'id': 'action3', 'ratios': (0, 0), 'type': ActionType.SELECTION.value},
         {'id': 'action4', 'ratios': (0, 0), 'type': ActionType.SELECTION.value},
         {'id': 'action5', 'ratios': (0, 0), 'type': ActionType.SELECTION.value}]}
     recognizer = Recognizer(data1)
@@ -242,52 +243,49 @@ class TestLoad(LoggedTestCase):
     self.assertEqual(len(recognizer.actionById), 19)
 
   def test_actionCoordinates(self):
-    recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.COORDINATES.value}]})
+    recognizer = Recognizer({'borders': (1, 1, 39, 39), 'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.COORDINATES.value}]})
     self.assertEqual(len(recognizer.actionById), 1)
-    recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.1, 0.1), 'type': ActionType.COORDINATES.value}]})
+    recognizer = Recognizer({'borders': (1, 1, 39, 39), 'actions': [{'id': 'action1', 'ratios': (0, 0, 0.1, 0.1), 'type': ActionType.COORDINATES}]})
     self.assertEqual(len(recognizer.actionById), 1)
 
   def test_actionSelection(self):
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
         'actions': [{'id': 'action1', 'ratios': (0, 0), 'type': ActionType.SELECTION.value}]})
     self.assertEqual(len(recognizer.actionById), 1)
-    recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.1, 0.1), 'type': ActionType.SELECTION.value}]})
+    recognizer = Recognizer({'borders': (1, 1, 39, 39), 'actions': [{'id': 'action1', 'ratios': (0, 0, 0.1, 0.1), 'type': ActionType.SELECTION}]})
     self.assertEqual(len(recognizer.actionById), 1)
 
   def test_actionFindImage(self):
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
-        'maxResults': 5, 'imageToFind': "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC"}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10, 'maxResults': 5,
+        'imageToFind': "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC"}]})
     self.assertEqual(len(recognizer.actionById), 1)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
-        'maxResults': 5, 'imageToFind': "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAF0lEQVR4nGOIi4v7/Pkz0/Pnz48dOwYAOSII/cUTqBEAAAAASUVORK5CYII="}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10, 'maxResults': 5,
+        'imageToFind': "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAF0lEQVR4nGOIi4v7/Pkz0/Pnz48dOwYAOSII/cUTqBEAAAAASUVORK5CYII="}]})
     self.assertEqual(len(recognizer.actionById), 1)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
-        'maxResults': 5, 'imageToFind': "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAAAAABX3VL4AAAADklEQVR4nGOI+8z0/BgACEIDASGCoWsAAAAASUVORK5CYII="}]})
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10, 'maxResults': 5,
+        'imageToFind': "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAAAAABX3VL4AAAADklEQVR4nGOI+8z0/BgACEIDASGCoWsAAAAASUVORK5CYII="}]})
     self.assertEqual(len(recognizer.actionById), 1)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
-        'maxResults': 5, 'imageToFind': "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC",
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10, 'maxResults': 5,
+        'imageToFind': "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC",
         'resizeInterval': (0.9, 1.1)}]})
     self.assertEqual(len(recognizer.actionById), 1)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
-        'maxResults': 5, 'imageToFind': "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC",
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10, 'maxResults': 5,
+        'imageToFind': "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC",
         'resizeInterval': (1, 3)}]})
     self.assertEqual(len(recognizer.actionById), 1)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
-        'maxResults': 5, 'imageToFind': "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC",
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.5, 0.5), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10, 'maxResults': 5,
+        'imageToFind': "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC",
         'resizeInterval': (2, 2)}]})
     self.assertEqual(len(recognizer.actionById), 1)
     recognizer = Recognizer({'borders': (1, 1, 39, 39),
-        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.06, 0.06), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10,
-        'maxResults': 5, 'imageToFind': "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC",
+        'actions': [{'id': 'action1', 'ratios': (0, 0, 0.06, 0.06), 'type': ActionType.FIND_IMAGE.value, 'threshold': 10, 'maxResults': 5,
+        'imageToFind': "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAG0lEQVR4nGOIi4v7//nz5/9Mz58/Zzh27BgDAGXBCvvJ+AJ6AAAAAElFTkSuQmCC",
         'resizeInterval': (0.5, 0.5)}]})
     self.assertEqual(len(recognizer.actionById), 1)
 

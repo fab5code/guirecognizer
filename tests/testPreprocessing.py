@@ -16,38 +16,36 @@ class TestPreprocessing(LoggedTestCase):
     with self.assertRaises(RecognizerValueError):
       Preprocessing('invalid') # type: ignore
     with self.assertRaises(RecognizerValueError):
-      Preprocessing({'operations': 'invalid'})
+      Preprocessing({'operations': 'invalid'}) # type: ignore
     with self.assertRaises(RecognizerValueError):
-      Preprocessing({'operations': ['invalid']})
+      Preprocessing({'operations': ['invalid']}) # type: ignore
 
   def test_error_invalidSuboperations(self):
     with self.assertRaises(RecognizerValueError):
-      Preprocessing({'operations': [{'id': 'operationId', 'suboperations': 'invalid'}]})
+      Preprocessing({'operations': [{'id': 'operationId', 'suboperations': 'invalid'}]}) # type: ignore
     with self.assertRaises(RecognizerValueError):
-      Preprocessing({'operations': [{'id': 'operationId', 'suboperations': ['invalid']}]})
+      Preprocessing({'operations': [{'id': 'operationId', 'suboperations': ['invalid']}]}) # type: ignore
 
   def test_error_invalidSuboperationData(self):
-    preprocessing = Preprocessing({'operations': [{'id': '',
-        'suboperations': [{'type': PreprocessingType.COLOR_MAP.value}]}]})
+    preprocessing = Preprocessing({'operations': [{'id': '', 'suboperations': [{'type': PreprocessingType.COLOR_MAP}]}]}) # type: ignore
     self.assertEqual(len(preprocessing.operationById), 0)
-    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': 'invalid', 'colorMap': {}}]}]})
+    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': 'invalid', 'colorMap': {}}]}]}) # type: ignore
     self.assertEqual(len(preprocessing.operationById), 0)
-    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.COLOR_MAP.value}]}]})
+    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.COLOR_MAP}]}]}) # type: ignore
     self.assertEqual(len(preprocessing.operationById), 0)
-    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.COLOR_MAP.value,
-        'colorMap': 'invalid'}]}]})
+    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.COLOR_MAP,
+        'colorMap': 'invalid'}]}]}) # type: ignore
     self.assertEqual(len(preprocessing.operationById), 0)
 
   def test_error_sameIds(self):
     preprocessing = Preprocessing({'operations': [
-      {'id': 'operationId', 'suboperations': [{'type': PreprocessingType.COLOR_MAP.value, 'colorMap': {}}]},
-      {'id': 'operationId', 'suboperations': [{'type': PreprocessingType.COLOR_MAP.value, 'colorMap': {}}]}
+      {'id': 'operationId', 'suboperations': [{'type': PreprocessingType.COLOR_MAP, 'colorMap': {}}]},
+      {'id': 'operationId', 'suboperations': [{'type': PreprocessingType.COLOR_MAP, 'colorMap': {}}]}
     ]})
     self.assertEqual(len(preprocessing.operationById), 1)
 
   def test_error_invalidProcessInput(self):
-    preprocessing = Preprocessing({'operations': [
-        {'id': 'operationId', 'suboperations': [{'type': PreprocessingType.COLOR_MAP.value, 'colorMap': {}}]}]})
+    preprocessing = Preprocessing({'operations': [{'id': 'operationId', 'suboperations': [{'type': PreprocessingType.COLOR_MAP, 'colorMap': {}}]}]})
     image = Image.open('tests/data/img/img1.png')
     with self.assertRaises(RecognizerValueError):
       preprocessing.process('invalid', 'operationId') # type: ignore
@@ -62,7 +60,7 @@ class TestPreprocessing(LoggedTestCase):
 
   def test_oneOperation(self):
     preprocessing = Preprocessing({'operations': [
-        {'id': 'operationId', 'suboperations': [{'type': PreprocessingType.COLOR_MAP.value, 'colorMap': {}}]}]})
+        {'id': 'operationId', 'suboperations': [{'type': PreprocessingType.COLOR_MAP, 'colorMap': {}}]}]})
     self.assertEqual(len(preprocessing.operationById), 1)
 
 class TestGrayscale(LoggedTestCase):
@@ -79,7 +77,7 @@ class TestGrayscale(LoggedTestCase):
 
   def test_preprocessing_grayscale(self):
     image = Image.open('tests/data/img/img4.png')
-    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.GRAYSCALE.value}]}]})
+    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.GRAYSCALE}]}]})
     newImage = preprocessing.process(image, 'operation1')
     self.assertEqual(newImage.getpixel((3, 0)), 94)
 
@@ -196,35 +194,35 @@ class TestColorMap(LoggedTestCase):
     self.assertEqual(newImage.getpixel((4, 0)), image.getpixel((4, 0)))
 
   def test_preprocessing_error(self):
-    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.COLOR_MAP.value,
+    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.COLOR_MAP,
         'colorMap': {'method': 'invalid', 'inputColor1': [255, 255, 255], 'difference': 0.05, 'outputColor1': [0, 0, 0]}}]}]})
     self.assertEqual(len(preprocessing.operationById), 0)
-    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.COLOR_MAP.value,
+    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.COLOR_MAP,
         'colorMap': {'method': ColorMapMethod.ONE_TO_ONE.value, 'inputColor1': 'invalid', 'difference': 0.05,
-        'outputColor1': [0, 0, 0]}}]}]})
+        'outputColor1': [0, 0, 0]}}]}]}) # type: ignore
     self.assertEqual(len(preprocessing.operationById), 0)
-    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.COLOR_MAP.value,
+    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.COLOR_MAP,
         'colorMap': {'method': ColorMapMethod.ONE_TO_ONE.value, 'inputColor1': [255, 255, 255], 'difference': 'invalid',
-        'outputColor1': [0, 0, 0]}}]}]})
+        'outputColor1': [0, 0, 0]}}]}]}) # type: ignore
     self.assertEqual(len(preprocessing.operationById), 0)
-    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.COLOR_MAP.value,
+    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.COLOR_MAP,
         'colorMap': {'method': ColorMapMethod.ONE_TO_ONE.value, 'inputColor1': [255, 255, 255], 'difference': 0.05,
-        'outputColor1': 'invalid'}}]}]})
+        'outputColor1': 'invalid'}}]}]}) # type: ignore
     self.assertEqual(len(preprocessing.operationById), 0)
-    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.COLOR_MAP.value,
+    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.COLOR_MAP,
         'colorMap': {'method': ColorMapMethod.RANGE_TO_ONE.value, 'inputColor1': [255, 255, 255], 'inputColor2': 'invalid',
-        'difference': 0.05, 'outputColor1': [0, 0, 0]}}]}]})
+        'difference': 0.05, 'outputColor1': [0, 0, 0]}}]}]}) # type: ignore
     self.assertEqual(len(preprocessing.operationById), 0)
-    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.COLOR_MAP.value,
+    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.COLOR_MAP,
         'colorMap': {'method': ColorMapMethod.RANGE_TO_RANGE.value, 'inputColor1': [255, 255, 255], 'inputColor2': [255, 255, 255],
-        'difference': 0.05, 'outputColor1': [0, 0, 0], 'outputColor1': 'invalid'}}]}]})
+        'difference': 0.05, 'outputColor1': [0, 0, 0], 'outputColor1': 'invalid'}}]}]}) # type: ignore
     self.assertEqual(len(preprocessing.operationById), 0)
 
   def test_preprocessing_oneToOne(self):
     image = Image.open('tests/data/img/img4.png')
     color = cast(tuple[int, int, int, int], image.getpixel((3, 0)))[:3]
     outputColor = (255, 0, 0)
-    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.COLOR_MAP.value,
+    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.COLOR_MAP,
         'colorMap': {'method': ColorMapMethod.ONE_TO_ONE.value, 'inputColor1': color, 'difference': 0,
         'outputColor1': outputColor}}]}]})
     newImage = preprocessing.process(image, 'operation1')
@@ -236,7 +234,7 @@ class TestColorMap(LoggedTestCase):
     inputColor1 = cast(tuple[int, int, int, int], image.getpixel((1, 0)))[:3]
     inputColor2 = cast(tuple[int, int, int, int], image.getpixel((3, 0)))[:3]
     outputColor = (255, 0, 0)
-    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.COLOR_MAP.value,
+    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.COLOR_MAP,
         'colorMap': {'method': ColorMapMethod.RANGE_TO_ONE.value, 'inputColor1': inputColor1, 'inputColor2': inputColor2,
         'difference': 0.05, 'outputColor1': outputColor}}]}]})
     newImage = preprocessing.process(image, 'operation1')
@@ -251,7 +249,7 @@ class TestColorMap(LoggedTestCase):
     inputColor2 = cast(tuple[int, int, int, int], image.getpixel((3, 0)))[:3]
     outputColor1 = (200, 0, 0)
     outputColor2 = (100, 0, 0)
-    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.COLOR_MAP.value,
+    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.COLOR_MAP,
         'colorMap': {'method': ColorMapMethod.RANGE_TO_RANGE.value, 'inputColor1': inputColor1, 'inputColor2': inputColor2,
         'difference': 0.05, 'outputColor1': outputColor1, 'outputColor2': outputColor2}}]}]})
     newImage = preprocessing.process(image, 'operation1')
@@ -378,30 +376,30 @@ class TestThreshold(LoggedTestCase):
     self.assertEqual(newImage.getpixel((10, 10)), 155)
 
   def test_preprocessing_error(self):
-    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.THRESHOLD.value,
+    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.THRESHOLD,
         'threshold': {'method': 'invalid', 'thresholdType': ThresholdType.BINARY.value}}]}]})
     self.assertEqual(len(preprocessing.operationById), 0)
-    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.THRESHOLD.value,
+    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.THRESHOLD,
         'threshold': {'method': ThresholdMethod.SIMPLE.value, 'thresholdType': 'invalid'}}]}]})
     self.assertEqual(len(preprocessing.operationById), 0)
-    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.THRESHOLD.value,
+    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.THRESHOLD,
         'threshold': {'method': ThresholdMethod.ADAPTIVE_MEAN.value, 'thresholdType': ThresholdType.TRUNCATE.value}}]}]})
     self.assertEqual(len(preprocessing.operationById), 0)
-    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.THRESHOLD.value,
+    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.THRESHOLD,
         'threshold': {'method': ThresholdMethod.SIMPLE.value, 'thresholdType': ThresholdType.BINARY.value,
-        'maxValue': 'invalid'}}]}]})
+        'maxValue': 'invalid'}}]}]}) # type: ignore
     self.assertEqual(len(preprocessing.operationById), 0)
-    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.THRESHOLD.value,
+    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.THRESHOLD,
         'threshold': {'method': ThresholdMethod.SIMPLE.value, 'thresholdType': ThresholdType.BINARY.value,
-        'threshold': 'invalid'}}]}]})
+        'threshold': 'invalid'}}]}]}) # type: ignore
     self.assertEqual(len(preprocessing.operationById), 0)
-    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.THRESHOLD.value,
+    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.THRESHOLD,
         'threshold': {'method': ThresholdMethod.ADAPTIVE_MEAN.value, 'thresholdType': ThresholdType.BINARY.value,
-        'blockSize': 'invalid'}}]}]})
+        'blockSize': 'invalid'}}]}]}) # type: ignore
     self.assertEqual(len(preprocessing.operationById), 0)
-    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.THRESHOLD.value,
+    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.THRESHOLD,
         'threshold': {'method': ThresholdMethod.ADAPTIVE_MEAN.value, 'thresholdType': ThresholdType.BINARY.value,
-        'cConstant': 'invalid'}}]}]})
+        'cConstant': 'invalid'}}]}]}) # type: ignore
     self.assertEqual(len(preprocessing.operationById), 0)
 
 class TestResize(LoggedTestCase):
@@ -474,13 +472,13 @@ class TestResize(LoggedTestCase):
     self.assertEqual(newHeight, height)
 
   def test_preprocessing_error(self):
-    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.RESIZE.value,
-        'resize': {'width': 'invalid', 'height': 200, 'method': ResizeMethod.UNFIXED_RATIO.value}}]}]})
+    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.RESIZE,
+        'resize': {'width': 'invalid', 'height': 200, 'method': ResizeMethod.UNFIXED_RATIO.value}}]}]}) # type: ignore
     self.assertEqual(len(preprocessing.operationById), 0)
-    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.RESIZE.value,
-        'resize': {'width': 200, 'height': 'invalid', 'method': ResizeMethod.UNFIXED_RATIO.value}}]}]})
+    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.RESIZE,
+        'resize': {'width': 200, 'height': 'invalid', 'method': ResizeMethod.UNFIXED_RATIO.value}}]}]}) # type: ignore
     self.assertEqual(len(preprocessing.operationById), 0)
-    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.RESIZE.value,
+    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.RESIZE,
         'resize': {'width': 200, 'height': 200, 'method': 'invalid'}}]}]})
     self.assertEqual(len(preprocessing.operationById), 0)
 
@@ -489,7 +487,7 @@ class TestResize(LoggedTestCase):
     originalWidth, originalHeight = image.size
     width = round(originalWidth * 1.6)
     height = round(originalHeight * 1.3)
-    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.RESIZE.value,
+    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.RESIZE,
         'resize': {'width': width, 'height': height, 'method': ResizeMethod.UNFIXED_RATIO.value}}]}]})
     newImage = preprocessing.process(image, 'operation1')
     newWidth, newHeight = newImage.size
@@ -501,7 +499,7 @@ class TestResize(LoggedTestCase):
     originalWidth, originalHeight = image.size
     width = round(originalWidth * 1.8)
     height = round(originalHeight * 1.8)
-    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.RESIZE.value,
+    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.RESIZE,
         'resize': {'width': width, 'method': ResizeMethod.FIXED_RATIO_WIDTH.value}}]}]})
     newImage = preprocessing.process(image, 'operation1')
     newWidth, newHeight = newImage.size
@@ -513,7 +511,7 @@ class TestResize(LoggedTestCase):
     originalWidth, originalHeight = image.size
     width = round(originalWidth * 1.7)
     height = round(originalHeight * 1.7)
-    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.RESIZE.value,
+    preprocessing = Preprocessing({'operations': [{'id': 'operation1', 'suboperations': [{'type': PreprocessingType.RESIZE,
         'resize': {'height': height, 'method': ResizeMethod.FIXED_RATIO_HEIGHT.value}}]}]})
     newImage = preprocessing.process(image, 'operation1')
     newWidth, newHeight = newImage.size

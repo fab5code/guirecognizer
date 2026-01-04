@@ -1,7 +1,7 @@
 import logging
 from abc import ABC, abstractmethod
-from enum import Enum, unique
-from typing import Any, TypedDict, TypeGuard, TypeIs, assert_never
+from enum import StrEnum, unique
+from typing import Any, Literal, TypedDict, TypeGuard, TypeIs, assert_never
 
 import numpy as np
 from PIL import Image, ImageOps
@@ -36,13 +36,21 @@ class GrayscalePreprocessor(Preprocessor):
     return ImageOps.grayscale(image)
 
 @unique
-class ColorMapMethod(Enum):
+class ColorMapMethod(StrEnum):
   """
   Color mapping methods.
   """
   ONE_TO_ONE = 'oneToOne'
   RANGE_TO_ONE = 'rangeToOne'
   RANGE_TO_RANGE = 'rangeToRange'
+
+class ColorMapData(TypedDict, total=False):
+  method: ColorMapMethod | str
+  inputColor1: PixelColor
+  inputColor2: PixelColor
+  difference: float
+  outputColor1: PixelColor
+  outputColor2: PixelColor
 
 class ColorMapPreprocessor(Preprocessor):
   """
@@ -63,8 +71,6 @@ class ColorMapPreprocessor(Preprocessor):
     """
     if self.isColorMapMethodDataValid(method):
       self.method = ColorMapMethod(method)
-    elif isinstance(method, ColorMapMethod):
-      self.method = method
     else:
       raise RecognizerValueError('Invalid method value.')
     if not Preprocessing.isPixelColorDataValid(inputColor1):
@@ -86,9 +92,9 @@ class ColorMapPreprocessor(Preprocessor):
       self.outputColor2 = outputColor2
 
   @classmethod
-  def isColorMapMethodDataValid(cls, colorMapMethodData: Any) -> TypeGuard[str]:
+  def isColorMapMethodDataValid(cls, colorMapMethodData: Any) -> TypeGuard[ColorMapMethod | str]:
     """
-    :param colorMapMethodData: In string form.
+    :param colorMapMethodData:
     """
     return isinstance(colorMapMethodData, str) and colorMapMethodData in [colorMapMethod.value for colorMapMethod in ColorMapMethod]
 
@@ -171,7 +177,7 @@ class ColorMapPreprocessor(Preprocessor):
     return newImage
 
 @unique
-class ThresholdMethod(Enum):
+class ThresholdMethod(StrEnum):
   """
   Threshold methods.
   """
@@ -181,7 +187,7 @@ class ThresholdMethod(Enum):
   OTSU = 'otsu'
 
 @unique
-class ThresholdType(Enum):
+class ThresholdType(StrEnum):
   """
   Threshold types.
   """
@@ -190,6 +196,14 @@ class ThresholdType(Enum):
   TRUNCATE = 'truncate'
   TO_ZERO = 'toZero'
   TO_ZERO_INVERSE = 'toZeroInverse'
+
+class ThresholdData(TypedDict, total=False):
+  method: ThresholdMethod | str
+  thresholdType: ThresholdType | str
+  maxValue: int
+  threshold: int
+  blockSize: int
+  cConstant: float
 
 class ThresholdPreprocessor(Preprocessor):
   """
@@ -210,14 +224,10 @@ class ThresholdPreprocessor(Preprocessor):
     """
     if self.isThresholdMethodDataValid(method):
       self.method = ThresholdMethod(method)
-    elif isinstance(method, ThresholdMethod):
-      self.method = method
     else:
       raise RecognizerValueError('Invalid method value.')
     if self.isThresholdTypeDataValid(thresholdType):
       self.thresholdType = ThresholdType(thresholdType)
-    elif isinstance(thresholdType, ThresholdType):
-      self.thresholdType = thresholdType
     else:
       raise RecognizerValueError('Invalid thresholdType value.')
     if not self.isThresholdTypeCompatibleWithThresholdMethod(self.thresholdType, self.method):
@@ -241,16 +251,16 @@ class ThresholdPreprocessor(Preprocessor):
       self.maxValue = maxValue
 
   @classmethod
-  def isThresholdMethodDataValid(cls, methodData: Any) -> TypeGuard[str]:
+  def isThresholdMethodDataValid(cls, methodData: Any) -> TypeGuard[ThresholdMethod | str]:
     """
-    :param methodData: In string form.
+    :param methodData:
     """
     return isinstance(methodData, str) and methodData in [method.value for method in ThresholdMethod]
 
   @classmethod
-  def isThresholdTypeDataValid(cls, thresholdTypeData: Any) -> TypeGuard[str]:
+  def isThresholdTypeDataValid(cls, thresholdTypeData: Any) -> TypeGuard[ThresholdType | str]:
     """
-    :param thresholdTypeData: In string form.
+    :param thresholdTypeData:
     """
     return isinstance(thresholdTypeData, str) and thresholdTypeData in [thresholdType.value for thresholdType in ThresholdType]
 
@@ -338,7 +348,7 @@ class ThresholdPreprocessor(Preprocessor):
     return Image.fromarray(newImageCv)
 
 @unique
-class ResizeMethod(Enum):
+class ResizeMethod(StrEnum):
   """
   Resize methods.
   """
@@ -352,12 +362,17 @@ class ResizeMethod(Enum):
   The width is computed from the height and the ratio width/height of the image to process.
   """
 
+class ResizeData(TypedDict, total=False):
+  width: int
+  height: int
+  method: ResizeMethod | str
+
 class ResizePreprocessor(Preprocessor):
   """
   Resize the image.
   """
 
-  def __init__(self, width: int=100, height: int=100, method: ResizeMethod=ResizeMethod.UNFIXED_RATIO):
+  def __init__(self, width: int=100, height: int=100, method: ResizeMethod | str=ResizeMethod.UNFIXED_RATIO):
     """
     :param width: (optional) default: 100
     :param height: (optional) default: 100
@@ -366,8 +381,6 @@ class ResizePreprocessor(Preprocessor):
     """
     if self.isResizeMethodDataValid(method):
       self.method = ResizeMethod(method)
-    elif isinstance(method, ResizeMethod):
-      self.method = method
     else:
       raise RecognizerValueError('Invalid method value.')
     if self.method in [ResizeMethod.UNFIXED_RATIO, ResizeMethod.FIXED_RATIO_WIDTH]:
@@ -387,9 +400,9 @@ class ResizePreprocessor(Preprocessor):
     return isinstance(widthOrHeightData, int) and 0 < widthOrHeightData
 
   @classmethod
-  def isResizeMethodDataValid(cls, methodData: Any) -> TypeGuard[str]:
+  def isResizeMethodDataValid(cls, methodData: Any) -> TypeGuard[ResizeMethod | str]:
     """
-    :param methodData: In string form.
+    :param methodData:
     """
     return isinstance(methodData, str) and methodData in [method.value for method in ResizeMethod]
 
@@ -406,6 +419,33 @@ class OperationDict(TypedDict):
   id: str
   suboperations: list[Preprocessor]
 
+class BaseSuboperationData(TypedDict):
+  type: PreprocessingType
+
+class GrayscaleSuboperationData(BaseSuboperationData):
+  type: Literal[PreprocessingType.GRAYSCALE]
+
+class ColorMapSuboperationData(BaseSuboperationData):
+  type: Literal[PreprocessingType.COLOR_MAP]
+  colorMap: ColorMapData
+
+class ThresholdSuboperationData(BaseSuboperationData):
+  type: Literal[PreprocessingType.THRESHOLD]
+  threshold: ThresholdData
+
+class ResizeSuboperationData(BaseSuboperationData):
+  type: Literal[PreprocessingType.RESIZE]
+  resize: ResizeData
+
+SuboperationData = GrayscaleSuboperationData | ColorMapSuboperationData | ThresholdSuboperationData | ResizeSuboperationData
+
+class OperationData(TypedDict):
+  id: str
+  suboperations: list[SuboperationData]
+
+class PreprocessingData(TypedDict, total=False):
+  operations: list[OperationData]
+
 class Preprocessing:
   """
   Preprocess images.
@@ -414,7 +454,7 @@ class Preprocessing:
   """
   operationById: dict[str, OperationDict]
 
-  def __init__(self, data: dict | None=None) -> None:
+  def __init__(self, data: PreprocessingData | None=None) -> None:
     """
     :param data: (optional) config data
     :raise RecognizerValueError: invalid `data`
@@ -440,7 +480,7 @@ class Preprocessing:
     return isImageDataValid(imageData)
 
   @classmethod
-  def isTypeDataValid(cls, typeData: Any) -> TypeGuard[str]:
+  def isTypeDataValid(cls, typeData: Any) -> TypeGuard[PreprocessingType]:
     """
     :param typeData:
     """
@@ -460,7 +500,7 @@ class Preprocessing:
     """
     return isPixelColorDifferenceDataValid(differenceData)
 
-  def loadData(self, data: dict) -> None:
+  def loadData(self, data: PreprocessingData) -> None:
     """
     Load actions.
 
@@ -483,7 +523,7 @@ class Preprocessing:
     """
     self.operationById.clear()
 
-  def _addOperation(self, data: dict) -> None:
+  def _addOperation(self, data: OperationData) -> None:
     """
     Create a preprocessing operation and add it to the list of operations.
 
@@ -518,7 +558,7 @@ class Preprocessing:
 
     self.operationById[operation['id']] = operation
 
-  def _isSuboperationDataMissing(self, preprocessingType: PreprocessingType, data: dict) -> bool:
+  def _isSuboperationDataMissing(self, preprocessingType: PreprocessingType, data: SuboperationData) -> bool:
     match preprocessingType:
       case PreprocessingType.COLOR_MAP:
         return 'colorMap' not in data or not isinstance(data['colorMap'], dict)
@@ -528,7 +568,7 @@ class Preprocessing:
         return 'resize' not in data or not isinstance(data['resize'], dict)
     return False
 
-  def _createPreprocessor(self, data: dict) -> Preprocessor:
+  def _createPreprocessor(self, data: SuboperationData) -> Preprocessor:
     """
     Create a preprocessing suboperation or preprocessor to be added to the list of suboperations of an operation.
 
@@ -538,15 +578,13 @@ class Preprocessing:
     :param data:
     :raise RecognizerValueError: invalid `data`
     """
-    if 'type' in data and self.isTypeDataValid(data['type']):
-      preprocessingType = PreprocessingType(data['type'])
-    else:
+    if 'type' not in data or not self.isTypeDataValid(data['type']):
       raise RecognizerValueError('Invalid preprocessing type.')
 
-    if self._isSuboperationDataMissing(preprocessingType, data):
+    if self._isSuboperationDataMissing(PreprocessingType(data['type']), data):
       raise RecognizerValueError('Invalid suboperation data.')
 
-    match preprocessingType:
+    match data['type']:
       case PreprocessingType.GRAYSCALE:
         return GrayscalePreprocessor()
       case PreprocessingType.COLOR_MAP:
@@ -556,7 +594,7 @@ class Preprocessing:
       case PreprocessingType.RESIZE:
         return ResizePreprocessor(**data['resize'])
       case _ as unreachable:
-        assert_never(preprocessingType)
+        assert_never(data['type'])
 
   def checkProcessInput(self, operationId: str) -> None:
     """

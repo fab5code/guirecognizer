@@ -3,7 +3,7 @@ import json
 import logging
 import math
 import os
-from enum import Enum, unique
+from enum import StrEnum, unique
 from io import BytesIO
 from math import ceil
 from statistics import mean
@@ -19,7 +19,7 @@ from guirecognizer.common import (RecognizerValueError, isIdDataValid,
                                   isImageDataValid, isPixelColorDataValid,
                                   isPixelColorDifferenceDataValid)
 from guirecognizer.mouse_helper import MouseHelper
-from guirecognizer.preprocessing import Preprocessing
+from guirecognizer.preprocessing import Preprocessing, PreprocessingData
 from guirecognizer.types import (AreaCoord, AreaRatios, Coord, PixelColor,
                                  PointRatios, Ratios)
 
@@ -87,7 +87,7 @@ class ExecuteParams(PipeInfoDict, total=False):
   selectedAreaFilepath: str
 
 @unique
-class OcrType(Enum):
+class OcrType(StrEnum):
   """
   OCR types.
   """
@@ -96,6 +96,21 @@ class OcrType(Enum):
 
 def isArea(coord: Coord) -> TypeIs[AreaCoord]:
   return SelectionType.fromSelection(coord) == SelectionType.AREA
+
+class ActionData(TypedDict, total=False):
+  id: Required[str]
+  type: Required[ActionType | str]
+  ratios: Required[Ratios]
+  pixelColor: PixelColor
+  imageHash: str
+  imageToFind: str
+  threshold: int
+  maxResults: int
+  resizeInterval: ResizeInterval | None
+
+class RecognizerData(PreprocessingData):
+  borders: AreaCoord
+  actions: list[ActionData]
 
 class Recognizer():
   borders: AreaCoord | None
@@ -110,7 +125,7 @@ class Recognizer():
   Can also be used as a static class to call a single action.
   """
 
-  def __init__(self, data: str | dict | None=None) -> None:
+  def __init__(self, data: str | RecognizerData | None=None) -> None:
     """
     :param data: (optional) config filepath or config data
     :raise RecognizerValueError: invalid `data`
@@ -608,7 +623,7 @@ class Recognizer():
         raise RecognizerValueError('Invalid data: config file must be of format json.')
     self.loadData(data)
 
-  def loadData(self, data: dict) -> None:
+  def loadData(self, data: RecognizerData) -> None:
     """
     Load actions.
 
@@ -621,7 +636,7 @@ class Recognizer():
       raise RecognizerValueError('Invalid data: data to be loaded should be a dict.')
 
     if 'borders' in data and self.isBordersDataValid(data['borders']):
-      self.borders = cast(AreaCoord, data['borders'])
+      self.borders = data['borders']
     else:
       raise RecognizerValueError('Incomplete data: the borders are missing which are necessary for any use.')
 
@@ -768,7 +783,7 @@ class Recognizer():
     except ValueError:
       return None
 
-  def _createAction(self, data: dict) -> None:
+  def _createAction(self, data: ActionData) -> None:
     """
     Create an action and add it to the list of actions.
 
@@ -793,8 +808,11 @@ class Recognizer():
       logger.warning(f'Invalid action ratios. This action \'{actionId}\' is ignored.')
       return
 
-    if 'type' in data and self.isTypeDataValid(data['type']):
-      action['type'] = ActionType(data['type'])
+    rawType = data.get('type')
+    if isinstance(rawType, ActionType):
+      action['type'] = rawType
+    elif self.isTypeDataValid(rawType):
+      action['type'] = ActionType(rawType)
     else:
       logger.warning(f'Invalid action type. This action \'{actionId}\' is ignored.')
       return

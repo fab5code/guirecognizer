@@ -1,8 +1,8 @@
-from enum import Enum, unique
+from enum import StrEnum, unique
 
 
 @unique
-class PreprocessingType(Enum):
+class PreprocessingType(StrEnum):
   """
   Available preprocessing types.
   """
