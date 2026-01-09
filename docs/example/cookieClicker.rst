@@ -62,7 +62,7 @@ Save the file *cookieClickerConfig.json* in your project folder: *File -> Save* 
 Python script
 ~~~~~~~~~~~~~
 
-Create a python file *bot.py*. Use the *guirecognizer* class :ref:`Recognizer <recognizer-class>` to load the configuration file.
+Create a python file *bot.py*. Use the *guirecognizer* class :ref:`Recognizer <api-recognizer-class>` to load the configuration file.
 
 Let's click on the cookie.
 

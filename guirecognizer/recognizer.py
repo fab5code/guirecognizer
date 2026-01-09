@@ -109,8 +109,8 @@ class ActionData(TypedDict, total=False):
   resizeInterval: ResizeInterval | None
 
 class RecognizerData(PreprocessingData):
-  borders: AreaCoord
-  actions: list[ActionData]
+  borders: Required[AreaCoord]
+  actions: Required[list[ActionData]]
 
 class Recognizer():
   borders: AreaCoord | None

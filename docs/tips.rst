@@ -10,3 +10,8 @@ Noisy background color
 ----------------------
 
 TODO: on coockie cliker use get pixel color on area instead of a pixel
+
+Loop through grid
+-----------------
+
+link issue with performance

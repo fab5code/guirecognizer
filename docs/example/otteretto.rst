@@ -88,7 +88,7 @@ Save the file *otterettoConfig.json* in your project folder: *File -> Save* or *
 Loop through the grid blocks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Create a python file *bot.py*. Use the *guirecognizer* class :ref:`Recognizer <recognizer-class>` to load the configuration file.
+Create a python file *bot.py*. Use the *guirecognizer* class :ref:`Recognizer <api-recognizer-class>` to load the configuration file.
 
 Check that the action called *topLeft*, defined earlier, is working correctly.
 
@@ -254,4 +254,4 @@ Now that you have access to the grid information, you can try to write a solver 
 
 You can try running a functional bot at
 `https://github.com/fab5code/guirecognizer/tree/main/examples/otteretto <https://github.com/fab5code/guirecognizer/tree/main/examples/otteretto>`_.
-It uses :meth:`MouseHelper.dragCoords` from the utility class :ref:`MouseHelper <mouse-helper>` to drag the mouse across blocks and select palindromes.
+It uses :meth:`MouseHelper.dragCoords` from the utility class :ref:`MouseHelper <api-mouse-helper>` to drag the mouse across blocks and select palindromes.

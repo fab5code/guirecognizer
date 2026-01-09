@@ -75,117 +75,59 @@ class ActionType(Enum):
 
   COORDINATES = ('coordinates', SelectionType.POINT_OR_AREA)
   """
-  Return the coordinates of a point or an area. It is designed to be used in a pipeline of actions.
-
-  Expects **a point or an area selection**.
-
-  **Return type:** :obj:`tuple`\\ [:obj:`int`] | :obj:`list`\\ [:obj:`int`]
-
-  **Returns:** point or area coordinates
+  Return the coordinates of a point or an area.
   """
   SELECTION = ('selection', SelectionType.POINT_OR_AREA)
   """
-  Return point as a pixel or an area as an image. It is designed to be used in a pipeline of actions.
-
-  Expects **a point or an area selection**.
-
-  **Return type:** :obj:`tuple`\\ [:obj:`int`] | :obj:`list`\\ [:obj:`int`] | :obj:`int` | :obj:`PIL.Image.Image`
-
-  **Returns:** point or area
+  Return point as a pixel or an area as an image.
   """
   FIND_IMAGE = ('findImage', SelectionType.AREA)
   """
   Find the locations of an image inside the selected area.
   Specify a detection threshold, the maximum number of locations and a resize interval to find the same image
   but a bit smaller or bigger.
-
-  Expects **an area selection**.
-
-  **Return type:** :obj:`list`\\ [:obj:`tuple`\\ [:obj:`int`]]
-
-  **Returns:** tuple containing the coordinates of each location
   """
   CLICK = ('click', SelectionType.POINT_OR_AREA)
   """
   Click on the selected point.
-
-  Expects **a point selection**.
-
-  **Return type:** :obj:`None`
   """
   PIXEL_COLOR = ('pixelColor', SelectionType.POINT_OR_AREA)
   """
   Compute the pixel color of the point selection or the average pixel color of the area selection.
-
-  Expects **a point or an area selection**.
-
-  **Return type:** :obj:`tuple`\\ [:obj:`int`]
-
-  **Returns:** rgb values between 0 and 255
   """
   COMPARE_PIXEL_COLOR = ('comparePixelColor', SelectionType.POINT_OR_AREA)
   """
   Compute the pixel color of the point selection or the average pixel color of the area selection
   then compute the difference with the pixel color in reference.
 
-  The difference is the average difference of the rgb colors and between 0 and 1.
-
-  Expects **a point or an area selection**.
-
-  **Return type:** :obj:`float`
+  The difference is the average difference of the rgb colors. It's always between 0 and 1.
   """
   IS_SAME_PIXEL_COLOR = ('isSamePixelColor', SelectionType.POINT_OR_AREA)
   """
   Compute the pixel color of the point selection or the average pixel color of the area selection
   and compare it to the pixel color in reference.
-
-  Expects **a point or an area selection**.
-
-  **Return type:** :obj:`bool`
   """
   IMAGE_HASH = ('imageHash', SelectionType.AREA)
   """
   Compute the image hash of the area selection. The color is taken into account. Similar images generate close hashes.
 
   More about image hashes: https://pypi.org/project/ImageHash .
-
-  Expects **an area selection**.
-
-  **Return type:** :obj:`str`
-
-  **Returns:** image hash
   """
   COMPARE_IMAGE_HASH = ('compareImageHash', SelectionType.AREA)
   """
   Compute the image hash of the area selection then compute the difference with the hash in reference.
-
-  Expects **an area selection**.
-
-  **Return type:** :obj:`int`
   """
   IS_SAME_IMAGE_HASH = ('isSameImageHash', SelectionType.AREA)
   """
   Compute the image hash of the area selection and compare it to the hash in reference.
-
-  Expects **an area selection**.
-
-  **Return type:** :obj:`bool`
   """
   TEXT = ('text', SelectionType.AREA)
   """
   Try to recognize text. Return the empty string if no text has been recognized.
-
-  Expects **an area selection**.
-
-  **Return type:** :obj:`str`
   """
   NUMBER = ('number', SelectionType.AREA)
   """
   Try to recognize a number. Return None if no number has been recognized.
-
-  Expects **an area selection**.
-
-  **Return type:** :obj:`float` | :obj:`None`
   """
 
   selectionType: SelectionType

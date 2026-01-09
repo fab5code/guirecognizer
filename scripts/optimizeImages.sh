@@ -9,7 +9,7 @@ function main {
   fi
 
   shopt -s nullglob
-  for filename in "$folder"/*.{jpg,jpeg,png,webp,JPG,JPEG,PNG,WEBP}; do
+  for filename in "$folder"/*.{jpg,jpeg,png,JPG,JPEG,PNG}; do
     convertImage "$filename"
   done
 }

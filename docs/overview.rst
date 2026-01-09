@@ -4,15 +4,15 @@ Overview
 What is *guirecognizer*
 -----------------------
 The main goal of *guirecognizer* is to retrieve information on the screen like getting a pixel color,
-a perceptual image hash of a screenshot area or finding an image on screen.
+an image hash of a screenshot area or finding an image on screen.
 
-For the exhaustive list of actions: :ref:`api-actions`.
+For the exhaustive list of actions: :doc:`API <api>`.
 
 Two optical character recognition libraries are supported by *guirecognizer*: `EasyOCR <https://github.com/JaidedAI/EasyOCR>`_
-and `tesseract <https://github.com/tesseract-ocr/tesseract>`_. More information about the OCRs: :ref:`api-ocrs`.
+and `tesseract <https://github.com/tesseract-ocr/tesseract>`_. More information about the :ref:`OCRs <api-ocrs>`.
 
 *guirecognizer* offers ways to preprocess an image before it's used by an action. This is especially useful to improve OCR efficiency.
-For the exhaustive list of preprocessing operations: :ref:`api-preprocessing`.
+For the exhaustive list of preprocessing operations: :ref:`Preprocessing API <api-preprocessing>`.
 
 The compagnion app **guirecognizerapp** helps create and preview actions which are then executed via *guirecognizer*.
 
@@ -64,3 +64,6 @@ In python
 .. code-block::
 
   TODO: complete
+
+
+TODO: show example of preprocessing to improve ocr

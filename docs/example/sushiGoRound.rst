@@ -85,7 +85,7 @@ Name the action *client0*.
 
 Save the file *sushiGoRoundConfig.json* in your project folder: *File -> Save* or *Ctrl+S*.
 
-The image hash is a perceptual hash meaning that two visually similar images have a small difference in their hashes.
+With an image hash, two visually similar images have a small difference in their hashes.
 We can use those hashes to identify the order of each customer.
 
 Create again a *Get Image Hash* action for each of the five other customers.
