@@ -306,6 +306,8 @@ As an example let's retrieve the text from the following image. Install one of t
 
   Hello World
 
+.. _api-action-number:
+
 Number
 ~~~~~~
 
@@ -345,7 +347,8 @@ Recognizer class
   :members: __init__, loadFilepath, loadData, clearAllData,
     executeCoordinates, executeSelection, executeFindImage, executeClick, executePixelColor, executeComparePixelColor, executeIsSamePixelColor,
     executeImageHash, executeCompareImageHash, executeIsSameImageHash, executeText, executeNumber, execute,
-    setAllScreens, setOcrOrder, setEasyOcr, setTesseractOcr
+    setAllScreens, setOcrOrder, setEasyOcr, setTesseractOcr,
+    getBordersImage
 
 .. autoclass:: guirecognizer.recognizer.ExecuteParams
    :members:

@@ -42,7 +42,7 @@ or just select the whole screenshot.
 
 .. figure:: /_static/examples/cookieClicker/setBorders.webp
    :alt: Set as borders the relevant part of the screen or just select the whole screenshot.
-   :width: 50%
+   :width: 80%
    :align: center
 
    Set as borders the relevant part of the screen or just select the whole screenshot.
@@ -52,7 +52,7 @@ Name it *cookie* and make the action selection. Select the big cookie on the lef
 
 .. figure:: /_static/examples/cookieClicker/clickCookie.webp
    :alt: Select where to click on screen for the new action *cookie*.
-   :width: 50%
+   :width: 80%
    :align: center
 
    Select where to click on screen for the new action *cookie*.
@@ -125,7 +125,7 @@ Name this action *buildingTop*.
 
 .. figure:: /_static/examples/cookieClicker/mapBuilding1.webp
    :alt: Select a point at the top of the first building ui element.
-   :width: 50%
+   :width: 80%
    :align: center
 
    Select a point at the top of the first building ui element.
@@ -134,7 +134,7 @@ Create another *Get Coordinates* action that selects the height of a building ui
 
 .. figure:: /_static/examples/cookieClicker/mapBuilding2.webp
    :alt: Select the height of a building ui element.
-   :width: 50%
+   :width: 80%
    :align: center
 
    Select the height of a building ui element.
@@ -176,7 +176,7 @@ the previous action *buildingTop* with 50 pixel width and 10 pixel height. Name 
 
 .. figure:: /_static/examples/cookieClicker/canBuyBuilding1.webp
    :alt: Select the area for the *Compare Pixel Color* action.
-   :width: 50%
+   :width: 80%
    :align: center
 
    Select the area for the *Compare Pixel Color* action.
@@ -187,7 +187,7 @@ screenshot tab.
 
 .. figure:: /_static/examples/cookieClicker/canBuyBuilding2.webp
    :alt: Select the area for the *Compare Pixel Color* action to test when a building cannot be bought.
-   :width: 50%
+   :width: 80%
    :align: center
 
    Select the area for the *Compare Pixel Color* action to test when a building cannot be bought.
@@ -247,7 +247,7 @@ Detecting them makes the bot a lot more efficient.
 
 .. figure:: /_static/examples/cookieClicker/goldenCookie1.webp
    :alt: A golden cookie.
-   :width: 50%
+   :width: 80%
    :align: center
 
    A golden cookie.
@@ -264,7 +264,7 @@ interface. Then select as the image to find a rectangle contained inside the gol
 
 .. figure:: /_static/examples/cookieClicker/goldenCookie2.webp
    :alt: Select the image to find as to search for golden cookies.
-   :width: 50%
+   :width: 80%
    :align: center
 
    Select the image to find so as to search for golden cookies.
@@ -276,7 +276,7 @@ With *guirecognizerapp* you can preview any action on the current screenshot. Pr
 
 .. figure:: /_static/examples/cookieClicker/goldenCookie3.webp
    :alt: Preview action findGolden.
-   :width: 50%
+   :width: 80%
    :align: center
 
    Preview action *findGolden*.
@@ -310,7 +310,7 @@ Then add a suboperation *Resize*: *Preprocess -> Add Suboperation -> Resize*. Le
 
 .. figure:: /_static/examples/cookieClicker/goldenCookie4.webp
    :alt: Create a preprocessing operation to resize the screenshot.
-   :width: 50%
+   :width: 80%
    :align: center
 
    Create a preprocessing operation to resize the screenshot.
@@ -320,7 +320,7 @@ at the bottom of the screenshot tab.
 
 .. figure:: /_static/examples/cookieClicker/goldenCookie5.webp
    :alt: Reselect the image to find.
-   :width: 50%
+   :width: 80%
    :align: center
 
    Reselect the image to find.
@@ -329,7 +329,7 @@ Finally preview again the action *findGolden* and select the preprocessing *gold
 
 .. figure:: /_static/examples/cookieClicker/goldenCookie6.webp
    :alt: Preview findGolden with preprocessing golden. The search performance has improved.
-   :width: 50%
+   :width: 80%
    :align: center
 
    Preview *findGolden* with preprocessing *golden*. The search performance has improved.

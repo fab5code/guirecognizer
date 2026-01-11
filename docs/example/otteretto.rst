@@ -48,14 +48,14 @@ Then define the borders, which represent the absolute coordinates of the screen 
 
 .. figure:: /_static/examples/otteretto/setBorders1.webp
    :alt: Setting the borders instructions: click on borders button.
-   :width: 50%
+   :width: 80%
    :align: center
 
    Click on the button to set the borders.
 
 .. figure:: /_static/examples/otteretto/setBorders2.webp
    :alt: Setting the borders instructions: select the screen portion.
-   :width: 50%
+   :width: 80%
    :align: center
 
    Select the screen portion. It's also possible to select the whole screenshot.
@@ -69,14 +69,14 @@ Try to select a point near the top-left corner of where a colored block appears.
 
 .. figure:: /_static/examples/otteretto/getCoordinates1.webp
    :alt: Click on the button to make the action selection.
-   :width: 50%
+   :width: 80%
    :align: center
 
    Click on the button to make the action selection.
 
 .. figure:: /_static/examples/otteretto/getCoordinates2.webp
    :alt: Select the point at the top left of the grid.
-   :width: 50%
+   :width: 80%
    :align: center
 
    Select the point at the top left of the grid.
@@ -150,7 +150,7 @@ For each action, name it then select on the screenshot a pixel corresponding to 
 
 .. figure:: /_static/examples/otteretto/identifyColor.webp
    :alt: Add actions Is Same Pixel Color to identify block colors.
-   :width: 50%
+   :width: 80%
    :align: center
 
    Add actions Is Same Pixel Color to identify block colors.
@@ -209,7 +209,8 @@ Improve performance
 At this point, each call to *recognizer.executePixelColor* retrieves screen information by calling the operating system's screen API.
 The whole loop takes around a second. Instead, retrieve the entire borders portion of the screen once and extract pixel colors directly from this image.
 
-To retrieve the borders portion of the screen, call *recognizer.getBordersImage*. Then pass the image as a parameter of *recognizer.executePixelColor*.
+To retrieve the borders portion of the screen, call :meth:`guirecognizer.Recognizer.getBordersImage`.
+Then pass the image as a parameter of *recognizer.executePixelColor*.
 
 .. code-block:: python
   :linenos:
@@ -244,7 +245,7 @@ To retrieve the borders portion of the screen, call *recognizer.getBordersImage*
         line += '  '
     print(line)
 
-With this approach, execution time drops to about 0.3 s instead of 1 s.
+With this approach, execution time drops to about 0.3s instead of 1s.
 
 What's next?
 ------------

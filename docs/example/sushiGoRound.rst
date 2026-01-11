@@ -16,7 +16,7 @@ restocking supplies in time to keep the sushi bar running smoothly.
 
 .. figure:: /_static/examples/sushiGoRound/game.webp
    :alt: In Sushi Go Round, you have up to six customers to server. Identify their orders, make sushi and manage the stock of ingredients.
-   :width: 50%
+   :width: 80%
    :align: center
 
    In Sushi Go Round, you have up to six customers to server. Identify their orders, make sushi and manage the stock of ingredients.
@@ -65,7 +65,7 @@ Define the borders so that they cover exactly the game interface, without any bl
 
 .. figure:: /_static/examples/sushiGoRound/setBorders.webp
    :alt: Define as borders the game interface.
-   :width: 50%
+   :width: 80%
    :align: center
 
    Define as borders the game interface.
@@ -78,7 +78,7 @@ Name the action *client0*.
 
 .. figure:: /_static/examples/sushiGoRound/identifyOrder1.webp
    :alt: To retrieve the first customer order, select a rectangle inside its bubble.
-   :width: 50%
+   :width: 80%
    :align: center
 
    To retrieve the first customer order, select a rectangle inside its bubble.
@@ -125,7 +125,7 @@ at the bottom and select the same selection as one of the *client* actions.
 
 .. figure:: /_static/examples/sushiGoRound/identifyOrder2.webp
    :alt: Select the same selection as one of the client actions that has an onigiri. In this screenshot, any of the actions client0, client2 and client5 works.
-   :width: 50%
+   :width: 80%
    :align: center
 
    Select the same selection as one of the *client* actions that has an onigiri. In this screenshot, any of the actions *client0*, *client2* and *client5* works.
@@ -155,7 +155,7 @@ On the following screenshot we have this console output. Every order is correct.
 
 .. figure:: /_static/examples/sushiGoRound/identifyOrder3.webp
    :alt: The bot correctly identifies the orders of all six customers.
-   :width: 50%
+   :width: 80%
    :align: center
 
    The bot correctly identifies the orders of all six customers.
@@ -178,7 +178,7 @@ Create a *Click* action: *Manage Actions -> Add Click Action*. Select the rice i
 
 .. figure:: /_static/examples/sushiGoRound/makeSushi1.webp
    :alt: Select the rice ingredient.
-   :width: 50%
+   :width: 80%
    :align: center
 
    Select the rice ingredient.
@@ -188,7 +188,7 @@ Finally add an action to click on the mat to make the sushi. Name it *makeSushi*
 
 .. figure:: /_static/examples/sushiGoRound/makeSushi2.webp
    :alt: Add an action to click on the mat to make the sushi.
-   :width: 50%
+   :width: 80%
    :align: center
 
    Add an action to click on the mat to make the sushi.
@@ -240,7 +240,7 @@ Take a screenshot and add another action to click on the rice item. Name it *buy
 
 .. figure:: /_static/examples/sushiGoRound/manageIngredients1.webp
    :alt: Add an action to click on the rice item.
-   :width: 50%
+   :width: 80%
    :align: center
 
    Add an action to click on the rice item.
@@ -249,7 +249,7 @@ Take another screenshot and add a third click action to confirm buying rice. Nam
 
 .. figure:: /_static/examples/sushiGoRound/manageIngredients2.webp
    :alt: Add a click action to confirm buying rice.
-   :width: 50%
+   :width: 80%
    :align: center
 
    Add a click action to confirm buying rice.
