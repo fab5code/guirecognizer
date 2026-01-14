@@ -1,7 +1,7 @@
-Bot for otteretto
+Bot for Otteretto
 =================
 
-This is a bot for the popular game otteretto: `https://otteretto.app/classic/ <https://otteretto.app/classic/>`_.
+This is a bot for the popular game Otteretto: `https://otteretto.app/classic/ <https://otteretto.app/classic/>`_.
 
 Otteretto
 ---------

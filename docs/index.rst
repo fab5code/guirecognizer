@@ -1,7 +1,7 @@
 guirecognizer documentation
 ===========================
 
-**guirecognizer** is a python library to recognize patterns on screen and make GUI actions.
+**guirecognizer** is a Python library to recognize patterns on screen and make GUI actions.
 
 
 .. toctree::

@@ -62,7 +62,7 @@ Save the file *cookieClickerConfig.json* in your project folder: *File -> Save* 
 Python script
 ~~~~~~~~~~~~~
 
-Create a python file *bot.py*. Use the *guirecognizer* class :ref:`Recognizer <api-recognizer-class>` to load the configuration file.
+Create a Python file *bot.py*. Use the *guirecognizer* class :ref:`Recognizer <api-recognizer-class>` to load the configuration file.
 
 Let's click on the cookie.
 
@@ -285,7 +285,7 @@ If you are using the same screenshot where you defined the image to find, it sho
 The performance of the search algorithm depends on the size of the search area and the size of the image to find.
 It's faster when the search area is small and when the image to find is big.
 
-In the python bot, search for the coordinates of golden cookies then click on them if any.
+In the Python bot, search for the coordinates of golden cookies then click on them if any.
 
 .. code-block:: python
   :linenos:
@@ -334,7 +334,7 @@ Finally preview again the action *findGolden* and select the preprocessing *gold
 
    Preview *findGolden* with preprocessing *golden*. The search performance has improved.
 
-In the python bot:
+In the Python bot:
 
 .. code-block:: python
 
@@ -346,7 +346,7 @@ Assembling the pieces together
 The bot handles three independent tasks: clicking on the cookie, managing updates and finding golden cookies.
 Since at least clicking on the cookie and searching golden cookies are full time jobs, multiple processes are necessary.
 As an analogy, instead of one employee multitasking, we assign one employee to each task.
-This is why we are going to use the python library `multiprocessing <https://realpython.com/ref/stdlib/multiprocessing/>`_.
+This is why we are going to use the Python library `multiprocessing <https://realpython.com/ref/stdlib/multiprocessing/>`_.
 
 We are going to spawn one process for each task then wait for them to finish. They are multiple processes but only one mouse.
 So we are going to use a *multiprocessing.Lock* to handle the mouse between the tasks.

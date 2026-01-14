@@ -21,7 +21,7 @@ One action available in *guirecognizer* is to get the color of a pixel on screen
 It can be used to assess whether something is present or not on screen.
 When the background is noisy, this strategy can still work by computing the average color over a screen area.
 
-Let's take the following image as an example. It comes from the :doc:`bot example for cookie clicker <example/cookieClicker>`.
+Let's take the following image as an example. It comes from the :doc:`bot example for the game Cookie Clicker <example/cookieClicker>`.
 
 .. figure:: /_static/tips/noisyBackground1.webp
    :alt: Example of a noisy background. The colors for the highlighted game element are not uniform.

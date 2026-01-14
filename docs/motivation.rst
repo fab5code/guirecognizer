@@ -3,7 +3,7 @@ Motivation
 
 TODO
 
-The motivation behind this project is to **speed up** the process of creating a bot in python using only the GUI
+The motivation behind this project is to **speed up** the process of creating a bot in Python using only the GUI
 ie the pixels of the screen, the mouse and the keyboard.
 It can be quite cumbersome to extract the right information from the screen or make some GUI actions like clicking
 on a specific screen position.

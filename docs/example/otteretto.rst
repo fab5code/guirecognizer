@@ -88,7 +88,7 @@ Save the file *otterettoConfig.json* in your project folder: *File -> Save* or *
 Loop through the grid blocks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Create a python file *bot.py*. Use the *guirecognizer* class :ref:`Recognizer <api-recognizer-class>` to load the configuration file.
+Create a Python file *bot.py*. Use the *guirecognizer* class :ref:`Recognizer <api-recognizer-class>` to load the configuration file.
 
 Check that the action called *topLeft*, defined earlier, is working correctly.
 

@@ -1,7 +1,7 @@
 guirecognizer
 =============
 
-**guirecognizer** is a python library to recognize patterns on screen and make GUI actions.
+**guirecognizer** is a Python library to recognize patterns on screen and make GUI actions.
 
 *guirecognizer* supports a list of actions like getting a pixel color, an image hash of a screenshot area or finding an image on screen.
 The compagnion app **guirecognizerapp** helps create and preview actions which are then executed via *guirecognizer*.
@@ -112,7 +112,7 @@ For instance:
 
 .. code-block:: console
 
-  $ ./scripts/optimizeImages.sh docs/_static/examples/otteretto
+  $ ./scripts/optimizeImages.sh docs/_static/app
 
 Coding style
 ^^^^^^^^^^^^
@@ -121,7 +121,7 @@ Some visual studio code settings of visualStudioCodeSettings.json should be used
 
 In Visual Studio Code, install extensions
 
-- isort to sort python automatically
+- isort to sort Python automatically
 - Pylance for type checking
 
 Improvements

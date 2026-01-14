@@ -277,7 +277,7 @@ Assembling the pieces together
 The bot handles three independent tasks: identifying orders, making sushi and managing ingredients.
 Those tasks can be done sequentially.
 As an analogy, instead of having multiple employees each handling a single task, we have one employee multitasking.
-This is why we are going to use the python library `asyncio <https://realpython.com/ref/stdlib/asyncio/>`_.
+This is why we are going to use the Python library `asyncio <https://realpython.com/ref/stdlib/asyncio/>`_.
 
 For the sake of this tutorial, here is only a skeleton illustrating the use of asyncio.
 

@@ -7,7 +7,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'guirecognizer'
-copyright = '2025, FAB V'
+copyright = '2026, FAB V'
 author = 'FAB V'
 
 # -- General configuration ---------------------------------------------------
