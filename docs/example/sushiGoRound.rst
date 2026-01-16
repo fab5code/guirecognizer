@@ -43,13 +43,13 @@ and identify it.
 Create the bot configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Install *guirecognizerapp* (it will also install *guirecognizer*)
+Install *guirecognizerapp* (this will also install *guirecognizer*)
 
 .. code-block:: console
 
   (venv) $ pip install guirecognizerapp
 
-Launch the app.
+Launch the application:
 
 .. code-block:: console
 
@@ -60,7 +60,7 @@ Play or skip the tutorial until the first day starts and six customers are prese
 
 In *guirecognizerapp* take a screenshot of the game: *Capture -> Take Screenshot* or shortcut *Ctrl+Alt+T*.
 
-Then define the borders, which represent the absolute coordinates of the screen portion used as a reference to define all actions.
+Then define the borders, which represent the absolute coordinates of the screen region that serve as a reference for all actions.
 Define the borders so that they cover exactly the game interface, without any black borders if present.
 
 .. figure:: /_static/examples/sushiGoRound/setBorders.webp

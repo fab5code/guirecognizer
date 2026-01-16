@@ -6,7 +6,7 @@ What is *guirecognizer*
 The main goal of *guirecognizer* is to retrieve information on the screen like getting a pixel color,
 an image hash of a screenshot area or finding an image on screen.
 
-For the exhaustive list of actions: :doc:`API <api>`.
+For an exhaustive list of available actions, see the :doc:`API <api>`.
 
 Two optical character recognition libraries are supported by *guirecognizer*: `EasyOCR <https://github.com/JaidedAI/EasyOCR>`_
 and `tesseract <https://github.com/tesseract-ocr/tesseract>`_. More information about the :ref:`OCRs <api-ocrs>`.
@@ -21,13 +21,13 @@ Getting started
 
 It's advised to use *guirecognizerapp* to generate a configuration file listing the actions.
 
-Install *guirecognizerapp* (it will also install *guirecognizer*)
+Install *guirecognizerapp* (this will also install *guirecognizer*)
 
 .. code-block:: console
 
   (venv) $ pip install guirecognizerapp
 
-Launch the app
+Launch the application:
 
 .. code-block:: console
 

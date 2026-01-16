@@ -18,7 +18,7 @@ Install *guirecognizerapp*
 
   (venv) $ pip install guirecognizerapp
 
-Launch the app
+Launch the application:
 
 .. code-block:: console
 

@@ -28,13 +28,13 @@ Let's create a Python script to retrieve grid information from the screen using 
 Create the bot configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Install *guirecognizerapp* (it will also install *guirecognizer*)
+Install *guirecognizerapp* (this will also install *guirecognizer*)
 
 .. code-block:: console
 
   (venv) $ pip install guirecognizerapp
 
-Launch the app.
+Launch the application:
 
 .. code-block:: console
 
@@ -44,7 +44,7 @@ In parallel open `https://otteretto.app/classic/ <https://otteretto.app/classic/
 
 In *guirecognizerapp* take a screenshot of the game: *Capture -> Take Screenshot* or shortcut *Ctrl+Alt+T*.
 
-Then define the borders, which represent the absolute coordinates of the screen portion used as a reference to define all actions.
+Then define the borders, which represent the absolute coordinates of the screen region that serve as a reference for all actions.
 
 .. figure:: /_static/examples/otteretto/setBorders1.webp
    :alt: Setting the borders instructions: click on borders button.

@@ -20,13 +20,13 @@ Let's start with the most basic action: clicking the big cookie.
 Create the bot configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Install *guirecognizerapp* (it will also install *guirecognizer*)
+Install *guirecognizerapp* (this will also install *guirecognizer*)
 
 .. code-block:: console
 
   (venv) $ pip install guirecognizerapp
 
-Launch the app.
+Launch the application:
 
 .. code-block:: console
 
@@ -36,7 +36,7 @@ In parallel open `https://orteil.dashnet.org/cookieclicker/ <https://orteil.dash
 
 In *guirecognizerapp* take a screenshot of the game: *Capture -> Take Screenshot* or shortcut *Ctrl+Alt+T*.
 
-Then define the borders, which represent the absolute coordinates of the screen portion used as a reference to define all actions.
+Then define the borders, which represent the absolute coordinates of the screen region that serve as a reference for all actions.
 Define the borders so that it takes exactly the whole game interface without the top header with the settings like *Change Language*
 or just select the whole screenshot.
 

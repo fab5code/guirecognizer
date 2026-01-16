@@ -17,7 +17,7 @@ ActionType defines the different kinds of operations that can be performed on sc
     IMAGE_HASH, COMPARE_IMAGE_HASH, IS_SAME_IMAGE_HASH, TEXT, NUMBER
 
 Even though the following examples define an action by giving a valid configuration using :class:`guirecognizer.recognizer.RecognizerData`,
-it's best to create a configuration file with :doc:`guirecognizerapp <app>` because the companion app helps create and preview actions.
+it's best to create a configuration file with :doc:`guirecognizerapp <app>` because the companion application helps create and preview actions.
 
 Coordinates
 ~~~~~~~~~~~
@@ -115,7 +115,7 @@ Here is the camera we are looking for.
 
    The camera to find among other things.
 
-The most convenient way is to define the action with :ref:`guirecognizerapp <app-find-image>`.
+The most convenient way is to define the action with :doc:`guirecognizerapp <app>`.
 Without *guirecognizerapp*, we can manually extract an area of pixels representing the camera.
 
 .. figure:: /_static/api/wallyCamera.webp
@@ -446,7 +446,7 @@ Manual configuration
 ~~~~~~~~~~~~~~~~~~~~
 
 This section documents the Python data structures used internally to represent configuration data.
-It's still best to create a configuration file with :doc:`guirecognizerapp <app>` instead because the companion app helps create and preview actions.
+It's still best to create a configuration file with :doc:`guirecognizerapp <app>` instead because the companion application helps create and preview actions.
 
 .. autoclass:: guirecognizer.recognizer.RecognizerData
    :members:
