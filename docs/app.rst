@@ -59,13 +59,15 @@ Define borders
 Click on the *Make Selection* button in the tab *Actions*.
 
 .. figure:: /_static/app/defineBorders1.webp
-   :alt: Click on the Make Selection to define the borders.
+   :alt: Click on the Make Selection button to define the borders.
    :width: 80%
    :align: center
 
-   Click on the *Make Selection* to define the borders.
+   Click on the *Make Selection* button to define the borders.
 
 Then select the area by mouse or with the controls at the bottom in the tab *Screenshot*.
+The selection can be repositioned or resized using the handles on the sides, resized from opposite sides while holding *Alt*,
+or translated horizontally or vertically (keeping its size) while holding *Space*.
 
 .. figure:: /_static/app/defineBorders2.webp
    :alt: Select the area.

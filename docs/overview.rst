@@ -1,27 +1,31 @@
 Overview
 ========
 
-What is *guirecognizer*
------------------------
-The main goal of *guirecognizer* is to retrieve information on the screen like getting a pixel color,
-an image hash of a screenshot area or finding an image on screen.
+What is *guirecognizer*?
+------------------------
 
-For an exhaustive list of available actions, see the :doc:`API <api>`.
+The main goal of *guirecognizer* is to recognize on-screen patterns, such as retrieving a pixel color,
+computing an image hash over a screenshot area, or finding a specific image.
+It can also perform basic GUI interactions, such as clicking on screen elements.
 
-Two optical character recognition libraries are supported by *guirecognizer*: `EasyOCR <https://github.com/JaidedAI/EasyOCR>`_
-and `tesseract <https://github.com/tesseract-ocr/tesseract>`_. More information about the :ref:`OCRs <api-ocrs>`.
+These interactions are referred to as actions. For an exhaustive list of available actions, see the :doc:`API <api>`.
 
-*guirecognizer* offers ways to preprocess an image before it's used by an action. This is especially useful to improve OCR efficiency.
-For the exhaustive list of preprocessing operations: :ref:`Preprocessing API <api-preprocessing>`.
+Two optical character recognition (OCR) libraries are supported by *guirecognizer*: `EasyOCR <https://github.com/JaidedAI/EasyOCR>`_
+and `tesseract <https://github.com/tesseract-ocr/tesseract>`_. For more information, see the :ref:`API OCRs section <api-ocrs>`.
 
-The compagnion app **guirecognizerapp** helps create and preview actions which are then executed via *guirecognizer*.
+*guirecognizer* provides image preprocessing capabilities that can be applied before executing an action.
+This is especially useful for improving OCR accuracy and reliability.
+For the exhaustive list of preprocessing suboperations, see the :ref:`API preprocessing section <api-preprocessing>`.
+
+The companion application :doc:`guirecognizerapp <app>` helps you create and preview actions and preprocessing operations through a visual interface,
+before using them in a Python bot with *guirecognizer*.
 
 Getting started
 ---------------
 
-It's advised to use *guirecognizerapp* to generate a configuration file listing the actions.
+*guirecognizer* relies on a configuration file that defines the actions.
 
-Install *guirecognizerapp* (this will also install *guirecognizer*)
+Let's install the companion application *guirecognizerapp* to generate a configuration file. This will also install *guirecognizer*.
 
 .. code-block:: console
 
@@ -33,24 +37,61 @@ Launch the application:
 
   (venv) $ python -m guirecognizerapp
 
-From the app, take a screenshot.
+From the application, take a screenshot using *Capture -> Take Screenshot* or use the keyboard shortcut *Ctrl+Alt+T*.
 
-Before defining an action, the borders must be set. The **borders** represent the part of the screen where the actions are taken place.
-They are defined in absolute coordinates while action selections are saved as relative coordinates, relative to the borders.
-In case a configuration file is used on another screen setup, redefining the borders may be enough to support the new setup instead of redefining all the actions.
-For instance select the whole screenshot as the borders.
+The first step is to define the borders.
+The borders represent the absolute coordinates of the screen region that serve as a reference for all actions.
+All action selections are defined relative to these borders.
+This greatly improves the reusability of the configuration file across different screen resolutions or setups.
 
-For the sake of this tutorial let's try to get the color of a pixel. Create a new action *Get Pixel Color*. Name your action and select a pixel.
+.. figure:: /_static/overview/defineBorders1.webp
+   :alt: Click on the Make Selection button to define the borders.
+   :width: 80%
+   :align: center
 
-Now you can preview the action (from the eye icon in front the action).
+   Click on the *Make Selection* button to define the borders.
 
-Save the file *guirecognizerConfig.json*.
+Select an area of the screenshot using the mouse or the controls at the bottom of the interface.
 
-For a full presentation of *guirecognizerapp*: TODO
+.. figure:: /_static/overview/defineBorders2.webp
+   :alt: Select the borders on the screenshot.
+   :width: 80%
+   :align: center
 
+   Select the borders on the screenshot.
+
+For the sake of this tutorial, let's retrieve the color of a single pixel.
+Create a new *Get Pixel Color* action: *Manage Actions -> Add Action Get Pixel Color*. Name your action *getColor* and select a pixel.
+
+.. figure:: /_static/overview/defineAction.webp
+   :alt: Select a point within the borders on the screenshot.
+   :width: 80%
+   :align: center
+
+   Select a point within the borders on the screenshot.
+
+You can preview the action by clicking on the eye icon.
+
+.. figure:: /_static/overview/preview1.webp
+   :alt: Preview the action getColor by clicking on the eye icon.
+   :width: 80%
+   :align: center
+
+   Preview the action *getColor* by clicking on the eye icon.
+
+.. figure:: /_static/overview/preview2.webp
+   :alt: Preview of the action getColor.
+   :width: 80%
+   :align: center
+
+   Preview of the action *getColor*.
+
+The preview shows the pixel color retrieved by the *getColor* action.
+
+Save the configuration file as *guirecognizerConfig.json* in your project folder: *File -> Save* or *Ctrl+S*.
 Now the configuration file can be used with *guirecognizer*.
 
-In python
+In your Python script:
 
 .. code-block:: python
   :linenos:
@@ -58,12 +99,15 @@ In python
   from guirecognizer import Recognizer
 
   recognizer = Recognizer('guirecognizerConfig.json')
-  color = recognizer.execute('getPixelColor')
+  color = recognizer.executePixelColor('getColor')
   print(color)
+
+This produces the following output:
 
 .. code-block::
 
-  TODO: complete
+  (243, 207, 85)
 
-
-TODO: show example of preprocessing to improve ocr
+Congratulations! You have created your first bot with *guirecognizer*.
+You can now continue by creating your own bot, exploring the available actions in the :doc:`API <api>` or
+reading the more detailed :doc:`bot examples <examples>`.

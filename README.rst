@@ -1,7 +1,7 @@
 guirecognizer
 =============
 
-**guirecognizer** is a Python library to recognize patterns on screen and make GUI actions.
+**guirecognizer** is a Python library for recognizing on-screen patterns and driving GUI interactions.
 
 *guirecognizer* supports a list of actions like getting a pixel color, an image hash of a screenshot area or finding an image on screen.
 The compagnion app **guirecognizerapp** helps create and preview actions which are then executed via *guirecognizer*.

@@ -6,8 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "guirecognizer"
 dynamic = ["version"]
 dependencies = ["numpy", "opencv-python", "imagehash", "pyautogui"]
-# TODO: add an email
-authors = [{ name = "FAB V" }]
+authors = [{ name = "FAB V", email = "fab5code@gmail.com" }]
 keywords = ["GUI", "recognizer"]
 license = "MIT"
 readme = { file = "README.rst", content-type = "text/x-rst" }
