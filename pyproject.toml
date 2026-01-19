@@ -5,14 +5,14 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "guirecognizer"
 dynamic = ["version"]
+description = "Recognize on-screen patterns and perform GUI interactions"
 dependencies = ["numpy", "opencv-python", "imagehash", "pyautogui"]
 authors = [{ name = "FAB V", email = "fab5code@gmail.com" }]
-keywords = ["GUI", "recognizer"]
+keywords = ["GUI", "recognize", "screen"]
 license = "MIT"
 readme = { file = "README.rst", content-type = "text/x-rst" }
 requires-python = ">=3.10"
 classifiers = [
-  "Private :: Do Not Upload",
   "Development Status :: 3 - Alpha",
   "Intended Audience :: Developers",
   "Programming Language :: Python :: 3.10",
