@@ -35,7 +35,7 @@ The borders represent the absolute coordinates of the screen region that serve a
 All action selections are defined relative to these borders.
 This greatly improves the reusability of the configuration file across different screen resolutions or setups.
 
-.. figure:: docs/_static/overview/defineBorders1.webp
+.. figure:: https://raw.githubusercontent.com/fab5code/guirecognizer/main/docs/_static/overview/defineBorders1.webp
    :alt: Click on the Make Selection button to define the borders.
    :width: 100%
    :align: center
@@ -44,7 +44,7 @@ This greatly improves the reusability of the configuration file across different
 
 Select an area of the screenshot using the mouse or the controls at the bottom of the interface.
 
-.. figure:: docs/_static/overview/defineBorders2.webp
+.. figure:: https://raw.githubusercontent.com/fab5code/guirecognizer/main/docs/_static/overview/defineBorders2.webp
    :alt: Select the borders on the screenshot.
    :width: 100%
    :align: center
@@ -54,7 +54,7 @@ Select an area of the screenshot using the mouse or the controls at the bottom o
 For the sake of this tutorial, let's retrieve the color of a single pixel.
 Create a new *Get Pixel Color* action: *Manage Actions -> Add Action Get Pixel Color*. Name your action *getColor* and select a pixel.
 
-.. figure:: docs/_static/overview/defineAction.webp
+.. figure:: https://raw.githubusercontent.com/fab5code/guirecognizer/main/docs/_static/overview/defineAction.webp
    :alt: Select a point within the borders on the screenshot.
    :width: 100%
    :align: center
@@ -63,14 +63,14 @@ Create a new *Get Pixel Color* action: *Manage Actions -> Add Action Get Pixel C
 
 You can preview the action by clicking on the eye icon.
 
-.. figure:: docs/_static/overview/preview1.webp
+.. figure:: https://raw.githubusercontent.com/fab5code/guirecognizer/main/docs/_static/overview/preview1.webp
    :alt: Preview the action getColor by clicking on the eye icon.
    :width: 100%
    :align: center
 
    Preview the action *getColor* by clicking on the eye icon.
 
-.. figure:: docs/_static/overview/preview2.webp
+.. figure:: https://raw.githubusercontent.com/fab5code/guirecognizer/main/docs/_static/overview/preview2.webp
    :alt: Preview of the action getColor.
    :width: 100%
    :align: center
