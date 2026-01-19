@@ -39,7 +39,6 @@ Install *guirecognizer* (already installed from installing *guirecognizerapp*)
 In python
 
 .. code-block:: python
-  :linenos:
 
   from guirecognizer import Recognizer
 
@@ -87,7 +86,6 @@ Generate full coverage report
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: console
-  :linenos:
 
   (venv) $ coverage run
   (venv) $ coverage html

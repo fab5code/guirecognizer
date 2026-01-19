@@ -43,5 +43,4 @@ Potential improvements
 
 - monitor client moods to manage priority and use sake
 - improve order guessing when customer has stolen an order
-- monitor passage of time to buy preemptively ingredients and even make preemptively orders (may not worth it for orders)
-especially while no client is waiting to be served
+- monitor passage of time to buy preemptively ingredients and even make preemptively orders (may not worth it for orders) especially while no client is waiting to be served
