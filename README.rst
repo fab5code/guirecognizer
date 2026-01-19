@@ -37,7 +37,7 @@ This greatly improves the reusability of the configuration file across different
 
 .. figure:: docs/_static/overview/defineBorders1.webp
    :alt: Click on the Make Selection button to define the borders.
-   :width: 80%
+   :width: 100%
    :align: center
 
    Click on the *Make Selection* button to define the borders.
@@ -46,7 +46,7 @@ Select an area of the screenshot using the mouse or the controls at the bottom o
 
 .. figure:: docs/_static/overview/defineBorders2.webp
    :alt: Select the borders on the screenshot.
-   :width: 80%
+   :width: 100%
    :align: center
 
    Select the borders on the screenshot.
@@ -56,7 +56,7 @@ Create a new *Get Pixel Color* action: *Manage Actions -> Add Action Get Pixel C
 
 .. figure:: docs/_static/overview/defineAction.webp
    :alt: Select a point within the borders on the screenshot.
-   :width: 80%
+   :width: 100%
    :align: center
 
    Select a point within the borders on the screenshot.
@@ -65,14 +65,14 @@ You can preview the action by clicking on the eye icon.
 
 .. figure:: docs/_static/overview/preview1.webp
    :alt: Preview the action getColor by clicking on the eye icon.
-   :width: 80%
+   :width: 100%
    :align: center
 
    Preview the action *getColor* by clicking on the eye icon.
 
 .. figure:: docs/_static/overview/preview2.webp
    :alt: Preview of the action getColor.
-   :width: 80%
+   :width: 100%
    :align: center
 
    Preview of the action *getColor*.
