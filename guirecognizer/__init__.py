@@ -11,4 +11,4 @@ from guirecognizer.recognizer import OcrType, Recognizer
 
 """A library to help recognize some patterns on screen and make GUI actions."""
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
