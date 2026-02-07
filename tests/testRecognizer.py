@@ -1,6 +1,6 @@
 import unittest
 from typing import cast
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from PIL import Image, ImageGrab, ImageOps
 
@@ -736,23 +736,26 @@ class TestExecuteAction(LoggedTestCase):
     self.assertEqual(len(cast(list, result)), 0)
 
   def test_actionClick(self):
-    with patch('pyautogui.click') as clickMock, patch('pyautogui.moveTo') as moveToMock:
+    pyautoguiMock = MagicMock()
+    with patch.dict("sys.modules", {"pyautogui": pyautoguiMock}):
       result = self.recognizer.execute('click1', screenshotFilepath='tests/data/img/img1.png')
-      self.assertEqual(result, None)
-      moveToMock.assert_called_once()
-      clickMock.assert_called_once()
+    self.assertEqual(result, None)
+    pyautoguiMock.moveTo.assert_called_once()
+    pyautoguiMock.click.assert_called_once()
 
-    with patch('pyautogui.click') as clickMock, patch('pyautogui.moveTo') as moveToMock:
+    pyautoguiMock = MagicMock()
+    with patch.dict("sys.modules", {"pyautogui": pyautoguiMock}):
       result = self.recognizer.execute('click2', screenshotFilepath='tests/data/img/img1.png')
-      self.assertEqual(result, None)
-      moveToMock.assert_called_once()
-      clickMock.assert_called_once()
+    self.assertEqual(result, None)
+    pyautoguiMock.moveTo.assert_called_once()
+    pyautoguiMock.click.assert_called_once()
 
-    with patch('pyautogui.click') as clickMock, patch('pyautogui.moveTo') as moveToMock:
+    pyautoguiMock = MagicMock()
+    with patch.dict("sys.modules", {"pyautogui": pyautoguiMock}):
       result = self.recognizer.executeClick('click1', screenshotFilepath='tests/data/img/img1.png')
-      self.assertEqual(result, None)
-      moveToMock.assert_called_once()
-      clickMock.assert_called_once()
+    self.assertEqual(result, None)
+    pyautoguiMock.moveTo.assert_called_once()
+    pyautoguiMock.click.assert_called_once()
 
   def test_actionPixelColor(self):
     result = self.recognizer.execute('pixelColor1', screenshotFilepath='tests/data/img/img1.png')
@@ -997,18 +1000,20 @@ class TestExecuteAction(LoggedTestCase):
     self.assertEqual(result, (42, 42, 42))
 
   def test_optionClickPauseDuration(self):
-    with patch('pyautogui.click') as clickMock, patch('pyautogui.moveTo') as moveToMock:
+    pyautoguiMock = MagicMock()
+    with patch.dict("sys.modules", {"pyautogui": pyautoguiMock}):
       result = self.recognizer.execute('click1', screenshotFilepath='tests/data/img/img1.png', clickPauseDuration=0.5)
-      self.assertEqual(result, None)
-      moveToMock.assert_called_once()
-      clickMock.assert_called_once()
+    self.assertEqual(result, None)
+    pyautoguiMock.moveTo.assert_called_once()
+    pyautoguiMock.click.assert_called_once()
 
   def test_optionNbClicks(self):
-    with patch('pyautogui.click') as clickMock, patch('pyautogui.moveTo') as moveToMock:
+    pyautoguiMock = MagicMock()
+    with patch.dict("sys.modules", {"pyautogui": pyautoguiMock}):
       result = self.recognizer.execute('click1', screenshotFilepath='tests/data/img/img1.png', nbClicks=5)
-      self.assertEqual(result, None)
-      moveToMock.assert_called_once()
-      self.assertEqual(clickMock.call_count, 5)
+    self.assertEqual(result, None)
+    pyautoguiMock.moveTo.assert_called_once()
+    self.assertEqual(pyautoguiMock.click.call_count, 5)
 
   def test_optionPixelColor(self):
     result = self.recognizer.execute('pixelColor1', pixelColor=(1, 42, 1))
