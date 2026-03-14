@@ -131,7 +131,7 @@ Install pytesseract (already in the dev dependencies).
 
 .. code-block:: console
 
-  (venv) $ python install easyocr
+  (venv) $ python install pytesseract
 
 Install tesseract: follow installation instruction in `https://github.com/tesseract-ocr/tesseract <https://github.com/tesseract-ocr/tesseract>`_.
 
